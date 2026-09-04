@@ -161,7 +161,7 @@ export default async function handler(req, res) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`,
           'HTTP-Referer': site,
-          'X-Title': 'Humane Theory — AI ROI'
+          'X-Title': 'Humane Theory, AI ROI'
         },
         body: JSON.stringify({
           model,
