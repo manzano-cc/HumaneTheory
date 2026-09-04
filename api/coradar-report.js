@@ -6,14 +6,16 @@
 // the model is instructed to produce a clearly hypothetical example
 // report rather than real claims about real companies or events.
 //
-// Cost model: OpenRouter free-tier models only, tried in order with
-// automatic fallback on rate-limit/failure. Never touches a paid model,
-// so this endpoint can never generate a bill.
+// Cost model: OpenRouter free-tier models only, called in parallel with
+// the first valid response winning. Never touches a paid model, so this
+// endpoint can never generate a bill.
 
 const MODELS = [
   'minimax/minimax-m3:free',
   'minimax/minimax-m2.7:free',
-  'z-ai/glm-5.2:free'
+  'z-ai/glm-5.2:free',
+  'liquid/lfm-2.5-2.6b:free',
+  'google/gemma-4-26b-a4b-it:free'
 ];
 
 const SYSTEM_PROMPT = `You are generating an ILLUSTRATIVE SAMPLE competitive-intelligence briefing for a product demo. This is not a real monitoring system: it has no live data feed and no knowledge of real, current events.

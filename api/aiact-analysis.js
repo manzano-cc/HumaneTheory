@@ -7,13 +7,15 @@
 // over the already-computed scores it is given; it never invents a
 // score, an obligation, or a legal conclusion.
 //
-// Cost model: OpenRouter free-tier models only, tried in order with
-// automatic fallback on rate-limit/failure. Never touches a paid model.
+// Cost model: OpenRouter free-tier models only, called in parallel with
+// the first valid response winning. Never touches a paid model.
 
 const MODELS = [
   'minimax/minimax-m3:free',
   'minimax/minimax-m2.7:free',
-  'z-ai/glm-5.2:free'
+  'z-ai/glm-5.2:free',
+  'liquid/lfm-2.5-2.6b:free',
+  'google/gemma-4-26b-a4b-it:free'
 ];
 
 const SYSTEM_PROMPT = `You are a careful AI governance analyst writing a short enrichment note for an EU AI Act readiness report.
