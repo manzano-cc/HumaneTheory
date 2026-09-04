@@ -145,7 +145,11 @@ export default async function handler(req, res) {
           response_format: { type: 'json_object' }
         })
       });
-      if (upstream.status === 429 || upstream.status >= 500 || !upstream.ok) return null;
+      if (upstream.status === 429 || upstream.status >= 500 || !upstream.ok) {
+        let bodySnippet = '';
+        try { bodySnippet = (await upstream.text()).slice(0, 200); } catch {}
+        return { __debug: true, model, status: upstream.status, bodySnippet };
+      }
 
       const data = await upstream.json();
       const raw = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
@@ -153,19 +157,20 @@ export default async function handler(req, res) {
       if (!parsed || !isValidShape(parsed)) return null;
 
       return { model, report: stripEmDash(parsed) };
-    } catch {
-      return null;
+    } catch (e) {
+      return { __debug: true, model, status: 'exception', bodySnippet: String(e && e.message || e) };
     } finally {
       clearTimeout(perModelTimeout);
     }
   }
 
   const results = await Promise.allSettled(MODELS.map(callModel));
-  const win = results.find(r => r.status === 'fulfilled' && r.value);
+  const win = results.find(r => r.status === 'fulfilled' && r.value && !r.value.__debug);
   if (win) {
     res.status(200).json({ ok: true, model: win.value.model, report: win.value.report });
     return;
   }
 
-  res.status(200).json({ ok: false, reason: 'unavailable' });
+  const debugInfo = results.map(r => r.status === 'fulfilled' ? r.value : { __debug: true, status: 'rejected', bodySnippet: String(r.reason) });
+  res.status(200).json({ ok: false, reason: 'unavailable', debug: debugInfo });
 }
