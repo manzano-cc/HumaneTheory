@@ -157,9 +157,8 @@ button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
 .step-card p{font-size:13px;line-height:1.5;color:#9a9a9a}
 
 /* ---------- Report generator ---------- */
-.report-frame{margin-top:32px;border-radius:16px;overflow:hidden;box-shadow:0 24px 60px -30px rgba(0,0,0,.6);height:640px}
-.report-frame iframe{width:100%;height:100%;border:none;display:block}
-@media(max-width:640px){.report-frame{height:720px}}
+.report-frame{margin-top:32px}
+.report-frame iframe{width:100%;height:420px;border:none;display:block;background:transparent}
 
 /* delivery */
 .channels{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:32px}
@@ -241,8 +240,8 @@ footer{background:#000000;padding:54px 0 0;position:relative;overflow:hidden;bor
         <div class="dropdown">
           <a href="../airoi/"><span class="dot"></span>AI ROI</a>
           <a href="../aiges/"><span class="dot"></span>AI ACT</a>
-          <a href="../bdash/"><span class="dot"></span>BDash</a>
           <a href="./"><span class="dot"></span>CoRadar</a>
+          <a href="../bdash/"><span class="dot"></span>BDash</a>
           <a class="disabled" href="#" onclick="return false" aria-disabled="true"><span class="dot"></span>ReputIA<span class="mtag mtag-soon">Coming Soon</span></a>
         </div>
       </div>
@@ -264,8 +263,8 @@ footer{background:#000000;padding:54px 0 0;position:relative;overflow:hidden;bor
     <div class="msec">Systems</div>
     <a class="mlink" href="../airoi/">AI ROI</a>
     <a class="mlink" href="../aiges/">AI ACT</a>
-    <a class="mlink" href="../bdash/">BDash</a>
     <a class="mlink" href="./">CoRadar</a>
+    <a class="mlink" href="../bdash/">BDash</a>
     <a class="mlink disabled" href="#" onclick="return false" aria-disabled="true">ReputIA<span class="mtag mtag-soon">Coming Soon</span></a>
     <div class="msec">More</div>
     <a class="mlink" href="../#about">About</a>
@@ -357,7 +356,7 @@ footer{background:#000000;padding:54px 0 0;position:relative;overflow:hidden;bor
     <h2>Put a radar on your market.</h2>
     <p>Share who to watch and how often you want the intel. CoRadar takes it from there.</p>
     <div class="hero-cta">
-      <a class="btn btn-dark" href="mailto:ignacio@manzano.cc?subject=Set%20up%20CoRadar&body=Competitors%20to%20track%3A%0ACadence%20(weekly%2Fmonthly)%3A%0ADelivery%20(email%2Fslack)%3A">Set up CoRadar →</a>
+      <a class="btn btn-dark" href="../?topic=coradar#contact">Set up CoRadar →</a>
       <a class="btn btn-ghost" href="../">Back to Humane Theory</a>
     </div>
   </div>
@@ -416,24 +415,23 @@ document.getElementById('coradar-embed-frame').srcdoc = `<!DOCTYPE html>
 <style>
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box }
 :root{
-  --tick-color:#d9d9d9; --handle-bg:rgba(255,255,255,0.1);
-  --handle-shadow:0px 1px 1px 0px rgba(0,0,0,0.05),0px 0px 0px 0.5px rgba(205,205,205,0.6),0px 4px 10px 0px rgba(33,33,38,0.05),0px 30px 68px 0px rgba(33,33,38,0.05);
+  --tick-color:#3a3a3a; --handle-bg:rgba(255,255,255,0.1);
+  --handle-shadow:0px 1px 1px 0px rgba(0,0,0,0.3),0px 0px 0px 0.5px rgba(255,255,255,0.16),0px 4px 10px 0px rgba(0,0,0,0.3),0px 10px 30px 0px rgba(0,0,0,0.4);
   --handle-inner-shadow:inset 0px 1px 0px 0px rgba(255,255,255,0.6);
-  --resize-handle-color:#5495FF; --label-color:#8c8c8c; --label-active-color:#1d1d1d;
-  --snap-duration:250ms; --snap-easing:cubic-bezier(0.32,0.72,0,1); --accent:#2d9f75;
+  --resize-handle-color:#6fae87; --label-color:#9a9a9a; --label-active-color:#f2f2f0;
+  --snap-duration:250ms; --snap-easing:cubic-bezier(0.32,0.72,0,1); --accent:#6fae87;
 }
-html,body{width:100%;height:100%}
+html,body{width:100%}
 body{
   font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  background:#f7f7f7; -webkit-font-smoothing:antialiased; overflow:hidden;
+  background:transparent; -webkit-font-smoothing:antialiased;
 }
-.cr-page{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-.cr-card{position:relative;width:100%;max-width:600px;background:#fff;border-radius:16px;padding:16px 18px 18px;box-shadow:0px 1px 1px 0px rgba(0,0,0,0.05),0px 0px 0px 0.5px #d9d9d9,0px 4px 10px 0px rgba(33,33,38,0.05),0px 30px 68px 0px rgba(33,33,38,0.05)}
-.cr-card::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;box-shadow:inset 0px 1px 0px 0px white}
-.cr-head{display:flex;align-items:center;justify-content:space-between;margin:-16px -18px 18px;padding:12px 16px;background:#fafafa;border-bottom:0.5px solid #d9d9d9;border-radius:16px 16px 0 0}
+.cr-page{padding:4px 0 8px}
+.cr-card{position:relative;width:100%;max-width:640px;margin:0 auto;padding:0}
+.cr-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 18px;padding:0 0 14px;border-bottom:1px solid #232323}
 .cr-title{font-size:13px;font-weight:600;color:var(--label-active-color);letter-spacing:-0.01em}
 .cr-steps-dots{display:flex;gap:5px}
-.cr-steps-dots span{width:5px;height:5px;border-radius:50%;background:#d9d9d9;transition:background .2s ease}
+.cr-steps-dots span{width:5px;height:5px;border-radius:50%;background:#333333;transition:background .2s ease}
 .cr-steps-dots span.on{background:var(--accent)}
 
 .cr-step{display:none}
@@ -441,35 +439,35 @@ body{
 .cr-field{margin-bottom:14px}
 .cr-field label{display:block;font-size:11.5px;font-weight:500;color:var(--label-color);margin-bottom:6px;letter-spacing:-0.01em}
 .cr-field input,.cr-field textarea{
-  width:100%;border:0.5px solid #d9d9d9;border-radius:8px;background:#fafafa;
-  padding:9px 11px;font-family:inherit;font-size:13.5px;color:#1d1d1d;outline:none;
+  width:100%;border:1px solid #232323;border-radius:8px;background:#0c0c0c;
+  padding:9px 11px;font-family:inherit;font-size:13.5px;color:#f2f2f0;outline:none;
   transition:border-color .15s ease,background .15s ease;
 }
-.cr-field input:focus,.cr-field textarea:focus{border-color:#1d1d1d;background:#fff}
+.cr-field input:focus,.cr-field textarea:focus{border-color:#555;background:#111}
 .cr-field textarea{resize:none;min-height:52px}
-.cr-hint{font-size:11px;color:#a3a3a3;margin-top:5px;line-height:1.4}
+.cr-hint{font-size:11px;color:#7a7a7a;margin-top:5px;line-height:1.4}
 
 .cr-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
-.cr-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 6px 5px 10px;background:#f2f2f2;border-radius:999px;font-size:12.5px;font-weight:500;color:#1d1d1d}
-.cr-chip button{all:unset;display:flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;color:#8c8c8c;cursor:pointer}
-.cr-chip button:hover{background:#e2e2e2;color:#1d1d1d}
+.cr-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 6px 5px 10px;background:#1c1c1c;border-radius:999px;font-size:12.5px;font-weight:500;color:#f2f2f0}
+.cr-chip button{all:unset;display:flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;color:#9a9a9a;cursor:pointer}
+.cr-chip button:hover{background:#2a2a2a;color:#f2f2f0}
 .cr-chip-input-row{display:flex;gap:8px}
 .cr-chip-input-row input{flex:1}
-.cr-add-btn{all:unset;flex:0 0 auto;display:flex;align-items:center;justify-content:center;width:38px;border-radius:8px;background:#1d1d1d;color:#fff;cursor:pointer;transition:background .15s ease}
-.cr-add-btn:hover{background:#333}
+.cr-add-btn{all:unset;flex:0 0 auto;display:flex;align-items:center;justify-content:center;width:38px;border-radius:8px;background:#f2f2f0;color:#0a0a0a;cursor:pointer;transition:background .15s ease}
+.cr-add-btn:hover{background:#e6e6e4}
 .cr-add-btn:active{transform:scale(.95)}
 
 .cr-nav{display:flex;justify-content:space-between;align-items:center;margin-top:18px}
 .cr-btn{all:unset;font-family:inherit;font-size:13px;font-weight:500;padding:9px 16px;border-radius:8px;cursor:pointer;transition:background-color .15s ease,color .15s ease,opacity .15s ease}
-.cr-btn-primary{background:#1d1d1d;color:#fff}
-.cr-btn-primary:hover{background:#333}
+.cr-btn-primary{background:#f2f2f0;color:#0a0a0a}
+.cr-btn-primary:hover{background:#e6e6e4}
 .cr-btn-primary:disabled{opacity:.35;cursor:not-allowed;pointer-events:none}
-.cr-btn-ghost{color:#8c8c8c}
-.cr-btn-ghost:hover{color:#1d1d1d}
+.cr-btn-ghost{color:#9a9a9a}
+.cr-btn-ghost:hover{color:#f2f2f0}
 
 /* ---- segmented presets (from reference component) ---- */
-.cr-presets{position:relative;display:inline-flex;gap:2px;background:#f2f2f2;border-radius:6px;padding:1px;margin-bottom:14px}
-.cr-presets-indicator{position:absolute;top:1px;left:0;height:calc(100% - 2px);background:#fff;border-radius:5px;box-shadow:0 1px 2px rgba(0,0,0,0.06),0 0 0 0.5px rgba(0,0,0,0.04);transition:left 300ms cubic-bezier(0.32,0.72,0,1),width 300ms cubic-bezier(0.32,0.72,0,1),opacity 200ms ease;z-index:0}
+.cr-presets{position:relative;display:inline-flex;gap:2px;background:#161616;border-radius:6px;padding:1px;margin-bottom:14px}
+.cr-presets-indicator{position:absolute;top:1px;left:0;height:calc(100% - 2px);background:#2a2a2a;border-radius:5px;box-shadow:0 0 0 0.5px rgba(255,255,255,0.08);transition:left 300ms cubic-bezier(0.32,0.72,0,1),width 300ms cubic-bezier(0.32,0.72,0,1),opacity 200ms ease;z-index:0}
 .cr-presets-indicator.is-hidden{opacity:0}
 .cr-preset{all:unset;position:relative;z-index:1;font-family:inherit;font-size:12px;font-weight:500;line-height:16px;letter-spacing:-0.01em;color:var(--label-color);padding:4px 10px;border-radius:5px;cursor:pointer;transition:color 150ms ease;user-select:none}
 .cr-preset:hover{color:var(--label-active-color)}
@@ -485,7 +483,7 @@ body{
 .ts-handle.is-dragging{cursor:grabbing}
 .ts-handle.is-pressing{transform:translateY(-50%) scale(0.97)}
 .ts-handle.is-snapping{transition:left var(--snap-duration) var(--snap-easing),width var(--snap-duration) var(--snap-easing),transform 200ms var(--snap-easing)}
-.ts-days-label{position:relative;z-index:1;display:flex;align-items:baseline;gap:3px;padding:4px 8px;font-size:12px;font-weight:500;line-height:16px;color:#1d1d1d;white-space:nowrap;pointer-events:none;letter-spacing:-0.01em;font-variant-numeric:tabular-nums;transition:transform 200ms var(--snap-easing),gap 250ms var(--snap-easing);background:radial-gradient(ellipse at center,rgba(255,255,255,1) 30%,rgba(255,255,255,0.9) 45%,rgba(255,255,255,0.6) 60%,rgba(255,255,255,0) 100%)}
+.ts-days-label{position:relative;z-index:1;display:flex;align-items:baseline;gap:3px;padding:4px 8px;font-size:12px;font-weight:500;line-height:16px;color:#f2f2f0;white-space:nowrap;pointer-events:none;letter-spacing:-0.01em;font-variant-numeric:tabular-nums;transition:transform 200ms var(--snap-easing),gap 250ms var(--snap-easing);background:radial-gradient(ellipse at center,rgba(0,0,0,1) 30%,rgba(0,0,0,0.9) 45%,rgba(0,0,0,0.6) 60%,rgba(0,0,0,0) 100%)}
 .ts-days-number{display:flex;overflow:hidden;height:16px}
 .ts-digit{display:inline-block;height:16px;overflow:hidden}
 .ts-digit-strip{display:flex;flex-direction:column;transition:transform 180ms var(--snap-easing)}
@@ -504,7 +502,7 @@ body{
 .ts-handle:hover .ts-resize-handle:hover::after,.ts-resize-handle.is-active::after{height:16px;opacity:1}
 .ts-months{position:relative;height:24px;margin-top:4px;overflow:hidden;display:flex;align-items:center;padding:0}
 .ts-expand-btn{all:unset;position:absolute;left:-4px;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;width:20px;height:30px;color:var(--label-color);cursor:pointer;border-radius:4px;transition:color 150ms ease,transform 200ms var(--snap-easing),background 150ms ease;user-select:none;z-index:4}
-.ts-expand-btn::before{content:"";position:absolute;top:0;bottom:0;left:0;width:40px;background:linear-gradient(to right,white 30%,transparent);pointer-events:none;z-index:-1;border-radius:4px 0 0 0}
+.ts-expand-btn::before{content:"";position:absolute;top:0;bottom:0;left:0;width:40px;background:linear-gradient(to right,#000 30%,transparent);pointer-events:none;z-index:-1;border-radius:4px 0 0 0}
 .ts-expand-btn:hover:not(:disabled){color:var(--label-active-color)}
 .ts-expand-btn:active:not(:disabled){transform:translateY(-50%) scale(0.9)}
 .ts-expand-btn:disabled{opacity:0.25;cursor:default;pointer-events:none}
@@ -521,20 +519,20 @@ body.is-slider-resizing *{cursor:ew-resize!important}
 
 /* ---- loading ---- */
 .cr-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 10px;gap:14px}
-.cr-spinner{width:22px;height:22px;border-radius:50%;border:2px solid #eee;border-top-color:#1d1d1d;animation:cr-spin .8s linear infinite}
+.cr-spinner{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.15);border-top-color:#6fae87;animation:cr-spin .8s linear infinite}
 @keyframes cr-spin{to{transform:rotate(360deg)}}
-.cr-loading p{font-size:13px;color:#8c8c8c}
+.cr-loading p{font-size:13px;color:#9a9a9a}
 
 /* ---- result ---- */
 .cr-result-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.cr-result-title{font-size:15px;font-weight:600;color:#1d1d1d}
-.cr-result-meta{font-size:11.5px;color:#8c8c8c;margin-top:2px}
+.cr-result-title{font-size:15px;font-weight:600;color:#f2f2f0}
+.cr-result-meta{font-size:11.5px;color:#9a9a9a;margin-top:2px}
 .cr-pill{font-size:11px;font-weight:600;color:var(--accent);background:rgba(45,159,117,.12);padding:4px 10px;border-radius:999px}
-.cr-disclaimer{font-size:10.5px;line-height:1.5;color:#b5b5b5;margin-bottom:14px;padding-bottom:12px;border-bottom:0.5px solid #eee}
-.cr-summary{font-size:13.5px;line-height:1.6;color:#333;margin-bottom:14px}
-.cr-summary b{color:#1d1d1d}
+.cr-disclaimer{font-size:10.5px;line-height:1.5;color:#7a7a7a;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #232323}
+.cr-summary{font-size:13.5px;line-height:1.6;color:#c7c7c7;margin-bottom:14px}
+.cr-summary b{color:#f2f2f0}
 .cr-findings{display:flex;flex-direction:column;gap:2px;margin-bottom:16px}
-.cr-finding{display:flex;gap:10px;padding:9px 0;border-bottom:0.5px solid #f0f0f0}
+.cr-finding{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #1c1c1c}
 .cr-finding:last-child{border-bottom:none}
 .cr-finding .d{width:7px;height:7px;border-radius:50%;flex:0 0 auto;margin-top:5px}
 .cr-finding .d.high{background:#e0685a}
@@ -542,14 +540,14 @@ body.is-slider-resizing *{cursor:ew-resize!important}
 .cr-finding .d.low{background:#9fd0b3}
 .cr-finding-body{flex:1;min-width:0}
 .cr-finding-top{display:flex;gap:6px;align-items:baseline;margin-bottom:2px;flex-wrap:wrap}
-.cr-finding-comp{font-size:12.5px;font-weight:600;color:#1d1d1d}
-.cr-finding-cat{font-size:10.5px;color:#a3a3a3;text-transform:uppercase;letter-spacing:.03em}
-.cr-finding-text{font-size:12.5px;line-height:1.5;color:#555}
+.cr-finding-comp{font-size:12.5px;font-weight:600;color:#f2f2f0}
+.cr-finding-cat{font-size:10.5px;color:#7a7a7a;text-transform:uppercase;letter-spacing:.03em}
+.cr-finding-text{font-size:12.5px;line-height:1.5;color:#b8b8b8}
 .cr-actions-title{font-size:11.5px;font-weight:600;color:var(--label-color);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
 .cr-actions{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
-.cr-actions li{display:flex;gap:8px;font-size:12.5px;line-height:1.5;color:#333}
+.cr-actions li{display:flex;gap:8px;font-size:12.5px;line-height:1.5;color:#c7c7c7}
 .cr-actions li::before{content:"→";flex:0 0 auto;color:var(--accent);font-weight:600}
-.cr-error{font-size:12.5px;color:#b5453b;background:#fdf1f0;border-radius:8px;padding:10px 12px;margin-bottom:14px;line-height:1.5}
+.cr-error{font-size:12.5px;color:#ff8a7e;background:rgba(224,104,90,.12);border-radius:8px;padding:10px 12px;margin-bottom:14px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -572,11 +570,11 @@ body.is-slider-resizing *{cursor:ew-resize!important}
         <input id="crIndustry" type="text" placeholder="e.g. B2B SaaS, project management" autocomplete="off">
       </div>
       <div class="cr-field">
-        <label for="crLocation">Market / location <span style="font-weight:400;color:#c2c2c2">(optional)</span></label>
+        <label for="crLocation">Market / location <span style="font-weight:400;color:#6d6d6d">(optional)</span></label>
         <input id="crLocation" type="text" placeholder="e.g. Spain, EU-wide, remote-first" autocomplete="off">
       </div>
       <div class="cr-field">
-        <label for="crDescription">What you do, in one line <span style="font-weight:400;color:#c2c2c2">(optional)</span></label>
+        <label for="crDescription">What you do, in one line <span style="font-weight:400;color:#6d6d6d">(optional)</span></label>
         <textarea id="crDescription" placeholder="e.g. Project management software for creative agencies"></textarea>
         <div class="cr-hint">This helps the model tell your company apart from others that share its name.</div>
       </div>
@@ -1186,11 +1184,31 @@ var TimelineSlider = class {
   });
 
   renderChips();
+
+  // Report our real content height to the parent page so it can size the
+  // iframe to fit (no internal scrollbar, no clipped content).
+  function reportHeight() {
+    var h = document.documentElement.scrollHeight;
+    parent.postMessage({ type: 'coradar-resize', height: h }, '*');
+  }
+  if (window.ResizeObserver) {
+    new ResizeObserver(reportHeight).observe(document.body);
+  } else {
+    window.addEventListener('load', reportHeight);
+  }
+  reportHeight();
 })();
 <\/script>
 </body>
 </html>
 `;
+
+window.addEventListener('message', function (e) {
+  var d = e.data;
+  if (!d || d.type !== 'coradar-resize' || typeof d.height !== 'number') return;
+  if (d.height <= 0 || d.height > 20000) return;
+  document.getElementById('coradar-embed-frame').style.height = Math.max(320, d.height + 8) + 'px';
+});
 
 /* Systems dropdown (same behaviour as root/airoi/aiges) */
 const sysItem = document.getElementById('systems-item');
