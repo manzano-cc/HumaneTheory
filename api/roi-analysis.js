@@ -143,10 +143,12 @@ export default async function handler(req, res) {
   const userPrompt = buildUserPrompt(input);
   const site = process.env.PUBLIC_SITE_URL || 'https://humanetheory.ai';
 
-  for (const model of MODELS) {
+  // Free-tier OpenRouter models can take 10-20s+ to respond under load, so
+  // trying them one after another with a short per-model timeout starves
+  // every attempt. Race them in parallel instead: first valid response wins.
+  async function callModel(model) {
     const controller = new AbortController();
-    const perModelTimeout = setTimeout(() => controller.abort(), 9000);
-
+    const perModelTimeout = setTimeout(() => controller.abort(), 25000);
     try {
       const upstream = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
@@ -168,23 +170,26 @@ export default async function handler(req, res) {
           response_format: { type: 'json_object' }
         })
       });
-      clearTimeout(perModelTimeout);
-
-      // Rate-limited or otherwise unavailable: try the next free model.
-      if (upstream.status === 429 || upstream.status >= 500) continue;
-      if (!upstream.ok) continue;
+      if (upstream.status === 429 || upstream.status >= 500 || !upstream.ok) return null;
 
       const data = await upstream.json();
       const raw = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
       const parsed = safeParseJSON(raw);
-      if (!parsed || !isValidShape(parsed)) continue;
+      if (!parsed || !isValidShape(parsed)) return null;
 
-      res.status(200).json({ ok: true, model, analysis: stripEmDash(parsed) });
-      return;
+      return { model, analysis: stripEmDash(parsed) };
     } catch {
+      return null;
+    } finally {
       clearTimeout(perModelTimeout);
-      continue; // network error, timeout, etc. — try the next model
     }
+  }
+
+  const results = await Promise.allSettled(MODELS.map(callModel));
+  const win = results.find(r => r.status === 'fulfilled' && r.value);
+  if (win) {
+    res.status(200).json({ ok: true, model: win.value.model, analysis: win.value.analysis });
+    return;
   }
 
   // Every free model failed or was rate-limited: tell the frontend to
