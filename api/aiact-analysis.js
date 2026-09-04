@@ -145,7 +145,8 @@ export default async function handler(req, res) {
             { role: 'user', content: userPrompt }
           ],
           max_tokens: 900,
-          temperature: 0.4
+          temperature: 0.4,
+          response_format: { type: 'json_object' }
         })
       });
       clearTimeout(perModelTimeout);
