@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "api/roi-analysis.js": {
+      "maxDuration": 30
+    },
+    "api/aiact-analysis.js": {
+      "maxDuration": 30
+    },
+    "api/coradar-report.js": {
+      "maxDuration": 30
+    }
+  }
+}

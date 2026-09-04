@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-ACT Comp | Humane Theory</title>
+<link rel="icon" type="image/svg+xml" href="../favicons/favicon.svg">
+<link rel="icon" type="image/png" href="../favicons/favicon.png">
+<link rel="shortcut icon" href="../favicons/favicon.ico">
+<style>
+/* ============================================================
+   AI-ACT COMP  /aiges
+   AI Governance & EU AI Act Readiness self-assessment.
+   Bilingual EN/ES. 100% client-side. No backend, no tracking.
+   Shares the Humane Theory visual language (see /airoi).
+   ============================================================ */
+
+/* ---------- Fonts (shared) ---------- */
+@font-face{font-family:"Geist";src:url("../fonts/Geist-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Geist";src:url("../fonts/Geist-Italic-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:italic;font-display:swap}
+@font-face{font-family:"Geist Mono";src:url("../fonts/GeistMono-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Geist Pixel";src:url("../fonts/GeistPixel-Square.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+
+/* ---------- Tokens (same as root / airoi) ---------- */
+:root{
+  --black:#0a0a0a;
+  --white:#ffffff;
+  --card:#161616;
+  --card-border:#262626;
+  --dark-card:#161616;
+  --dark-border:#262626;
+  --maxw:1180px;
+  --pad:40px;
+  --btn-radius:9px;
+  --accent:#7b93c9;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;scroll-behavior:smooth}
+body{
+  font-family:"Geist",system-ui,sans-serif;color:#f2f2f2;
+  background:#000000;
+  min-height:100vh;
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+input{font:inherit;color:inherit}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad)}
+
+/* ---------- Topbar (identical to root/airoi) ---------- */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:50;background:transparent;transition:background .3s ease,border-color .3s ease}
+.topbar.scrolled{background:rgba(0,0,0,.7);-webkit-backdrop-filter:saturate(160%) blur(14px);backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid #1c1c1c}
+.header-row{display:flex;align-items:center;justify-content:space-between;padding-top:26px;padding-bottom:16px;gap:24px}
+.logo{display:flex;align-items:center;gap:9px;padding:6px 10px;border-radius:999px}
+.logo img{height:20px;width:auto;display:block;filter:brightness(0) invert(1)}
+
+.menu-toggle{
+  display:none;align-items:center;justify-content:center;width:34px;height:34px;
+  color:#e6e6e4;flex:0 0 auto;position:relative;z-index:46;
+}
+.menu-toggle svg{width:17px;height:17px}
+.menu-toggle .icon-close{display:none}
+.menu-toggle[aria-expanded="true"] .icon-menu{display:none}
+.menu-toggle[aria-expanded="true"] .icon-close{display:block}
+.mobile-panel{isolation:isolate;
+  position:fixed;inset:0;z-index:44;background:#0a0a0a;
+  padding:88px 24px 26px;height:100vh;height:100dvh;overflow-y:auto;
+  transform:translateY(-8px);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;
+}
+.mobile-panel.open{opacity:1;transform:none;pointer-events:auto}
+.mobile-panel .msec{font-family:"Geist Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#6d6d6d;margin:20px 0 8px}
+.mobile-panel .msec:first-child{margin-top:0}
+.mobile-panel .mlink{display:block;padding:12px 2px;font-size:15px;color:#e6e6e4;border-bottom:1px solid #1c1c1c}
+.mobile-panel .mcontact{display:flex;width:100%;height:44px;margin-top:22px}
+
+.main-nav{display:flex;align-items:center;gap:6px;position:relative}
+.nav-item{position:relative}
+.nav-link{
+  display:flex;align-items:center;gap:5px;padding:9px 14px;border-radius:var(--btn-radius);
+  font-size:13.5px;color:#c7c7c7;transition:color .18s ease,background .18s ease;
+}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,.06)}
+.nav-link svg{width:10px;height:10px;opacity:.7;transition:transform .2s ease}
+.nav-item.open .nav-link svg{transform:rotate(180deg)}
+
+.dropdown{
+  position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(-6px);
+  min-width:190px;background:#0d0d0d;border:1px solid #232323;border-radius:12px;
+  padding:6px;box-shadow:0 20px 50px rgba(0,0,0,.5);
+  opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease;
+}
+.nav-item.open .dropdown{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.dropdown a{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:8px;font-size:13px;color:#d4d4d4}
+.dropdown a:hover{background:rgba(255,255,255,.06);color:#fff}
+.dropdown a .dot{width:4px;height:4px;border-radius:1px;background:#5a5a5a;flex:0 0 auto}
+.dropdown a{position:relative}
+.dropdown a.disabled,.mlink.disabled{opacity:.5;cursor:default}
+.dropdown a.disabled:hover,.mlink.disabled:hover{background:transparent;color:#d4d4d4}
+
+.mtag{
+  margin-left:3px;font-weight:600;letter-spacing:.02em;line-height:1;
+  background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+}
+.mtag-new{font-size:10px;position:relative;top:-.5em;background-image:linear-gradient(180deg,#836464 0%,#B58A8A 100%)}
+.mtag-soon{font-size:8px;vertical-align:middle;background-image:linear-gradient(180deg,#525252 0%,#727272 100%)}
+
+.header-right{display:flex;align-items:center;gap:14px}
+.header-right .btn{height:30px;padding:0 16px;font-size:13.5px}
+.text-link{font-size:13.5px;color:#c7c7c7;transition:color .15s ease}
+.text-link:hover{color:#fff}
+
+/* ---------- Page head ---------- */
+.page-head{padding-top:150px;padding-bottom:8px}
+.section-label{font-family:"Geist Mono",monospace;font-size:14px;color:#f2f2f2;font-weight:500;margin-bottom:20px}
+.page-title{font-family:"Geist",sans-serif;font-weight:500;font-size:clamp(28px,4.4vw,50px);line-height:1.05;letter-spacing:-.01em;color:#b8b8b8;filter:url(#innerText)}
+.page-sub{margin-top:14px;max-width:620px;font-weight:300;font-size:clamp(14px,1.6vw,17px);line-height:1.5;color:#a8a8a8}
+.privacy-note{margin-top:18px;max-width:680px;display:flex;gap:11px;align-items:flex-start;background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:14px 16px;font-size:12.5px;line-height:1.55;color:#8f8f8f}
+.privacy-note svg{width:17px;height:17px;flex:0 0 auto;color:var(--accent);margin-top:1px}
+.privacy-note strong{color:#dcdcdc;font-weight:600}
+
+/* ---------- Progress ---------- */
+.progress{margin:34px 0 22px;display:flex;align-items:center;gap:16px}
+.progress .step-label{font-family:"Geist Pixel","Geist Mono",monospace;font-size:11px;color:#a8a8a8;white-space:nowrap}
+.progress .bar{flex:1;height:3px;background:#262626;border-radius:99px;overflow:hidden}
+.progress .bar i{display:block;height:100%;width:0;background:#f2f2f2;border-radius:99px;transition:width .45s cubic-bezier(.4,0,.2,1)}
+
+/* ---------- Steps ---------- */
+.step{display:none;padding-bottom:90px}
+.step.active{display:block;animation:stepIn .35s ease both}
+@keyframes stepIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.step h2{font-size:clamp(18px,2.2vw,24px);font-weight:600;letter-spacing:-.01em;margin-bottom:6px}
+.step .hint{font-size:13.5px;color:#8f8f8f;margin-bottom:26px;max-width:660px;line-height:1.55}
+
+/* ---------- Profile fields ---------- */
+.field{margin-bottom:20px;max-width:820px}
+.field-label{font-family:"Geist Pixel","Geist Mono",monospace;font-size:10.5px;color:#a8a8a8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px;display:block}
+.sel-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:820px}
+.sel{position:relative}
+.sel-btn{width:100%;display:flex;align-items:center;gap:11px;text-align:left;background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:15px 16px;font-size:14.5px;font-weight:500;color:#8f8f8f;transition:border-color .18s ease, background .18s ease}
+.sel-btn:hover{background:#1e1e1e}
+.sel-btn.filled{color:#f2f2f2}
+.sel-btn .ic{width:19px;height:19px;flex:0 0 auto;color:#8f8f8f;display:none}
+.sel-btn.filled .ic{display:block}
+.sel-btn .txt{flex:1}
+.sel-btn .chev{width:14px;height:14px;color:#9a9a96;transition:transform .2s ease;flex:0 0 auto}
+.sel.open .sel-btn{border-color:#9a9a96}
+.sel.open .sel-btn .chev{transform:rotate(180deg)}
+.sel-panel{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:40;background:#141414;border:1px solid var(--card-border);border-radius:10px;box-shadow:0 18px 46px rgba(0,0,0,.5);max-height:320px;overflow:auto;display:none;padding:6px}
+.sel.open .sel-panel{display:block;animation:stepIn .18s ease both}
+.sel-opt{width:100%;display:flex;align-items:center;gap:11px;text-align:left;padding:11px 12px;border-radius:7px;font-size:14px;color:#ececec;transition:background .12s ease}
+.sel-opt:hover{background:#1f1f1f}
+.sel-opt.selected{background:#232323;font-weight:500}
+.sel-opt .ic{width:18px;height:18px;flex:0 0 auto;color:#8f8f8f}
+.ic svg{width:100%;height:100%;display:block}
+.text-input{width:100%;max-width:380px;background:#1f1f1f;border:1px solid var(--card-border);border-radius:8px;padding:13px 15px;font-size:14px;color:#f2f2f2;outline:none;transition:border-color .15s ease}
+.text-input:focus{border-color:#9a9a96}
+.text-input::placeholder{color:#7a7a7a}
+.choice-grid{display:flex;flex-wrap:wrap;gap:9px}
+.choice{background:var(--card);border:1px solid var(--card-border);border-radius:999px;padding:10px 18px;font-size:13.5px;font-weight:500;color:#8f8f8f;transition:all .15s ease}
+.choice:hover{border-color:#9a9a96;color:#f2f2f2}
+.choice.on{background:#f2f2f2;border-color:#f2f2f2;color:#0a0a0a}
+
+/* ---------- Checkbox grid ---------- */
+.check-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:9px;max-width:900px}
+.check{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:12px 15px;font-size:13.5px;color:#a8a8a8;transition:all .15s ease;text-align:left}
+.check:hover{background:#1e1e1e}
+.check .box{width:17px;height:17px;border:1.6px solid #4a4a4a;border-radius:5px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;transition:all .15s ease}
+.check .box svg{width:11px;height:11px;color:#0a0a0a;opacity:0;transform:scale(.6);transition:all .15s ease}
+.check.on{border-color:#f2f2f2;color:#f2f2f2;font-weight:500}
+.check.on .box{background:#f2f2f2;border-color:#f2f2f2}
+.check.on .box svg{opacity:1;transform:scale(1)}
+.check.risk.on .box{background:#b0563f;border-color:#b0563f}
+.check.risk.on .box svg{color:#fff}
+.check.risk.on{border-color:#4a2e20;color:#e0a290}
+
+/* ---------- Assessment ---------- */
+.scale-legend{background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:14px 18px;margin-bottom:22px;display:flex;flex-wrap:wrap;gap:14px 22px;font-size:12px;color:#8f8f8f}
+.scale-legend b{font-family:"Geist Mono",monospace;color:#f2f2f2;margin-right:5px}
+.cat-block{margin-bottom:26px}
+.cat-head{font-family:"Geist Mono",monospace;font-size:12.5px;color:var(--accent);font-weight:500;margin-bottom:12px;display:flex;align-items:center;gap:9px}
+.cat-head .cn{font-family:"Geist Pixel","Geist Mono",monospace;font-size:10px;color:#9a9a96}
+.q-card{background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:18px 20px;margin-bottom:10px;opacity:0;transform:translateY(6px);animation:qIn .35s ease forwards}
+@keyframes qIn{to{opacity:1;transform:none}}
+.q-top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.q-text{font-size:14.5px;font-weight:500;color:#f2f2f2;flex:1;min-width:240px;line-height:1.4}
+.q-num{font-family:"Geist Pixel","Geist Mono",monospace;font-size:10px;color:#9a9a96;display:block;margin-bottom:4px}
+.scale-row{display:flex;gap:7px;flex-wrap:wrap}
+.scale-row button{width:38px;height:38px;border-radius:8px;border:1px solid var(--card-border);background:#1f1f1f;font-family:"Geist Mono",monospace;font-size:14px;color:#8f8f8f;transition:all .15s ease}
+.scale-row button:hover{border-color:#9a9a96;color:#f2f2f2}
+.scale-row button.on{background:#f2f2f2;border-color:#f2f2f2;color:#0a0a0a}
+.yesno{display:flex;gap:8px}
+.yesno button{font-size:12.5px;font-weight:500;color:#8f8f8f;border:1px solid var(--card-border);border-radius:999px;padding:8px 20px;background:#1f1f1f;transition:all .15s ease}
+.yesno button:hover{border-color:#9a9a96;color:#f2f2f2}
+.yesno button.on{background:#f2f2f2;border-color:#f2f2f2;color:#0a0a0a}
+.slider-wrap{margin-top:14px;display:flex;align-items:center;gap:16px}
+.slider-wrap input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:5px;border-radius:99px;background:#262626;outline:none}
+.slider-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:#f2f2f2;cursor:pointer;border:2px solid #0a0a0a;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.slider-wrap input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#f2f2f2;cursor:pointer;border:2px solid #0a0a0a}
+.slider-val{font-family:"Geist Mono",monospace;font-size:14px;color:#f2f2f2;min-width:52px;text-align:right}
+.answered-count{font-family:"Geist Mono",monospace;font-size:12px;color:#8f8f8f;margin-top:6px}
+
+/* ---- unified glossy button system (same as root/airoi) ---- */
+.step-nav{display:flex;justify-content:space-between;align-items:center;margin-top:30px;gap:14px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;
+  border-radius:var(--btn-radius);padding:0 22px;font-size:14px;font-weight:500;white-space:nowrap;
+  transition:filter .15s ease,transform .1s ease;
+}
+.btn:active{transform:translateY(1px)}
+
+.btn-dark{
+  background:linear-gradient(180deg,#ffffff 0%,#d9d9d6 100%);
+  border:1px solid #c7c7c4;
+  box-shadow:inset 0 1px 1px #ffffff, inset 0 -1px 2px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.3);
+  color:#141414;text-shadow:0 1px 0 rgba(255,255,255,.75);
+}
+.btn-dark:hover{filter:brightness(1.05)}
+.btn-dark[disabled]{opacity:.35;cursor:not-allowed;filter:none}
+
+.btn-ghost{
+  background:linear-gradient(180deg,#2e2e2e 0%,#161616 100%);
+  border:1px solid #333;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.1), inset 0 -1px 2px rgba(0,0,0,.6), 0 1px 2px rgba(0,0,0,.35);
+  color:#e6e6e4;text-shadow:0 1px 1px rgba(0,0,0,.7);
+}
+.btn-ghost:hover{filter:brightness(1.18)}
+.validate-msg{font-size:12.5px;color:#b05c3f;margin-top:14px;display:none}
+.validate-msg.show{display:block}
+
+/* loading */
+.loading{display:none;padding-bottom:120px}
+.loading.active{display:block;animation:stepIn .3s ease both}
+.load-card{background:var(--card);border:1px solid var(--card-border);border-radius:8px;box-shadow:0 24px 70px rgba(0,0,0,.35);padding:28px 30px;max-width:640px}
+.load-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.load-title{font-family:"Geist Mono",monospace;font-size:12.5px;color:#9a9a9a}
+.load-pct{font-family:"Geist Pixel","Geist Mono",monospace;font-size:12px;color:#fff}
+.load-lines{font-family:"Geist Mono",monospace;font-size:12.5px;line-height:2;color:#dadada;min-height:150px}
+.load-lines .ln{opacity:0;transform:translateY(4px);transition:opacity .3s ease, transform .3s ease}
+.load-lines .ln.on{opacity:1;transform:none}
+.load-lines .ok{color:#39d27a}
+.load-bar{height:3px;background:#2e2e2e;border-radius:99px;overflow:hidden;margin-top:18px}
+.load-bar i{display:block;height:100%;width:0;background:#f5f5f2;border-radius:99px;transition:width .3s linear}
+.term-cursor{display:inline-block;width:7px;height:1.05em;background:#dadada;vertical-align:-.16em;margin-left:2px;animation:blink .8s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ---------- Results ---------- */
+.results{display:none;padding-bottom:40px}
+.results.active{display:block;animation:stepIn .4s ease both}
+.score-hero{display:grid;grid-template-columns:auto 1fr;gap:30px;align-items:center;background:#161616;border:1px solid #262626;border-radius:12px;padding:30px 32px;margin-top:24px;opacity:0;transform:translateY(10px);animation:qIn .45s ease forwards}
+.donut{position:relative;width:150px;height:150px;flex:0 0 auto}
+.donut svg{transform:rotate(-90deg)}
+.donut .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut .num{font-size:38px;font-weight:600;color:#fff;line-height:1}
+.donut .den{font-family:"Geist Mono",monospace;font-size:11px;color:#8a8a8a;margin-top:3px}
+.score-meta .lvl{font-size:22px;font-weight:600;color:#fff;letter-spacing:-.01em}
+.score-meta .lvl-sub{font-size:13.5px;color:#9a9a9a;margin-top:6px;max-width:460px;line-height:1.5}
+.score-tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+.tag{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:500;padding:6px 13px;border-radius:999px;background:#242424;color:#cfcfcf;border:1px solid #333}
+.tag .dot{width:7px;height:7px;border-radius:50%}
+.risk-high .dot{background:#e0685a}.risk-high{color:#e88b80}
+.risk-medium .dot{background:#e0b34c}.risk-medium{color:#e0b34c}
+.risk-low .dot{background:#39d27a}.risk-low{color:#39d27a}
+
+/* risk classification banner */
+.risk-banner{margin-top:14px;border-radius:8px;padding:20px 22px;border:1px solid;opacity:0;transform:translateY(10px);animation:qIn .45s ease forwards;animation-delay:.05s}
+.risk-banner.tier-minimal{background:#12201a;border-color:#234a30}
+.risk-banner.tier-limited{background:#141a24;border-color:#26314a}
+.risk-banner.tier-high{background:#241a15;border-color:#4a2e20}
+.risk-banner.tier-prohibited{background:#241414;border-color:#4a2323}
+.risk-banner .rb-head{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;margin-bottom:8px;color:#f2f2f2}
+.risk-banner .rb-badge{font-family:"Geist Mono",monospace;font-size:10.5px;padding:4px 10px;border-radius:999px;background:#f2f2f2;color:#0a0a0a}
+.risk-banner p{font-size:13px;color:#c2c2c2;line-height:1.55;max-width:760px}
+.risk-banner .cases{margin-top:8px;font-size:12px;color:#9a9a9a}
+
+/* AI top alert: only shown when the AI flags something notably bad or notably good */
+.ai-alert{
+  margin-top:14px;display:flex;gap:12px;align-items:flex-start;padding:16px 18px;border-radius:8px;border:1px solid;
+  opacity:0;transform:translateY(8px);animation:qIn .4s ease forwards;
+}
+.ai-alert[hidden]{display:none}
+.ai-alert.critical{background:#241414;border-color:#4a2323}
+.ai-alert.positive{background:#12201a;border-color:#234a30}
+.ai-alert-ic{width:18px;height:18px;flex:0 0 auto;margin-top:1px;border-radius:50%;position:relative}
+.ai-alert.critical .ai-alert-ic{background:#c67a7a}
+.ai-alert.positive .ai-alert-ic{background:#6fae87}
+.ai-alert p{font-size:13px;line-height:1.55;color:#d6d6d6;margin:0}
+.ai-alert p b{color:#f2f2f2}
+
+/* AI notes: deliberately quiet, sits below everything else */
+.ai-notes{margin-top:24px;padding-top:18px;border-top:1px solid #232323}
+.ai-notes-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ai-notes-label{font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#6d6d6d}
+.ai-notes-status{font-family:"Geist Mono",monospace;font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:#6d6d6d}
+.ai-notes-diagnosis{font-size:12.5px;line-height:1.6;color:#9a9a9a;max-width:760px;margin-bottom:14px}
+.ai-notes-cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.ai-notes-cols .col span{font-family:"Geist Mono",monospace;font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:#6d6d6d;display:block;margin-bottom:7px}
+.ai-notes-cols ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.ai-notes-cols li{font-size:12px;line-height:1.5;color:#8f8f8f;padding-left:12px;position:relative}
+.ai-notes-cols .pros li::before{content:"+";position:absolute;left:0;color:#6fae87}
+.ai-notes-cols .cons li::before{content:"–";position:absolute;left:0;color:#c99a55}
+@media(max-width:600px){.ai-notes-cols{grid-template-columns:1fr}}
+
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.res-card{background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:22px;min-height:118px;display:flex;flex-direction:column;justify-content:flex-end;opacity:0;transform:translateY(10px);animation:qIn .45s ease forwards}
+.res-card .k{font-family:"Geist Pixel","Geist Mono",monospace;font-size:10.5px;color:#a8a8a8;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px}
+.res-card .v{font-size:clamp(22px,2.6vw,30px);font-weight:600;letter-spacing:-.02em;color:#f2f2f2;line-height:1}
+.res-card .u{font-size:12px;color:#8f8f8f;margin-top:6px}
+.mini-bar{height:7px;background:#262626;border-radius:99px;overflow:hidden;margin-top:12px}
+.mini-bar i{display:block;height:100%;width:0;border-radius:99px;transition:width .9s cubic-bezier(.4,0,.2,1)}
+
+.res-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.res-panel{background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:24px;opacity:0;transform:translateY(10px);animation:qIn .45s ease forwards;animation-delay:.15s}
+.res-panel.full{grid-column:span 2}
+.res-panel h3{font-family:"Geist Mono",monospace;font-size:13px;font-weight:500;margin-bottom:4px}
+.res-panel .sub{font-size:12px;color:#9a9a9a;margin-bottom:18px}
+.res-panel ol,.res-panel ul{list-style:none;display:flex;flex-direction:column;gap:11px}
+.res-panel li{font-size:13.5px;color:#a8a8a8;display:flex;gap:10px;align-items:flex-start;line-height:1.45}
+.res-panel li .idx{font-family:"Geist Pixel","Geist Mono",monospace;font-size:10.5px;color:#9a9a96;padding-top:2px;white-space:nowrap}
+.strengths li .idx{color:#39d27a}.gaps li .idx{color:#e0985a}
+
+/* radar */
+.radar-wrap{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+.radar-wrap svg{flex:0 0 auto;max-width:100%;height:auto}
+.radar-legend{display:grid;grid-template-columns:1fr 1fr;gap:5px 18px;font-size:11.5px;color:#a8a8a8}
+.radar-legend span{display:flex;gap:7px}
+.radar-legend b{font-family:"Geist Mono",monospace;color:#8f8f8f;font-weight:400}
+
+/* category bars */
+.hchart{display:flex;flex-direction:column;gap:13px}
+.hrow{display:grid;grid-template-columns:minmax(150px,42%) 1fr auto;gap:12px;align-items:center}
+.hrow .lbl{font-size:13px;color:#a8a8a8;line-height:1.3}
+.hrow .track{height:10px;background:#262626;border-radius:99px;overflow:hidden}
+.hrow .fill{height:100%;width:0;border-radius:99px;transition:width .9s cubic-bezier(.4,0,.2,1)}
+.hrow .val{font-family:"Geist Mono",monospace;font-size:11.5px;color:#a8a8a8;white-space:nowrap;text-align:right;min-width:46px}
+
+/* obligations table */
+.otable-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.otable{width:100%;min-width:480px;border-collapse:collapse;font-size:13px}
+.otable th{text-align:left;font-family:"Geist Mono",monospace;font-size:11px;color:#8f8f8f;font-weight:500;padding:0 10px 12px;border-bottom:1px solid #262626}
+.otable td{padding:12px 10px;border-bottom:1px solid #232323;color:#a8a8a8;vertical-align:top}
+.otable tr:last-child td{border-bottom:none}
+.status-pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:500;padding:4px 11px;border-radius:999px;white-space:nowrap}
+.status-pill .d{width:6px;height:6px;border-radius:50%}
+.st-strong{background:#12201a;color:#4bc17e}.st-strong .d{background:#39b06a}
+.st-partial{background:#141a24;color:#8ba3d6}.st-partial .d{background:#5f7fc4}
+.st-needs{background:#241d12;color:#d9a44c}.st-needs .d{background:#d9a44c}
+.st-missing{background:#241414;color:#d9846f}.st-missing .d{background:#d06a5a}
+
+/* roadmap */
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.plan-col{background:#1b1b1b;border:1px solid var(--card-border);border-radius:8px;padding:18px}
+.plan-col h4{font-family:"Geist Mono",monospace;font-size:12px;color:var(--accent);margin-bottom:12px}
+.plan-col ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.plan-col li{font-size:12.5px;color:#a8a8a8;line-height:1.4;padding-left:14px;position:relative}
+.plan-col li:before{content:"";position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:50%;background:#9a9a96}
+
+.assumptions{margin-top:14px;font-size:11.5px;color:#9a9a9a;line-height:1.7}
+.disclaimer{margin-top:22px;font-size:11.5px;color:#9a9a9a;line-height:1.6;max-width:700px}
+.res-actions{margin-top:26px;display:flex;gap:12px;flex-wrap:wrap}
+footer{background:#000000;padding:54px 0 0;position:relative;overflow:hidden;border-top:1px solid #1c1c1c}
+.foot-trust{padding-bottom:40px;border-bottom:1px solid #1c1c1c;margin-bottom:40px}
+.ft-pill{display:inline-flex;font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#8f8f8f;border:1px solid #262626;border-radius:999px;padding:4px 11px;margin-bottom:14px}
+.foot-trust h3{font-size:17px;font-weight:500;color:#e6e6e4;letter-spacing:-.01em;margin-bottom:10px}
+.foot-trust p{max-width:640px;font-size:13px;line-height:1.65;color:#8a8a8a;font-weight:300}
+.foot-top{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap}
+.foot-mark{display:inline-flex;align-items:center}
+.foot-mark img{height:24px;width:auto;filter:brightness(0) invert(1) url(#innerSm)}
+.foot-cols{display:flex;gap:70px}
+.foot-cols .col h4{font-size:10px;letter-spacing:.08em;color:#999999;text-transform:uppercase;margin-bottom:14px;font-weight:600}
+.foot-cols .col ul{list-style:none}
+.foot-cols .col li{font-size:13px;color:#4e4e4e;margin-bottom:8px}
+.foot-cols .col a:hover{color:#999999}
+.foot-legal{margin-top:44px;display:flex;flex-direction:column;gap:8px}
+.foot-legal .copy{font-size:10px;color:#4e4e4e;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
+.foot-legal .flink{display:block;font-size:12px;color:#999999}
+.foot-legal .flink:hover{color:#e6e6e4}
+.giant{margin-top:20px;text-align:center;font-weight:500;font-size:clamp(70px,20vw,260px);line-height:.82;letter-spacing:-.03em;color:#303030;white-space:nowrap;user-select:none;margin-bottom:-.16em;filter:url(#innerGiant);pointer-events:none}
+@media(max-width:560px){.foot-top{flex-direction:column;gap:24px}.foot-cols{gap:40px;flex-wrap:wrap}}
+
+.foot-strip{margin-top:70px;padding:26px 0 34px;font-family:"Geist Pixel","Geist Mono",monospace;font-size:10.5px;color:#8f8f8f;text-transform:uppercase;letter-spacing:.04em}
+
+/* responsive */
+@media(max-width:820px){
+  :root{--pad:32px}
+  .res-grid{grid-template-columns:1fr 1fr}
+  .res-cols{grid-template-columns:1fr}
+  .res-panel.full{grid-column:span 1}
+  .sel-row{grid-template-columns:1fr}
+  .plan-grid{grid-template-columns:1fr}
+  .score-hero{grid-template-columns:1fr;justify-items:center;text-align:center}
+  .score-meta .lvl-sub{margin-left:auto;margin-right:auto}
+  .score-tags{justify-content:center}
+  .radar-wrap{justify-content:center}
+}
+@media(max-width:560px){
+  :root{--pad:26px}
+  .page-head{padding-top:120px}
+  .res-grid{grid-template-columns:1fr}
+  .hrow{grid-template-columns:1fr;gap:6px}
+  .hrow .val{text-align:left}
+  .radar-legend{grid-template-columns:1fr}
+  .otable{font-size:12px}
+}
+@media(max-width:640px){
+  .main-nav,.header-right{display:none}
+  .menu-toggle{display:flex}
+  .header-row{padding-left:24px;padding-right:24px}
+}
+
+/* print */
+@media print{
+  body{background:#fff !important;background-image:none !important}
+  .topbar,.progress,.res-actions,.foot-strip,.step,.loading{display:none !important}
+  .page-head{padding-top:20px}.page-title{filter:none;color:#333}
+  .results{display:block !important;padding-bottom:0}
+  .res-card,.res-panel,.score-hero,.plan-col,.risk-banner,.ai-alert,.ai-notes{break-inside:avoid;opacity:1 !important;transform:none !important;animation:none !important}
+  .ai-alert{background:#f5f5f2 !important;border-color:#ddd !important}
+  .ai-alert p{color:#333 !important}
+  .ai-notes{border-color:#ddd !important}
+  .ai-notes-label,.ai-notes-status,.ai-notes-cols .col span{color:#555 !important}
+  .ai-notes-diagnosis,.ai-notes-cols li{color:#333 !important}
+  .score-hero{background:#161616 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .hrow .fill,.mini-bar i,.donut svg circle,.radar-data{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{margin:14mm}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="innerText" x="-20%" y="-20%" width="140%" height="140%"><feOffset dx="0" dy="2.5"/><feGaussianBlur stdDeviation="2.4" result="off"/><feComposite operator="out" in="SourceGraphic" in2="off" result="inv"/><feFlood flood-color="#000" flood-opacity="0.9"/><feComposite operator="in" in2="inv" result="shd"/><feComposite operator="over" in="shd" in2="SourceGraphic"/></filter>
+  <filter id="innerSm" x="-30%" y="-30%" width="160%" height="160%"><feOffset dx="0" dy="0.8"/><feGaussianBlur stdDeviation="0.7" result="off"/><feComposite operator="out" in="SourceGraphic" in2="off" result="inv"/><feFlood flood-color="#000" flood-opacity="0.95"/><feComposite operator="in" in2="inv" result="shd"/><feComposite operator="over" in="shd" in2="SourceGraphic"/></filter>
+
+  <filter id="innerGiant" x="-20%" y="-20%" width="140%" height="140%"><feOffset dx="0" dy="6"/><feGaussianBlur stdDeviation="7" result="off"/><feComposite operator="out" in="SourceGraphic" in2="off" result="inv"/><feFlood flood-color="#000000" flood-opacity="0.85"/><feComposite operator="in" in2="inv" result="shd"/><feComposite operator="over" in="shd" in2="SourceGraphic"/></filter>
+</defs></svg>
+
+<!-- ===== Topbar ===== -->
+<div class="topbar" id="topbar">
+  <div class="wrap header-row">
+    <a class="logo" href="../" aria-label="Humane Theory">
+      <img src="../logo-humanetheory.svg" alt="Humane Theory">
+    </a>
+
+    <nav class="main-nav" id="main-nav">
+      <div class="nav-item" id="systems-item">
+        <button class="nav-link" id="systems-btn" aria-expanded="false">
+          Systems
+          <svg viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="dropdown">
+          <a href="../airoi/"><span class="dot"></span>AI ROI</a>
+          <a href="./"><span class="dot"></span>AI ACT</a>
+          <a href="../bdash/"><span class="dot"></span>BDash</a>
+          <a href="../coradar/"><span class="dot"></span>CoRadar</a>
+          <a class="disabled" href="#" onclick="return false" aria-disabled="true"><span class="dot"></span>ReputIA<span class="mtag mtag-soon">Coming Soon</span></a>
+        </div>
+      </div>
+      <a class="nav-link" href="../#about">About</a>
+      <a class="nav-link" href="../statement/">Statement</a>
+    </nav>
+
+    <div class="header-right">
+      <a class="btn btn-ghost" href="../?topic=aiges#contact">Contact</a>
+    </div>
+
+    <button class="menu-toggle" id="menu-toggle" aria-label="Menu" aria-expanded="false">
+      <svg class="icon-menu" viewBox="0 0 20 14" fill="none"><path d="M1 1h18M1 7h18M1 13h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <svg class="icon-close" viewBox="0 0 20 20" fill="none"><path d="M2 2l16 16M18 2L2 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <div class="mobile-panel" id="mobile-panel">
+    <div class="msec">Systems</div>
+    <a class="mlink" href="../airoi/">AI ROI</a>
+    <a class="mlink" href="./">AI ACT</a>
+    <a class="mlink" href="../bdash/">BDash</a>
+    <a class="mlink" href="../coradar/">CoRadar</a>
+    <a class="mlink disabled" href="#" onclick="return false" aria-disabled="true">ReputIA<span class="mtag mtag-soon">Coming Soon</span></a>
+    <div class="msec">More</div>
+    <a class="mlink" href="../#about">About</a>
+    <a class="mlink" href="../statement/">Statement</a>
+    <a class="btn btn-ghost mcontact" href="../?topic=aiges#contact">Contact</a>
+  </div>
+</div>
+
+<!-- ===== Page head ===== -->
+<header class="wrap page-head">
+  <div class="section-label">/aiges</div>
+  <h1 class="page-title" data-i18n="title">AI GOVERNANCE READINESS.</h1>
+  <p class="page-sub" data-i18n="subtitle">Assess your AI governance maturity and estimated readiness for the EU AI Act. Identify risks, gaps and practical next steps.</p>
+  <div class="privacy-note">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg>
+    <span><span data-i18n="privacy"></span> <a href="how-it-works/" style="color:#dcdcdc;text-decoration:underline;text-underline-offset:2px">How this is calculated →</a></span>
+  </div>
+  <div class="progress" id="progress">
+    <span class="step-label" id="step-label">STEP 01 / 03</span>
+    <div class="bar"><i id="bar-fill"></i></div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- STEP 1 · Company profile -->
+  <section class="step active" id="step-1">
+    <h2 data-i18n="s1_title">Company profile</h2>
+    <p class="hint" data-i18n="s1_hint">A few details so the assessment reflects your context. Nothing here leaves your browser.</p>
+
+    <div class="sel-row">
+      <div class="field"><span class="field-label" data-i18n="f_industry">Industry</span>
+        <div class="sel" id="sel-industry"><button class="sel-btn" type="button"><span class="ic"></span><span class="txt" data-i18n="ph_industry">Select your industry</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></button><div class="sel-panel"></div></div>
+      </div>
+      <div class="field"><span class="field-label" data-i18n="f_size">Company size</span>
+        <div class="sel" id="sel-size"><button class="sel-btn" type="button"><span class="ic"></span><span class="txt" data-i18n="ph_size">Select number of employees</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></button><div class="sel-panel"></div></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="field-label" data-i18n="f_country">Country / region</span>
+      <div class="sel ac" id="sel-country" style="max-width:380px">
+        <input class="text-input" id="in-country" type="text" autocomplete="off" data-i18n-ph="ph_country" placeholder="e.g. Spain, EU" style="max-width:none">
+        <div class="sel-panel" id="country-panel"></div>
+      </div>
+    </div>
+    <div class="field"><span class="field-label" data-i18n="f_useai">Does the company currently use AI?</span>
+      <div class="choice-grid" id="useai-grid"></div>
+    </div>
+    <div class="field"><span class="field-label" data-i18n="f_own">Does the company develop its own models?</span>
+      <div class="choice-grid" id="own-grid"></div>
+    </div>
+    <div class="field"><span class="field-label" data-i18n="f_vendors">Third-party AI in use</span>
+      <div class="check-grid" id="vendors-grid"></div>
+    </div>
+    <div class="field"><span class="field-label" data-i18n="f_count">Approximate number of AI systems in use</span>
+      <div class="choice-grid" id="count-grid"></div>
+    </div>
+
+    <p class="validate-msg" id="s1-validate" data-i18n="s1_validate">Please select at least industry and company size.</p>
+    <div class="step-nav"><span></span><button class="btn btn-dark" id="continue-1" data-i18n="continue">Continue →</button></div>
+  </section>
+
+  <!-- STEP 2 · AI use cases -->
+  <section class="step" id="step-2">
+    <h2 data-i18n="s2_title">AI use cases</h2>
+    <p class="hint" data-i18n="s2_hint">Select every use case that applies. This drives an indicative EU AI Act risk classification. Selecting none is fine.</p>
+    <div class="check-grid" id="usecases-grid"></div>
+    <div class="step-nav"><button class="btn btn-ghost" data-back data-i18n="back_btn">← Back</button><button class="btn btn-dark" id="continue-2" data-i18n="continue">Continue →</button></div>
+  </section>
+
+  <!-- STEP 3 · Assessment -->
+  <section class="step" id="step-3">
+    <h2 data-i18n="s3_title">Governance assessment</h2>
+    <p class="hint" data-i18n="s3_hint">24 questions across 12 areas, based on AI governance best practices and public EU AI Act requirements. Use the maturity scale.</p>
+    <div class="scale-legend" id="scale-legend"></div>
+    <div id="assessment"></div>
+    <p class="answered-count" id="answered-count"></p>
+    <p class="validate-msg" id="s3-validate" data-i18n="s3_validate">Please answer all maturity-scale questions to continue.</p>
+    <div class="step-nav"><button class="btn btn-ghost" data-back data-i18n="back_btn">← Back</button><button class="btn btn-dark" id="calc-btn" data-i18n="get_results">Get results →</button></div>
+  </section>
+
+  <!-- LOADING -->
+  <section class="loading" id="loading">
+    <div class="load-card">
+      <div class="load-head"><span class="load-title">_Bot ./aegis_scan.sh</span><span class="load-pct" id="load-pct">0%</span></div>
+      <div class="load-lines" id="load-lines"></div>
+      <div class="load-bar"><i id="load-bar-fill"></i></div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="results" id="results">
+    <h2 data-i18n="r_title">AI governance report</h2>
+    <p class="hint" id="res-context"></p>
+
+    <div class="score-hero">
+      <div class="donut" id="donut"></div>
+      <div class="score-meta">
+        <div class="lvl" id="r-level"></div>
+        <div class="lvl-sub" id="r-level-sub"></div>
+        <div class="score-tags">
+          <span class="tag" id="r-risk"><span class="dot"></span><span id="r-risk-text"></span></span>
+          <span class="tag" id="r-maturity"><span id="r-maturity-text"></span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="risk-banner" id="risk-banner">
+      <div class="rb-head"><span id="rb-title"></span><span class="rb-badge" id="rb-badge"></span></div>
+      <p id="rb-text"></p>
+      <div class="cases" id="rb-cases"></div>
+    </div>
+
+    <div class="ai-alert" id="ai-alert" hidden>
+      <span class="ai-alert-ic" id="ai-alert-ic"></span>
+      <p id="ai-alert-text"></p>
+    </div>
+
+    <div class="res-grid" id="score-cards"></div>
+
+    <div class="res-cols">
+      <div class="res-panel full">
+        <h3>/maturity-radar</h3>
+        <p class="sub" data-i18n="r_radar_sub">Maturity across the 12 governance areas.</p>
+        <div class="radar-wrap"><div id="radar"></div><div class="radar-legend" id="radar-legend"></div></div>
+      </div>
+
+      <div class="res-panel full">
+        <h3>/category-scores</h3>
+        <p class="sub" data-i18n="r_cat_sub">Maturity by area, 0 to 100.</p>
+        <div class="hchart" id="chart-cats"></div>
+      </div>
+
+      <div class="res-panel">
+        <h3>/strengths</h3>
+        <p class="sub" data-i18n="r_str_sub">Your three strongest areas.</p>
+        <ol class="strengths" id="r-strengths"></ol>
+      </div>
+      <div class="res-panel">
+        <h3>/priority-gaps</h3>
+        <p class="sub" data-i18n="r_gap_sub">The three areas to address first.</p>
+        <ol class="gaps" id="r-gaps"></ol>
+      </div>
+
+      <div class="res-panel full">
+        <h3>/obligations-checklist</h3>
+        <p class="sub" data-i18n="r_obl_sub">Audit-style view of key governance areas.</p>
+        <div class="otable-wrap"><table class="otable"><thead><tr><th data-i18n="th_area">Area</th><th data-i18n="th_status">Status</th><th data-i18n="th_comment">Comment</th></tr></thead><tbody id="r-obligations"></tbody></table></div>
+      </div>
+
+      <div class="res-panel full">
+        <h3>/30-60-90-roadmap</h3>
+        <p class="sub" data-i18n="r_plan_sub">A staged plan generated from your priority gaps.</p>
+        <div class="plan-grid" id="r-plan"></div>
+      </div>
+
+      <div class="res-panel full">
+        <h3>/industry-recommendations</h3>
+        <p class="sub" id="r-ind-sub"></p>
+        <ul id="r-industry"></ul>
+      </div>
+    </div>
+
+    <div class="ai-notes" id="ai-notes">
+      <div class="ai-notes-head">
+        <span class="ai-notes-label" id="ai-notes-label">AI notes</span>
+        <span class="ai-notes-status" id="ai-notes-status"></span>
+      </div>
+      <p class="ai-notes-diagnosis" id="ai-notes-diagnosis"></p>
+      <div class="ai-notes-cols" id="ai-notes-cols"></div>
+    </div>
+
+    <p class="assumptions" id="r-how"></p>
+    <p class="disclaimer" id="r-disclaimer"></p>
+
+    <div class="res-actions">
+      <button class="btn btn-dark" id="pdf-btn" data-i18n="download_pdf">↓ Download free report</button>
+      <button class="btn btn-ghost" id="restart-btn" data-i18n="restart">↺ Start over</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-trust">
+      <span class="ft-pill">AIGEA</span>
+      <h3>Part of AIGEA.</h3>
+      <p>Humane Theory is the applied-systems arm of AIGEA, the Artificial Intelligence Governance &amp; Ethics Agency. AIGEA researches how AI should be governed and used responsibly; Humane Theory builds the models, tools and systems that put those principles to work inside real companies, with a human always able to check what the AI did and why.</p>
+    </div>
+    <div class="foot-top">
+      <a class="foot-mark" href="../"><img src="../logo-humanetheory.svg" alt="Humane Theory"></a>
+      <div class="foot-cols">
+        <div class="col"><h4>Project</h4><ul>
+          <li><a href="../statement/">Statement</a></li>
+          <li><a href="../#systems">Systems</a></li>
+          <li><a href="https://aigea.org" target="_blank" rel="noopener">About AIGEA</a></li>
+        </ul></div>
+        <div class="col"><h4>Social</h4><ul>
+          <li><a href="#" onclick="return false">LinkedIn</a></li>
+          <li><a href="#" onclick="return false">X</a></li>
+        </ul></div>
+        <div class="col"><h4>Contact</h4><ul>
+          <li><a href="mailto:info@aigea.org">info@aigea.org</a></li>
+          <li><a href="https://aigea.org" target="_blank" rel="noopener">aigea.org</a></li>
+        </ul></div>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <span class="copy">COPYRIGHT ©2026 HUMANE THEORY</span>
+      <a class="flink" href="../privacy-policy/">Privacy Policy</a>
+      <a class="flink" href="../terms-of-use/">Terms of Use</a>
+      <a class="flink" href="../?topic=custom#contact">Custom Work</a>
+    </div>
+  </div>
+  <div class="giant">Humane Theory</div>
+</footer>
+
+<script>
+/* ============================================================
+   ICONS (shared)
+   ============================================================ */
+const ICONS = {
+  manufacturing:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V10l5 3v-3l5 3v-3l4 2.5V21"/><path d="M16 10V5h3v6.5"/></svg>',
+  technology:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="10.5" rx="1.5"/><path d="M2 19h20"/></svg>',
+  services:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="8" width="17" height="11" rx="2"/><path d="M9 8V6.5A1.5 1.5 0 0 1 10.5 5h3A1.5 1.5 0 0 1 15 6.5V8"/><path d="M3.5 13h17"/></svg>',
+  healthcare:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M12 8.5v7M8.5 12h7"/></svg>',
+  financial:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"/><path d="M14.8 9.3a3.4 3.4 0 1 0 0 5.4"/><path d="M8.3 11h4M8.3 13h4"/></svg>',
+  retail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 8h13l-1.1 12h-10.8L5.5 8z"/><path d="M9 10.5V6a3 3 0 0 1 6 0v4.5"/></svg>',
+  logistics:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6.5" width="12" height="9" rx="1"/><path d="M14.5 9.5h3.8l3.2 3.5v2.5h-7"/><circle cx="7" cy="17.7" r="1.8"/><circle cx="17" cy="17.7" r="1.8"/></svg>',
+  aviation:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L3 10.5l6 2.5L12 21l3-6.5L21 3z"/><path d="M9 13L21 3"/></svg>',
+  hospitality:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v11"/><path d="M3 15h18v3"/><path d="M9.5 12H18a3 3 0 0 1 3 3"/><circle cx="6.2" cy="12" r="1.6"/></svg>',
+  education:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5l10 4.5-10 4.5L2 9l10-4.5z"/><path d="M6.5 11.3v4.2c0 1.3 2.5 2.6 5.5 2.6s5.5-1.3 5.5-2.6v-4.2"/></svg>',
+  government:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5.5H3L12 3z"/><path d="M5 8.5V18M9.7 8.5V18M14.3 8.5V18M19 8.5V18"/><path d="M3 21h18"/></svg>',
+  construction:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16.5a8 8 0 0 1 16 0"/><path d="M2.5 16.5h19"/><path d="M9.5 10V6h5v4"/></svg>',
+  other:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M4 7.5l8 4.5 8-4.5"/><path d="M12 12v9"/></svg>'
+};
+const CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 6"/></svg>';
+
+/* ============================================================
+   i18n
+   ============================================================ */
+let LANG='en';
+const STR = {
+  back:{en:"Back",es:"Volver"}, back_btn:{en:"← Back",es:"← Atrás"},
+  continue:{en:"Continue →",es:"Continuar →"}, get_results:{en:"Get results →",es:"Ver resultados →"},
+  restart:{en:"↺ Start over",es:"↺ Empezar de nuevo"}, download_pdf:{en:"↓ Download free report",es:"↓ Descargar informe gratis"},
+  title:{en:"AI GOVERNANCE READINESS.",es:"PREPARACIÓN EN GOBIERNO DE IA."},
+  subtitle:{en:"Assess your AI governance maturity and estimated readiness for the EU AI Act. Identify risks, gaps and practical next steps.",
+            es:"Evalúa tu madurez en gobierno de IA y tu preparación estimada frente al Reglamento Europeo de IA. Identifica riesgos, brechas y próximos pasos prácticos."},
+  privacy:{en:"Private by design. Your answers and the full assessment are processed locally in your browser, and nothing is stored on our side. To write the personalized report below, only the calculated results, never your raw answers or any identifying detail, are processed once through Humane Theory's own analysis system. That data is never retained, resold, or shared afterward.",
+           es:"Privada por diseño. Tus respuestas y la evaluación completa se procesan localmente en tu navegador, y no almacenamos nada de nuestro lado. Para redactar el informe personalizado de abajo, solo los resultados ya calculados, nunca tus respuestas en bruto ni ningún dato identificativo, se procesan una única vez a través del sistema de análisis propio de Humane Theory. Esos datos nunca se conservan, revenden ni comparten después."},
+  s1_title:{en:"Company profile",es:"Perfil de la empresa"},
+  s1_hint:{en:"A few details so the assessment reflects your context. Nothing here leaves your browser.",es:"Unos datos para que la evaluación refleje tu contexto. Nada de esto sale de tu navegador."},
+  s1_validate:{en:"Please select at least industry and company size.",es:"Selecciona al menos industria y tamaño de empresa."},
+  f_industry:{en:"Industry",es:"Industria"}, ph_industry:{en:"Select your industry",es:"Selecciona tu industria"},
+  f_size:{en:"Company size",es:"Tamaño de empresa"}, ph_size:{en:"Select number of employees",es:"Selecciona nº de empleados"},
+  f_country:{en:"Country / region",es:"País / región"}, ph_country:{en:"e.g. Spain, EU",es:"ej. España, UE"},
+  f_useai:{en:"Does the company currently use AI?",es:"¿La empresa utiliza IA actualmente?"},
+  f_own:{en:"Does the company develop its own models?",es:"¿La empresa desarrolla modelos propios?"},
+  f_vendors:{en:"Third-party AI in use",es:"IA de terceros que utilizáis"},
+  f_count:{en:"Approximate number of AI systems in use",es:"Número aproximado de sistemas de IA utilizados"},
+  s2_title:{en:"AI use cases",es:"Casos de uso de IA"},
+  s2_hint:{en:"Select every use case that applies. This drives an indicative EU AI Act risk classification. Selecting none is fine.",
+           es:"Selecciona todos los usos aplicables. Esto genera una clasificación de riesgo orientativa según el EU AI Act. Puedes no seleccionar ninguno."},
+  s3_title:{en:"Governance assessment",es:"Evaluación de gobierno"},
+  s3_hint:{en:"24 questions across 12 areas, based on AI governance best practices and public EU AI Act requirements. Use the maturity scale.",
+           es:"24 preguntas en 12 áreas, basadas en buenas prácticas de gobierno de IA y en los requisitos públicos del EU AI Act. Usa la escala de madurez."},
+  s3_validate:{en:"Please answer all maturity-scale questions to continue.",es:"Responde todas las preguntas de escala para continuar."},
+  answered:{en:"answered",es:"respondidas"},
+  r_title:{en:"AI governance report",es:"Informe de gobierno de IA"},
+  r_radar_sub:{en:"Maturity across the 12 governance areas.",es:"Madurez en las 12 áreas de gobierno."},
+  r_cat_sub:{en:"Maturity by area, 0 to 100.",es:"Madurez por área, de 0 a 100."},
+  r_str_sub:{en:"Your three strongest areas.",es:"Tus tres áreas más fuertes."},
+  r_gap_sub:{en:"The three areas to address first.",es:"Las tres áreas a abordar primero."},
+  r_obl_sub:{en:"Audit-style view of key governance areas.",es:"Vista tipo auditoría de las áreas clave de gobierno."},
+  r_plan_sub:{en:"A staged plan generated from your priority gaps.",es:"Un plan por fases generado a partir de tus brechas prioritarias."},
+  th_area:{en:"Area",es:"Área"}, th_status:{en:"Status",es:"Estado"}, th_comment:{en:"Comment",es:"Comentario"},
+  d30:{en:"First 30 days",es:"Primeros 30 días"}, d60:{en:"Days 30-60",es:"Días 30-60"}, d90:{en:"Days 60-90",es:"Días 60-90"},
+  ind_rec_sub:{en:"Governance priorities that matter most in your sector.",es:"Prioridades de gobierno que más importan en tu sector."},
+  ctx_generated:{en:"Generated",es:"Generado"},
+  st_strong:{en:"Strong",es:"Sólido"}, st_partial:{en:"Partial",es:"Parcial"}, st_needs:{en:"Needs improvement",es:"A mejorar"}, st_missing:{en:"Missing",es:"Ausente"},
+  cmt_strong:{en:"Well established and monitored.",es:"Bien establecido y monitorizado."},
+  cmt_partial:{en:"Exists but not fully implemented.",es:"Existe pero no está plenamente implementado."},
+  cmt_needs:{en:"Informal or incomplete, needs structure.",es:"Informal o incompleto, necesita estructura."},
+  cmt_missing:{en:"Not in place yet.",es:"Aún no existe."},
+  how:{en:"How this is calculated: each answer is normalized to 0-100. Category scores are the average of their questions. The overall score is the average of the 12 categories. EU AI Act readiness weights risk classification, human oversight, transparency, data governance and documentation. Composite scores group related categories. The risk classification is derived only from the AI use cases you selected.",
+       es:"Cómo se calcula: cada respuesta se normaliza a 0-100. La puntuación de cada categoría es la media de sus preguntas. La puntuación global es la media de las 12 categorías. La preparación para el EU AI Act pondera clasificación de riesgo, supervisión humana, transparencia, gobernanza de datos y documentación. Los scores compuestos agrupan categorías relacionadas. La clasificación de riesgo se deriva únicamente de los casos de uso que selecciones."},
+  disclaimer:{en:"This tool provides an indicative self-assessment based on AI governance best practices and publicly available requirements of the European Union AI Act. It does not constitute legal advice, an official audit, or proof of regulatory compliance.",
+              es:"Esta herramienta proporciona una autoevaluación orientativa basada en buenas prácticas de gobierno de la IA y en los requisitos públicos del Reglamento Europeo de Inteligencia Artificial (EU AI Act). No constituye asesoramiento legal, una auditoría oficial ni una certificación de cumplimiento."}
+};
+const SCALE = [
+  {en:"Not in place",es:"No existe"},
+  {en:"Informal",es:"Informal"},
+  {en:"Documented",es:"Documentado"},
+  {en:"Implemented",es:"Implementado"},
+  {en:"Monitored & improving",es:"Monitorizado y mejora continua"}
+];
+const YESNO={yes:{en:"Yes",es:"Sí"},no:{en:"No",es:"No"}};
+
+/* ============================================================
+   CONFIG
+   ============================================================ */
+const CATEGORIES = [
+  {id:"governance",   name:{en:"AI Governance",es:"Gobierno de IA"}},
+  {id:"inventory",    name:{en:"AI Inventory",es:"Inventario de IA"}},
+  {id:"riskclass",    name:{en:"AI Risk Classification",es:"Clasificación de riesgo"}},
+  {id:"oversight",    name:{en:"Human Oversight",es:"Supervisión humana"}},
+  {id:"data",         name:{en:"Data Governance",es:"Gobernanza de datos"}},
+  {id:"transparency", name:{en:"Transparency",es:"Transparencia"}},
+  {id:"security",     name:{en:"Security & Robustness",es:"Seguridad y robustez"}},
+  {id:"thirdparty",   name:{en:"Third-party AI Governance",es:"Gobierno de IA de terceros"}},
+  {id:"documentation",name:{en:"Documentation",es:"Documentación"}},
+  {id:"monitoring",   name:{en:"Continuous Monitoring",es:"Monitorización continua"}},
+  {id:"literacy",     name:{en:"AI Literacy",es:"Alfabetización en IA"}},
+  {id:"incident",     name:{en:"Incident Management",es:"Gestión de incidentes"}}
+];
+const catName = id => CATEGORIES.find(c=>c.id===id).name[LANG];
+
+const SIZES = [
+  {label:{en:"1-10 employees",es:"1-10 empleados"}},{label:{en:"11-50 employees",es:"11-50 empleados"}},
+  {label:{en:"51-200 employees",es:"51-200 empleados"}},{label:{en:"201-500 employees",es:"201-500 empleados"}},
+  {label:{en:"501-1,000 employees",es:"501-1.000 empleados"}},{label:{en:"1,001-5,000 employees",es:"1.001-5.000 empleados"}},
+  {label:{en:"5,000+ employees",es:"5.000+ empleados"}}
+];
+const INDUSTRIES = [
+  {id:"manufacturing",icon:"manufacturing",name:{en:"Manufacturing",es:"Manufactura"}},
+  {id:"technology",icon:"technology",name:{en:"Technology",es:"Tecnología"}},
+  {id:"services",icon:"services",name:{en:"Professional Services",es:"Servicios profesionales"}},
+  {id:"healthcare",icon:"healthcare",name:{en:"Healthcare",es:"Salud"}},
+  {id:"financial",icon:"financial",name:{en:"Financial Services",es:"Servicios financieros"}},
+  {id:"retail",icon:"retail",name:{en:"Retail & Ecommerce",es:"Retail y ecommerce"}},
+  {id:"logistics",icon:"logistics",name:{en:"Transportation & Logistics",es:"Transporte y logística"}},
+  {id:"aviation",icon:"aviation",name:{en:"Aviation",es:"Aviación"}},
+  {id:"hospitality",icon:"hospitality",name:{en:"Hospitality",es:"Hostelería"}},
+  {id:"education",icon:"education",name:{en:"Education",es:"Educación"}},
+  {id:"government",icon:"government",name:{en:"Government",es:"Sector público"}},
+  {id:"construction",icon:"construction",name:{en:"Construction",es:"Construcción"}},
+  {id:"other",icon:"other",name:{en:"Other",es:"Otro"}}
+];
+const USE_AI = [
+  {id:"no",label:{en:"No",es:"No"}},{id:"evaluating",label:{en:"Evaluating it",es:"Estamos evaluándola"}},
+  {id:"pilot",label:{en:"Yes, in pilots",es:"Sí, en proyectos piloto"}},{id:"production",label:{en:"Yes, in production",es:"Sí, en producción"}}
+];
+const OWN = [{id:"yes",label:{en:"Yes",es:"Sí"}},{id:"no",label:{en:"No",es:"No"}}];
+const VENDORS = [
+  {id:"openai",label:{en:"OpenAI",es:"OpenAI"}},{id:"copilot",label:{en:"Microsoft Copilot",es:"Microsoft Copilot"}},
+  {id:"azure",label:{en:"Microsoft Azure AI",es:"Microsoft Azure AI"}},{id:"google",label:{en:"Google",es:"Google"}},
+  {id:"anthropic",label:{en:"Anthropic",es:"Anthropic"}},{id:"aws",label:{en:"AWS",es:"AWS"}},
+  {id:"meta",label:{en:"Meta",es:"Meta"}},{id:"mistral",label:{en:"Mistral",es:"Mistral"}},{id:"others",label:{en:"Others",es:"Otros"}}
+];
+const COUNTS = [{id:"1-5",label:{en:"1-5",es:"1-5"}},{id:"6-20",label:{en:"6-20",es:"6-20"}},{id:"20+",label:{en:"More than 20",es:"Más de 20"}}];
+
+/* AI use cases with indicative EU AI Act tier. tier: minimal|limited|high|prohibited */
+const USECASES = [
+  {id:"chatbots",tier:"limited",label:{en:"Chatbots",es:"Chatbots"}},
+  {id:"customer",tier:"minimal",label:{en:"Customer service",es:"Atención al cliente"}},
+  {id:"marketing",tier:"minimal",label:{en:"Marketing",es:"Marketing"}},
+  {id:"content",tier:"limited",label:{en:"Content generation",es:"Generación de contenido"}},
+  {id:"coding",tier:"minimal",label:{en:"Programming",es:"Programación"}},
+  {id:"hr",tier:"high",label:{en:"Human Resources",es:"Recursos Humanos"}},
+  {id:"recruit",tier:"high",label:{en:"Recruitment",es:"Selección de personal"}},
+  {id:"candidate",tier:"high",label:{en:"Candidate evaluation",es:"Evaluación de candidatos"}},
+  {id:"credit",tier:"high",label:{en:"Credit or financial scoring",es:"Crédito o scoring financiero"}},
+  {id:"insurance",tier:"high",label:{en:"Insurance",es:"Seguros"}},
+  {id:"health",tier:"high",label:{en:"Healthcare",es:"Sanidad"}},
+  {id:"education",tier:"high",label:{en:"Education",es:"Educación"}},
+  {id:"critical",tier:"high",label:{en:"Critical infrastructure",es:"Infraestructuras críticas"}},
+  {id:"transport",tier:"high",label:{en:"Transport",es:"Transporte"}},
+  {id:"logistics",tier:"minimal",label:{en:"Logistics",es:"Logística"}},
+  {id:"biometric",tier:"high",label:{en:"Biometric recognition",es:"Reconocimiento biométrico"}},
+  {id:"facial",tier:"prohibited",label:{en:"Facial recognition",es:"Reconocimiento facial"}},
+  {id:"surveillance",tier:"prohibited",label:{en:"Surveillance",es:"Vigilancia"}},
+  {id:"recommend",tier:"limited",label:{en:"Recommendation systems",es:"Sistemas de recomendación"}},
+  {id:"docauto",tier:"minimal",label:{en:"Document automation",es:"Automatización documental"}},
+  {id:"other",tier:"minimal",label:{en:"Other",es:"Otro"}}
+];
+const TIER_ORDER = ["minimal","limited","high","prohibited"];
+const TIER_INFO = {
+  minimal:{badge:"MINIMAL",title:{en:"Likely Minimal Risk",es:"Probable riesgo mínimo"},
+    text:{en:"Based on the use cases selected, your AI activities likely fall under minimal-risk categories. Basic transparency and good governance practices are usually enough.",es:"Según los casos de uso seleccionados, tus actividades de IA probablemente entran en categorías de riesgo mínimo. Suelen bastar la transparencia básica y buenas prácticas de gobierno."}},
+  limited:{badge:"LIMITED",title:{en:"Likely Limited Risk",es:"Probable riesgo limitado"},
+    text:{en:"Some selected use cases (such as chatbots or content generation) may carry transparency obligations, like informing users they are interacting with AI.",es:"Algunos casos de uso seleccionados (como chatbots o generación de contenido) pueden conllevar obligaciones de transparencia, como informar a los usuarios de que interactúan con IA."}},
+  high:{badge:"HIGH-RISK",title:{en:"Potential High-Risk AI",es:"Posible IA de alto riesgo"},
+    text:{en:"Some selected use cases may fall within high-risk categories under the EU AI Act. These typically involve stricter obligations. A specialized legal review is strongly recommended.",es:"Algunos casos de uso seleccionados podrían entrar en categorías de alto riesgo del EU AI Act, que suelen implicar obligaciones más estrictas. Se recomienda encarecidamente una revisión jurídica especializada."}},
+  prohibited:{badge:"NEEDS LEGAL REVIEW",title:{en:"Potential Prohibited AI Practice",es:"Posible práctica de IA prohibida"},
+    text:{en:"Some selected use cases (such as certain facial recognition or surveillance applications) may relate to practices that are restricted or prohibited under the EU AI Act. A specialized legal review is strongly recommended before proceeding.",es:"Algunos casos de uso seleccionados (como ciertas aplicaciones de reconocimiento facial o vigilancia) pueden relacionarse con prácticas restringidas o prohibidas por el EU AI Act. Se recomienda encarecidamente una revisión jurídica especializada antes de continuar."}}
+};
+
+/* 24 questions, 2 per category. type: scale(0-4) | slider(0-100) | yesno */
+const QUESTIONS = [
+  {id:"q1", cat:"governance", type:"scale", text:{en:"Is there a corporate policy on responsible AI use?",es:"¿Existe una política corporativa sobre el uso responsable de IA?"}},
+  {id:"q2", cat:"governance", type:"scale", text:{en:"Is there an AI owner or committee, and does management review AI use periodically?",es:"¿Existe un responsable o comité de IA y la dirección revisa periódicamente el uso de IA?"}},
+  {id:"q3", cat:"inventory", type:"scale", text:{en:"Is there an inventory of all AI systems in use, each with an identified owner?",es:"¿Existe un inventario de todos los sistemas de IA utilizados, cada uno con un propietario identificado?"}},
+  {id:"q4", cat:"inventory", type:"slider", text:{en:"What share of your AI systems is captured in that inventory?",es:"¿Qué porcentaje de tus sistemas de IA está recogido en ese inventario?"}},
+  {id:"q5", cat:"riskclass", type:"scale", text:{en:"Are AI systems classified by their level of risk?",es:"¿Se clasifican los sistemas de IA según su nivel de riesgo?"}},
+  {id:"q6", cat:"riskclass", type:"scale", text:{en:"Is the classification reviewed when systems or their use change?",es:"¿Se revisa la clasificación cuando cambian los sistemas o su uso?"}},
+  {id:"q7", cat:"oversight", type:"scale", text:{en:"Is there human oversight over relevant AI-supported decisions?",es:"¿Existe supervisión humana sobre las decisiones relevantes apoyadas por IA?"}},
+  {id:"q8", cat:"oversight", type:"scale", text:{en:"Is it possible to review or override a decision made by an AI system?",es:"¿Es posible revisar o anular una decisión tomada por un sistema de IA?"}},
+  {id:"q9", cat:"data", type:"scale", text:{en:"Do you know the origin of the data used and review its quality?",es:"¿Se conoce el origen de los datos utilizados y se revisa su calidad?"}},
+  {id:"q10",cat:"data", type:"scale", text:{en:"Are bias assessments performed on data and models?",es:"¿Se realizan evaluaciones de posibles sesgos en datos y modelos?"}},
+  {id:"q11",cat:"transparency", type:"scale", text:{en:"Are users informed when they interact with an AI system?",es:"¿Se informa a los usuarios cuando interactúan con un sistema de IA?"}},
+  {id:"q12",cat:"transparency", type:"scale", text:{en:"Is the general functioning of AI systems documented and explainable?",es:"¿Se documenta y se puede explicar el funcionamiento general de los sistemas de IA?"}},
+  {id:"q13",cat:"security", type:"scale", text:{en:"Are tests carried out before deploying AI systems?",es:"¿Se realizan pruebas antes de desplegar los sistemas de IA?"}},
+  {id:"q14",cat:"security", type:"scale", text:{en:"Is there a defined procedure to handle AI failures or malfunctions?",es:"¿Existe un procedimiento definido ante fallos o mal funcionamiento de la IA?"}},
+  {id:"q15",cat:"thirdparty", type:"scale", text:{en:"Are AI vendors assessed before contracting them?",es:"¿Se evalúan los proveedores de IA antes de contratarlos?"}},
+  {id:"q16",cat:"thirdparty", type:"scale", text:{en:"Are third-party AI contracts and terms reviewed periodically?",es:"¿Se revisan periódicamente los contratos y condiciones de la IA de terceros?"}},
+  {id:"q17",cat:"documentation", type:"scale", text:{en:"Is there technical documentation for your AI systems?",es:"¿Existe documentación técnica de los sistemas de IA?"}},
+  {id:"q18",cat:"documentation", type:"scale", text:{en:"Are relevant changes recorded with version traceability?",es:"¿Se registran los cambios relevantes con trazabilidad de versiones?"}},
+  {id:"q19",cat:"monitoring", type:"scale", text:{en:"Are models monitored after deployment?",es:"¿Se monitorizan los modelos tras su despliegue?"}},
+  {id:"q20",cat:"monitoring", type:"scale", text:{en:"Are internal audits or periodic reviews of AI carried out?",es:"¿Se realizan auditorías internas o revisiones periódicas de la IA?"}},
+  {id:"q21",cat:"literacy", type:"slider", text:{en:"What share of staff has received AI training?",es:"¿Qué porcentaje del personal ha recibido formación sobre IA?"}},
+  {id:"q22",cat:"literacy", type:"scale", text:{en:"Is training role-based and are there internal responsible-use guidelines?",es:"¿La formación depende del rol y existen guías internas de uso responsable?"}},
+  {id:"q23",cat:"incident", type:"scale", text:{en:"Is there a procedure to log AI-related incidents?",es:"¿Existe un procedimiento para registrar incidentes relacionados con IA?"}},
+  {id:"q24",cat:"incident", type:"scale", text:{en:"Are incidents analyzed and corrective actions defined?",es:"¿Se analizan los incidentes y se definen acciones correctivas?"}}
+];
+
+/* per-category roadmap actions */
+const GAP_ACTIONS = {
+  governance:{d30:{en:"Draft a short responsible-AI policy.",es:"Redactar una política breve de IA responsable."},d60:{en:"Appoint an AI owner or committee.",es:"Nombrar un responsable o comité de IA."},d90:{en:"Set a periodic management review of AI.",es:"Establecer una revisión periódica de IA por dirección."}},
+  inventory:{d30:{en:"List all AI systems currently in use.",es:"Listar todos los sistemas de IA en uso."},d60:{en:"Assign an owner to each system.",es:"Asignar un propietario a cada sistema."},d90:{en:"Keep the inventory updated as a living register.",es:"Mantener el inventario actualizado como registro vivo."}},
+  riskclass:{d30:{en:"Define simple risk tiers for your AI systems.",es:"Definir niveles de riesgo simples para tus sistemas de IA."},d60:{en:"Classify each system and flag sensitive use cases.",es:"Clasificar cada sistema y marcar casos de uso sensibles."},d90:{en:"Review classification on any change of use.",es:"Revisar la clasificación ante cualquier cambio de uso."}},
+  oversight:{d30:{en:"Identify decisions that need human oversight.",es:"Identificar decisiones que requieren supervisión humana."},d60:{en:"Define override and escalation procedures.",es:"Definir procedimientos de anulación y escalado."},d90:{en:"Train reviewers and log oversight actions.",es:"Formar a revisores y registrar las acciones de supervisión."}},
+  data:{d30:{en:"Document data sources for key systems.",es:"Documentar las fuentes de datos de los sistemas clave."},d60:{en:"Add data quality and bias checks.",es:"Añadir controles de calidad de datos y de sesgos."},d90:{en:"Make bias assessments a standard step.",es:"Convertir las evaluaciones de sesgo en un paso estándar."}},
+  transparency:{d30:{en:"Add AI-interaction notices where users are involved.",es:"Añadir avisos de interacción con IA donde haya usuarios."},d60:{en:"Document how each system works at a high level.",es:"Documentar cómo funciona cada sistema a alto nivel."},d90:{en:"Publish clear internal transparency guidance.",es:"Publicar una guía interna de transparencia clara."}},
+  security:{d30:{en:"Define a pre-deployment testing checklist.",es:"Definir una checklist de pruebas previas al despliegue."},d60:{en:"Add performance monitoring for live systems.",es:"Añadir monitorización de rendimiento a los sistemas en producción."},d90:{en:"Write a failure and rollback procedure.",es:"Redactar un procedimiento de fallo y reversión."}},
+  thirdparty:{d30:{en:"List your AI vendors and what they process.",es:"Listar tus proveedores de IA y qué procesan."},d60:{en:"Add an assessment step before contracting vendors.",es:"Añadir una evaluación antes de contratar proveedores."},d90:{en:"Schedule periodic contract and terms reviews.",es:"Programar revisiones periódicas de contratos y condiciones."}},
+  documentation:{d30:{en:"Gather existing AI documentation in one place.",es:"Reunir la documentación de IA existente en un lugar."},d60:{en:"Create technical docs for key systems.",es:"Crear documentación técnica de los sistemas clave."},d90:{en:"Introduce version control and change logs.",es:"Introducir control de versiones y registro de cambios."}},
+  monitoring:{d30:{en:"Define a few monitoring metrics per system.",es:"Definir unas métricas de monitorización por sistema."},d60:{en:"Set up post-deployment monitoring.",es:"Configurar la monitorización tras el despliegue."},d90:{en:"Run a first internal AI audit.",es:"Realizar una primera auditoría interna de IA."}},
+  literacy:{d30:{en:"Publish basic responsible-AI guidelines for staff.",es:"Publicar guías básicas de IA responsable para el personal."},d60:{en:"Roll out general AI awareness training.",es:"Desplegar formación general de concienciación en IA."},d90:{en:"Add role-based training for high-exposure teams.",es:"Añadir formación por rol para equipos de mayor exposición."}},
+  incident:{d30:{en:"Create a simple AI incident log.",es:"Crear un registro simple de incidentes de IA."},d60:{en:"Define who triages and responds to incidents.",es:"Definir quién clasifica y responde a los incidentes."},d90:{en:"Add incident analysis and corrective actions.",es:"Añadir análisis de incidentes y acciones correctivas."}}
+};
+
+/* obligations checklist rows (subset of categories, audit style) */
+const OBLIGATIONS = ["governance","inventory","riskclass","oversight","data","transparency","documentation","thirdparty","monitoring","literacy","incident"];
+
+/* industry recommendations */
+const INDUSTRY_RECS = {
+  manufacturing:[{en:"Govern AI in quality, vision and predictive maintenance",es:"Gobernar la IA en calidad, visión y mantenimiento predictivo"},{en:"Keep human oversight on safety-relevant decisions",es:"Mantener supervisión humana en decisiones de seguridad"},{en:"Document models embedded in machinery",es:"Documentar los modelos integrados en la maquinaria"},{en:"Assess AI vendors in your supply chain",es:"Evaluar a los proveedores de IA de tu cadena"}],
+  technology:[{en:"Inventory internal and product AI systems",es:"Inventariar los sistemas de IA internos y de producto"},{en:"Add transparency notices to AI features",es:"Añadir avisos de transparencia a las funciones con IA"},{en:"Formalize model testing and monitoring",es:"Formalizar las pruebas y monitorización de modelos"},{en:"Govern third-party model and API usage",es:"Gobernar el uso de modelos y APIs de terceros"}],
+  services:[{en:"Classify client-facing and internal AI uses",es:"Clasificar los usos de IA internos y de cara al cliente"},{en:"Set human review on AI-generated deliverables",es:"Establecer revisión humana de entregables generados por IA"},{en:"Document AI use in engagements",es:"Documentar el uso de IA en los proyectos"},{en:"Train staff on responsible AI use",es:"Formar al personal en uso responsable de la IA"}],
+  healthcare:[{en:"Treat clinical AI as potentially high-risk and seek legal review",es:"Tratar la IA clínica como posible alto riesgo y buscar revisión jurídica"},{en:"Keep strong human oversight and traceability",es:"Mantener supervisión humana y trazabilidad sólidas"},{en:"Assess data quality and bias carefully",es:"Evaluar con cuidado la calidad de datos y los sesgos"},{en:"Document systems for auditability",es:"Documentar los sistemas para su auditabilidad"}],
+  financial:[{en:"Credit scoring and profiling may be high-risk, seek legal review",es:"El scoring crediticio y el profiling pueden ser de alto riesgo; buscar revisión jurídica"},{en:"Strengthen model documentation and monitoring",es:"Reforzar la documentación y monitorización de modelos"},{en:"Run bias and fairness assessments",es:"Realizar evaluaciones de sesgo y equidad"},{en:"Govern third-party AI and data providers",es:"Gobernar la IA y los proveedores de datos de terceros"}],
+  retail:[{en:"Add transparency to chatbots and recommendations",es:"Añadir transparencia a chatbots y recomendaciones"},{en:"Govern personalization and pricing models",es:"Gobernar los modelos de personalización y precios"},{en:"Inventory marketing and content AI tools",es:"Inventariar las herramientas de IA de marketing y contenido"},{en:"Assess vendors handling customer data",es:"Evaluar proveedores que traten datos de clientes"}],
+  logistics:[{en:"Govern routing and forecasting models",es:"Gobernar los modelos de rutas y previsión"},{en:"Keep human oversight on operational decisions",es:"Mantener supervisión humana en decisiones operativas"},{en:"Document and monitor deployed systems",es:"Documentar y monitorizar los sistemas desplegados"},{en:"Assess telematics and AI vendors",es:"Evaluar proveedores de telemática e IA"}],
+  aviation:[{en:"Treat safety and operations AI with strict governance",es:"Tratar la IA de seguridad y operaciones con gobierno estricto"},{en:"Keep rigorous documentation and traceability",es:"Mantener documentación y trazabilidad rigurosas"},{en:"Ensure human oversight on critical decisions",es:"Garantizar supervisión humana en decisiones críticas"},{en:"Align AI governance with existing safety compliance",es:"Alinear el gobierno de IA con el cumplimiento de seguridad existente"}],
+  hospitality:[{en:"Add transparency to guest-facing AI",es:"Añadir transparencia a la IA de cara al huésped"},{en:"Govern dynamic pricing and personalization",es:"Gobernar el pricing dinámico y la personalización"},{en:"Inventory AI tools across properties",es:"Inventariar las herramientas de IA en todas las sedes"},{en:"Train staff on responsible AI use",es:"Formar al personal en uso responsable de la IA"}],
+  education:[{en:"Student-facing AI may be high-risk, seek legal review",es:"La IA orientada a estudiantes puede ser de alto riesgo; buscar revisión jurídica"},{en:"Keep human oversight on grading and admissions",es:"Mantener supervisión humana en calificación y admisiones"},{en:"Assess bias in assessment tools",es:"Evaluar sesgos en las herramientas de evaluación"},{en:"Provide AI literacy for staff and students",es:"Ofrecer alfabetización en IA a personal y estudiantes"}],
+  government:[{en:"Public-sector AI often faces stricter obligations",es:"La IA del sector público suele tener obligaciones más estrictas"},{en:"Prioritize transparency and human oversight",es:"Priorizar la transparencia y la supervisión humana"},{en:"Keep thorough documentation and audit trails",es:"Mantener documentación exhaustiva y trazas de auditoría"},{en:"Assess vendors and publish clear notices",es:"Evaluar proveedores y publicar avisos claros"}],
+  construction:[{en:"Inventory AI in design, planning and safety",es:"Inventariar la IA en diseño, planificación y seguridad"},{en:"Keep human oversight on safety-relevant outputs",es:"Mantener supervisión humana en resultados de seguridad"},{en:"Document models and data sources",es:"Documentar los modelos y las fuentes de datos"},{en:"Assess AI vendors and subcontractor tools",es:"Evaluar proveedores de IA y herramientas de subcontratas"}],
+  other:[{en:"Start by inventorying your AI systems",es:"Empieza inventariando tus sistemas de IA"},{en:"Classify use cases by risk",es:"Clasificar los casos de uso por riesgo"},{en:"Add human oversight and transparency",es:"Añadir supervisión humana y transparencia"},{en:"Document, monitor and train your teams",es:"Documentar, monitorizar y formar a tus equipos"}]
+};
+
+const LEVELS = [
+  {max:19, id:"l1", name:{en:"Level 1 · Ad Hoc",es:"Nivel 1 · Ad Hoc"}, sub:{en:"AI is used without formal governance. Foundations are not in place yet.",es:"Se usa IA sin gobierno formal. Aún no hay bases establecidas."}},
+  {max:39, id:"l2", name:{en:"Level 2 · Emerging",es:"Nivel 2 · Emergente"}, sub:{en:"Some practices exist but they are informal or partial. Structure will unlock most of the value.",es:"Existen algunas prácticas, pero son informales o parciales. Estructurarlas dará la mayor parte del valor."}},
+  {max:59, id:"l3", name:{en:"Level 3 · Managed",es:"Nivel 3 · Gestionado"}, sub:{en:"Governance is documented and applied across key areas, with gaps remaining.",es:"El gobierno está documentado y aplicado en áreas clave, con brechas pendientes."}},
+  {max:79, id:"l4", name:{en:"Level 4 · Controlled",es:"Nivel 4 · Controlado"}, sub:{en:"Governance is implemented and largely consistent, approaching audit readiness.",es:"El gobierno está implementado y es mayormente consistente, acercándose a la preparación para auditoría."}},
+  {max:100,id:"l5", name:{en:"Level 5 · Optimised",es:"Nivel 5 · Optimizado"}, sub:{en:"Mature, monitored and continuously improving AI governance across the organization.",es:"Gobierno de IA maduro, monitorizado y en mejora continua en toda la organización."}}
+];
+const RISKS = {high:{en:"High risk exposure",es:"Exposición de riesgo alta"},medium:{en:"Medium risk exposure",es:"Exposición de riesgo media"},low:{en:"Low risk exposure",es:"Exposición de riesgo baja"}};
+
+const LOADING_STEPS = [
+  {en:"Scoring governance maturity...",es:"Puntuando la madurez de gobierno...",at:200},
+  {en:"Estimating EU AI Act readiness...",es:"Estimando preparación para el EU AI Act...",at:900},
+  {en:"Classifying use-case risk...",es:"Clasificando el riesgo de los casos de uso...",at:1600},
+  {en:"Detecting strengths and gaps...",es:"Detectando fortalezas y brechas...",at:2300},
+  {en:"Building your 30-60-90 roadmap...",es:"Construyendo tu roadmap 30-60-90...",at:2950}
+];
+const LOADING_TOTAL = 3600;
+
+/* ============================================================
+   STATE + i18n
+   ============================================================ */
+const state = { industry:null, size:null, country:"", useAI:null, own:null, vendors:new Set(), count:null, usecases:new Set(), answers:{} };
+let lastResult=null;
+
+function t(key){ return (STR[key]||{})[LANG]||key; }
+function applyLang(){
+  document.documentElement.lang=LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.getAttribute('data-i18n')));
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>el.placeholder=t(el.getAttribute('data-i18n-ph')));
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+const steps=[document.getElementById('step-1'),document.getElementById('step-2'),document.getElementById('step-3')];
+const resultsEl=document.getElementById('results'), loadingEl=document.getElementById('loading');
+const barFill=document.getElementById('bar-fill'), stepLabel=document.getElementById('step-label');
+let current=0;
+function setProgress(txt,w){ stepLabel.textContent=txt; barFill.style.width=w; }
+function showStep(i){ steps.forEach((s,idx)=>s.classList.toggle('active',idx===i)); resultsEl.classList.remove('active'); loadingEl.classList.remove('active'); current=i; setProgress('STEP 0'+(i+1)+' / 03', ((i+1)/3*90)+'%'); window.scrollTo({top:0,behavior:'smooth'}); }
+function showLoading(){ steps.forEach(s=>s.classList.remove('active')); resultsEl.classList.remove('active'); loadingEl.classList.add('active'); setProgress(LANG==='es'?'CALCULANDO':'CALCULATING','95%'); window.scrollTo({top:0,behavior:'smooth'}); }
+function showResults(){ steps.forEach(s=>s.classList.remove('active')); loadingEl.classList.remove('active'); resultsEl.classList.add('active'); setProgress(LANG==='es'?'RESULTADOS':'RESULTS','100%'); window.scrollTo({top:0,behavior:'smooth'}); }
+document.querySelectorAll('[data-back]').forEach(b=>b.addEventListener('click',()=>showStep(current-1)));
+
+/* ============================================================
+   COMPONENTS: dropdown, single-choice, multi-checkbox
+   ============================================================ */
+function createSelect(root, items, onPick){
+  const btn=root.querySelector('.sel-btn'), panel=root.querySelector('.sel-panel');
+  const icBox=btn.querySelector('.ic'), txt=btn.querySelector('.txt');
+  root._render=()=>{ panel.innerHTML='';
+    items.forEach((item,idx)=>{ const o=document.createElement('button'); o.type='button'; o.className='sel-opt'+(root._sel===idx?' selected':'');
+      o.innerHTML=(item.icon?'<span class="ic">'+ICONS[item.icon]+'</span>':'')+'<span>'+(item.name?item.name[LANG]:item.label[LANG])+'</span>';
+      o.addEventListener('click',()=>{ root._sel=idx; txt.textContent=item.name?item.name[LANG]:item.label[LANG]; btn.classList.add('filled'); if(item.icon)icBox.innerHTML=ICONS[item.icon]; root.classList.remove('open'); root._render(); onPick(item,idx); });
+      panel.appendChild(o); });
+    if(root._sel!=null){ const it=items[root._sel]; txt.textContent=it.name?it.name[LANG]:it.label[LANG]; } };
+  root._render();
+  btn.addEventListener('click',e=>{ e.stopPropagation(); document.querySelectorAll('.sel.open').forEach(s=>{if(s!==root)s.classList.remove('open');}); root.classList.toggle('open'); });
+}
+document.addEventListener('click',()=>document.querySelectorAll('.sel.open').forEach(s=>s.classList.remove('open')));
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.sel.open').forEach(s=>s.classList.remove('open')); });
+
+function createChoice(gridId,items,onPick){ const grid=document.getElementById(gridId);
+  grid._render=()=>{ grid.innerHTML=''; items.forEach(item=>{ const b=document.createElement('button'); b.type='button'; b.className='choice'+(grid._sel===item.id?' on':''); b.textContent=item.label[LANG];
+    b.addEventListener('click',()=>{ grid._sel=item.id; grid._render(); onPick(item); }); grid.appendChild(b); }); };
+  grid._render();
+}
+function createChecks(gridId,items,set,opts){ const grid=document.getElementById(gridId); opts=opts||{};
+  grid._render=()=>{ grid.innerHTML=''; items.forEach(item=>{ const on=set.has(item.id);
+    const b=document.createElement('button'); b.type='button'; b.className='check'+(on?' on':'')+((opts.risk && (item.tier==='high'||item.tier==='prohibited'))?' risk':'');
+    b.innerHTML='<span class="box">'+CHECK+'</span><span>'+item.label[LANG]+'</span>';
+    b.addEventListener('click',()=>{ if(set.has(item.id))set.delete(item.id); else set.add(item.id); grid._render(); }); grid.appendChild(b); }); };
+  grid._render();
+}
+
+const selIndustry=document.getElementById('sel-industry'), selSize=document.getElementById('sel-size');
+createSelect(selIndustry, INDUSTRIES, item=>state.industry=item);
+createSelect(selSize, SIZES, item=>state.size=item);
+
+/* ============================================================
+   COUNTRY / REGION autocomplete
+   Free-text input with a live-filtered suggestion list: regions,
+   countries and major cities across Europe, US, LatAm & the Americas.
+   ============================================================ */
+const PLACES = [
+  // Regions / supranational
+  "Europe","European Union","Latin America","North America","Central America","United Kingdom","United States","Nordics","Benelux",
+  "Asia","Asia-Pacific","APAC","Middle East","Gulf (GCC)","Africa","Oceania","CIS",
+  // Europe - countries
+  "Spain","Portugal","France","Germany","Italy","United Kingdom","Ireland","Netherlands","Belgium","Luxembourg","Switzerland","Austria",
+  "Sweden","Norway","Denmark","Finland","Iceland","Poland","Czech Republic","Slovakia","Hungary","Romania","Bulgaria","Greece","Croatia",
+  "Slovenia","Serbia","Ukraine","Estonia","Latvia","Lithuania","Malta","Cyprus","Russia",
+  // Europe - major cities
+  "Madrid, Spain","Barcelona, Spain","Valencia, Spain","Seville, Spain","Bilbao, Spain","Lisbon, Portugal","Porto, Portugal",
+  "Paris, France","Lyon, France","Marseille, France","Berlin, Germany","Munich, Germany","Frankfurt, Germany","Hamburg, Germany",
+  "Rome, Italy","Milan, Italy","Turin, Italy","London, United Kingdom","Manchester, United Kingdom","Edinburgh, United Kingdom",
+  "Dublin, Ireland","Amsterdam, Netherlands","Rotterdam, Netherlands","Brussels, Belgium","Antwerp, Belgium","Zurich, Switzerland",
+  "Geneva, Switzerland","Vienna, Austria","Stockholm, Sweden","Oslo, Norway","Copenhagen, Denmark","Helsinki, Finland",
+  "Warsaw, Poland","Krakow, Poland","Prague, Czech Republic","Budapest, Hungary","Bucharest, Romania","Athens, Greece",
+  "Zagreb, Croatia","Kyiv, Ukraine","Moscow, Russia","Saint Petersburg, Russia",
+  // United States - cities
+  "New York, United States","Los Angeles, United States","San Francisco, United States","Chicago, United States","Miami, United States",
+  "Boston, United States","Austin, United States","Seattle, United States","Washington DC, United States","Houston, United States",
+  "Dallas, United States","Atlanta, United States","Denver, United States","Philadelphia, United States","San Diego, United States",
+  // North America - other
+  "Canada","Toronto, Canada","Vancouver, Canada","Montreal, Canada","Mexico","Mexico City, Mexico","Guadalajara, Mexico","Monterrey, Mexico",
+  // Central America / Caribbean
+  "Costa Rica","San José, Costa Rica","Panama","Panama City, Panama","Guatemala","Guatemala City, Guatemala",
+  "Dominican Republic","Santo Domingo, Dominican Republic","Puerto Rico","El Salvador","Honduras","Nicaragua","Cuba","Jamaica",
+  // South America / LatAm
+  "Argentina","Buenos Aires, Argentina","Brazil","São Paulo, Brazil","Rio de Janeiro, Brazil","Brasília, Brazil",
+  "Chile","Santiago, Chile","Colombia","Bogotá, Colombia","Medellín, Colombia","Peru","Lima, Peru","Uruguay","Montevideo, Uruguay",
+  "Ecuador","Quito, Ecuador","Venezuela","Caracas, Venezuela","Bolivia","La Paz, Bolivia","Paraguay","Asunción, Paraguay",
+  // Asia - East & Southeast
+  "China","Beijing, China","Shanghai, China","Shenzhen, China","Guangzhou, China","Hong Kong","Taiwan","Taipei, Taiwan",
+  "Japan","Tokyo, Japan","Osaka, Japan","South Korea","Seoul, South Korea","Singapore","Malaysia","Kuala Lumpur, Malaysia",
+  "Indonesia","Jakarta, Indonesia","Thailand","Bangkok, Thailand","Vietnam","Ho Chi Minh City, Vietnam","Hanoi, Vietnam",
+  "Philippines","Manila, Philippines",
+  // Asia - South
+  "India","Mumbai, India","Delhi, India","Bangalore, India","Hyderabad, India","Pune, India","Pakistan","Bangladesh","Sri Lanka",
+  // Middle East
+  "United Arab Emirates","Dubai, United Arab Emirates","Abu Dhabi, United Arab Emirates","Saudi Arabia","Riyadh, Saudi Arabia",
+  "Jeddah, Saudi Arabia","Qatar","Doha, Qatar","Kuwait","Bahrain","Oman","Israel","Tel Aviv, Israel","Jerusalem, Israel",
+  "Turkey","Istanbul, Turkey","Ankara, Turkey","Jordan","Lebanon",
+  // Africa
+  "South Africa","Johannesburg, South Africa","Cape Town, South Africa","Nigeria","Lagos, Nigeria","Egypt","Cairo, Egypt",
+  "Kenya","Nairobi, Kenya","Morocco","Casablanca, Morocco","Ghana","Ethiopia","Tunisia","Algeria",
+  // Oceania
+  "Australia","Sydney, Australia","Melbourne, Australia","Brisbane, Australia","Perth, Australia","New Zealand","Auckland, New Zealand"
+];
+
+(function setupCountryAutocomplete(){
+  const root = document.getElementById('sel-country');
+  const input = document.getElementById('in-country');
+  const panel = document.getElementById('country-panel');
+
+  function render(query){
+    const q = query.trim().toLowerCase();
+    const matches = q
+      ? PLACES.filter(p=>p.toLowerCase().includes(q)).slice(0,8)
+      : PLACES.slice(0,8);
+    if(matches.length===0){ root.classList.remove('open'); panel.innerHTML=''; return; }
+    panel.innerHTML = matches.map(p=>'<button type="button" class="sel-opt">'+p+'</button>').join('');
+    panel.querySelectorAll('.sel-opt').forEach((btn,i)=>{
+      btn.addEventListener('mousedown', e=>{ // mousedown fires before input blur
+        e.preventDefault();
+        input.value = matches[i];
+        state.country = matches[i];
+        root.classList.remove('open');
+      });
+    });
+    root.classList.add('open');
+  }
+
+  input.addEventListener('input', ()=>{ state.country = input.value.trim(); render(input.value); });
+  input.addEventListener('focus', ()=> render(input.value));
+  input.addEventListener('blur', ()=> setTimeout(()=>root.classList.remove('open'), 100));
+})();
+createChoice('useai-grid', USE_AI, item=>state.useAI=item.id);
+createChoice('own-grid', OWN, item=>state.own=item.id);
+createChoice('count-grid', COUNTS, item=>state.count=item.id);
+createChecks('vendors-grid', VENDORS, state.vendors);
+createChecks('usecases-grid', USECASES, state.usecases, {risk:true});
+
+document.getElementById('continue-1').addEventListener('click',()=>{
+  state.country=document.getElementById('in-country').value.trim();
+  if(!state.industry||!state.size){ document.getElementById('s1-validate').classList.add('show'); return; }
+  document.getElementById('s1-validate').classList.remove('show');
+  showStep(1);
+});
+document.getElementById('continue-2').addEventListener('click',()=>{ buildAssessment(); showStep(2); });
+
+/* ============================================================
+   STEP 3 · assessment
+   ============================================================ */
+function buildScaleLegend(){ document.getElementById('scale-legend').innerHTML = SCALE.map((s,i)=>'<span><b>'+i+'</b>'+s[LANG]+'</span>').join(''); }
+function buildAssessment(){
+  buildScaleLegend();
+  const host=document.getElementById('assessment'); host.innerHTML='';
+  QUESTIONS.forEach(q=>{ if(q.type==='slider' && state.answers[q.id]==null) state.answers[q.id]=0; });
+  let qi=0;
+  CATEGORIES.forEach((cat,ci)=>{
+    const qs=QUESTIONS.filter(q=>q.cat===cat.id); if(!qs.length) return;
+    const block=document.createElement('div'); block.className='cat-block';
+    block.innerHTML='<div class="cat-head"><span class="cn">'+String(ci+1).padStart(2,'0')+'</span>'+cat.name[LANG]+'</div>';
+    qs.forEach(q=>{ qi++;
+      const card=document.createElement('div'); card.className='q-card'; card.style.animationDelay=(qi*0.015)+'s';
+      let inner='<div class="q-top"><div class="q-text"><span class="q-num">Q'+String(qi).padStart(2,'0')+'</span>'+q.text[LANG]+'</div>';
+      if(q.type==='scale') inner+='<div class="scale-row" data-q="'+q.id+'">'+[0,1,2,3,4].map(v=>'<button type="button" data-v="'+v+'"'+(state.answers[q.id]===v?' class="on"':'')+'>'+v+'</button>').join('')+'</div></div>';
+      else if(q.type==='yesno') inner+='<div class="yesno" data-q="'+q.id+'"><button type="button" data-v="1"'+(state.answers[q.id]===1?' class="on"':'')+'>'+YESNO.yes[LANG]+'</button><button type="button" data-v="0"'+(state.answers[q.id]===0?' class="on"':'')+'>'+YESNO.no[LANG]+'</button></div></div>';
+      else inner+='</div>';
+      if(q.type==='slider'){ const val=state.answers[q.id]||0; inner+='<div class="slider-wrap"><input type="range" min="0" max="100" step="1" value="'+val+'" data-q="'+q.id+'"><span class="slider-val">'+val+'%</span></div>'; }
+      card.innerHTML=inner; block.appendChild(card);
+    });
+    host.appendChild(block);
+  });
+  host.querySelectorAll('.scale-row, .yesno').forEach(row=>row.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    state.answers[row.dataset.q]=Number(b.dataset.v); row.querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); updateAnswered(); document.getElementById('s3-validate').classList.remove('show');
+  })));
+  host.querySelectorAll('input[type=range]').forEach(r=>r.addEventListener('input',()=>{ state.answers[r.dataset.q]=Number(r.value); r.nextElementSibling.textContent=r.value+'%'; }));
+  updateAnswered();
+}
+function requiredQs(){ return QUESTIONS.filter(q=>q.type==='scale'||q.type==='yesno'); }
+function answeredCount(){ return requiredQs().filter(q=>state.answers[q.id]!=null).length; }
+function updateAnswered(){ document.getElementById('answered-count').textContent = answeredCount()+' / '+requiredQs().length+' '+t('answered'); }
+document.getElementById('calc-btn').addEventListener('click',()=>{ if(answeredCount()<requiredQs().length){ document.getElementById('s3-validate').classList.add('show'); return; } runLoading(); });
+
+/* ============================================================
+   SCORING MODEL
+   ============================================================ */
+function qNorm(q){ const a=state.answers[q.id];
+  if(q.type==='scale') return a==null?null:a/4;
+  if(q.type==='yesno') return a==null?null:a;
+  if(q.type==='slider') return (a==null?0:a)/100; return null; }
+function categoryScore(catId){ const qs=QUESTIONS.filter(q=>q.cat===catId); let n=0,d=0; qs.forEach(q=>{const v=qNorm(q); if(v!=null){n+=v;d++;}}); return d?Math.round(n/d*100):0; }
+function weighted(w,cs){ let n=0,d=0; for(const id in w){ n+=cs[id]*w[id]; d+=w[id]; } return d?Math.round(n/d):0; }
+
+function classifyRisk(){
+  let tier="minimal";
+  state.usecases.forEach(id=>{ const uc=USECASES.find(u=>u.id===id); if(uc && TIER_ORDER.indexOf(uc.tier)>TIER_ORDER.indexOf(tier)) tier=uc.tier; });
+  if(state.usecases.size===0) tier="minimal";
+  return tier;
+}
+function calculate(){
+  const cs={}; CATEGORIES.forEach(c=>cs[c.id]=categoryScore(c.id));
+  const overall=Math.round(CATEGORIES.reduce((a,c)=>a+cs[c.id],0)/CATEGORIES.length);
+
+  const scores = {
+    aiGovernance:  Math.round((cs.governance+cs.inventory+cs.riskclass)/3),
+    euReadiness:   weighted({riskclass:1.2,oversight:1.2,transparency:1.1,data:1.1,documentation:1.0,governance:1.0,security:0.9,thirdparty:0.9},cs),
+    responsibleAI: overall,
+    operational:   Math.round((cs.monitoring+cs.security+cs.incident)/3),
+    documentation: cs.documentation,
+    literacy:      cs.literacy,
+    vendor:        cs.thirdparty,
+    riskMgmt:      Math.round((cs.riskclass+cs.security+cs.incident)/3),
+    overall:       overall
+  };
+
+  const tier=classifyRisk();
+  // risk exposure: higher tier + lower readiness => more exposure
+  const tierWeight={minimal:0,limited:1,high:2,prohibited:3}[tier];
+  const exposureBasis = tierWeight*22 + (100-scores.euReadiness)*0.5;
+  const riskId = exposureBasis>=70?'high':(exposureBasis>=38?'medium':'low');
+
+  const level=LEVELS.find(l=>overall<=l.max);
+
+  const ranked=CATEGORIES.map(c=>({id:c.id,score:cs[c.id]})).sort((a,b)=>b.score-a.score);
+  const strengths=ranked.slice(0,3), gaps=ranked.slice(-3).reverse();
+
+  return { cs, overall, scores, tier, riskId, level, strengths, gaps };
+}
+
+/* ============================================================
+   RENDER HELPERS
+   ============================================================ */
+function countUp(el,target,fmt,dur=900){ const t0=performance.now();
+  (function tick(now){ const p=Math.min((now-t0)/dur,1); el.textContent=fmt(Math.round(target*(1-Math.pow(1-p,3)))); if(p<1)requestAnimationFrame(tick); })(t0);
+  setTimeout(()=>{el.textContent=fmt(target);},dur+150); }
+function scoreColor(s){ return s>=75?'#39d27a':(s>=50?'#7b93c9':(s>=25?'#e0b34c':'#e0985a')); }
+
+function radarSVG(cs){
+  const cx=140,cy=140,rmax=100,n=CATEGORIES.length;
+  const ang=i=>(-90+i*360/n)*Math.PI/180;
+  const pt=(i,r)=>[Math.round((cx+r*Math.cos(ang(i)))*10)/10,Math.round((cy+r*Math.sin(ang(i)))*10)/10];
+  let rings=''; [0.25,0.5,0.75,1].forEach(f=>{ rings+='<polygon points="'+CATEGORIES.map((_,i)=>pt(i,rmax*f).join(',')).join(' ')+'" fill="none" stroke="#2c2c2c" stroke-width="1"/>'; });
+  let axes=''; CATEGORIES.forEach((_,i)=>{ const[x,y]=pt(i,rmax); axes+='<line x1="'+cx+'" y1="'+cy+'" x2="'+x+'" y2="'+y+'" stroke="#242424" stroke-width="1"/>'; });
+  let labels=''; CATEGORIES.forEach((_,i)=>{ const[x,y]=pt(i,rmax+13); labels+='<text x="'+x+'" y="'+y+'" font-family="Geist Mono,monospace" font-size="8" fill="#9a9a96" text-anchor="middle" dominant-baseline="middle">'+String(i+1).padStart(2,'0')+'</text>'; });
+  const dpts=CATEGORIES.map((c,i)=>pt(i,rmax*(cs[c.id]/100)).join(',')).join(' ');
+  const data='<polygon class="radar-data" points="'+dpts+'" fill="rgba(123,147,201,0.18)" stroke="#7b93c9" stroke-width="1.6" stroke-linejoin="round" style="opacity:0;transition:opacity .6s ease"/>';
+  let dots=''; CATEGORIES.forEach((c,i)=>{ const[x,y]=pt(i,rmax*(cs[c.id]/100)); dots+='<circle cx="'+x+'" cy="'+y+'" r="2.4" fill="#7b93c9"/>'; });
+  return '<svg width="280" height="280" viewBox="0 0 280 280">'+rings+axes+labels+data+dots+'</svg>';
+}
+
+function renderResults(r){
+  lastResult=r;
+  const d=new Date();
+  document.getElementById('res-context').textContent = state.industry.name[LANG]+' · '+state.size.label[LANG]+(state.country?(' · '+state.country):'')+' · '+t('ctx_generated')+' '+d.toLocaleDateString(LANG==='es'?'es-ES':'en-GB');
+
+  // donut (overall)
+  const R=64,C=2*Math.PI*R,off=C*(1-r.overall/100),col=scoreColor(r.overall);
+  document.getElementById('donut').innerHTML='<svg width="150" height="150" viewBox="0 0 150 150"><circle cx="75" cy="75" r="'+R+'" fill="none" stroke="#2a2a2a" stroke-width="12"/><circle id="donut-arc" cx="75" cy="75" r="'+R+'" fill="none" stroke="'+col+'" stroke-width="12" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+C+'"/></svg><div class="center"><div class="num" id="donut-num">0</div><div class="den">/ 100</div></div>';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ const a=document.getElementById('donut-arc'); a.style.transition='stroke-dashoffset 1.1s cubic-bezier(.4,0,.2,1)'; a.style.strokeDashoffset=off; }));
+  countUp(document.getElementById('donut-num'), r.overall, v=>v, 1100);
+
+  document.getElementById('r-level').textContent=r.level.name[LANG];
+  document.getElementById('r-level-sub').textContent=r.level.sub[LANG];
+  const riskTag=document.getElementById('r-risk'); riskTag.className='tag risk-'+r.riskId;
+  document.getElementById('r-risk-text').textContent=RISKS[r.riskId][LANG];
+  document.getElementById('r-maturity-text').textContent=r.level.name[LANG];
+
+  // risk banner
+  const info=TIER_INFO[r.tier], banner=document.getElementById('risk-banner');
+  banner.className='risk-banner tier-'+r.tier;
+  document.getElementById('rb-title').textContent=info.title[LANG];
+  document.getElementById('rb-badge').textContent=info.badge;
+  document.getElementById('rb-text').textContent=info.text[LANG];
+  const sensitive=[...state.usecases].map(id=>USECASES.find(u=>u.id===id)).filter(u=>u&&(u.tier==='high'||u.tier==='prohibited'));
+  document.getElementById('rb-cases').textContent = sensitive.length ? (LANG==='es'?'Casos de uso a revisar: ':'Use cases to review: ')+sensitive.map(u=>u.label[LANG]).join(', ') : '';
+
+  // score cards
+  const S=r.scores;
+  const cards=[
+    {k:{en:"Overall readiness",es:"Preparación global"},v:S.overall},
+    {k:{en:"EU AI Act readiness",es:"Preparación EU AI Act"},v:S.euReadiness},
+    {k:{en:"AI Governance score",es:"Score de gobierno de IA"},v:S.aiGovernance},
+    {k:{en:"Responsible AI maturity",es:"Madurez de IA responsable"},v:S.responsibleAI},
+    {k:{en:"Operational controls",es:"Controles operativos"},v:S.operational},
+    {k:{en:"Documentation readiness",es:"Preparación documental"},v:S.documentation},
+    {k:{en:"Human oversight",es:"Supervisión humana"},v:r.cs.oversight},
+    {k:{en:"Data governance",es:"Gobernanza de datos"},v:r.cs.data},
+    {k:{en:"Vendor governance",es:"Gobierno de proveedores"},v:S.vendor}
+  ];
+  document.getElementById('score-cards').innerHTML = cards.map((c,i)=>
+    '<div class="res-card" style="animation-delay:'+(0.05+i*0.04)+'s"><div class="k">'+c.k[LANG]+'</div><div class="v" data-cu="'+c.v+'">0</div><div class="u">/ 100</div><div class="mini-bar"><i data-w="'+c.v+'" style="background:'+scoreColor(c.v)+'"></i></div></div>').join('');
+  document.querySelectorAll('#score-cards .v').forEach(el=>countUp(el, Number(el.dataset.cu), v=>v));
+  requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll('#score-cards .mini-bar i').forEach(i=>i.style.width=i.dataset.w+'%')));
+
+  // radar
+  document.getElementById('radar').innerHTML=radarSVG(r.cs);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ const p=document.querySelector('.radar-data'); if(p)p.style.opacity=1; }));
+  document.getElementById('radar-legend').innerHTML=CATEGORIES.map((c,i)=>'<span><b>'+String(i+1).padStart(2,'0')+'</b>'+c.name[LANG]+' · '+r.cs[c.id]+'</span>').join('');
+
+  // category bars
+  document.getElementById('chart-cats').innerHTML=CATEGORIES.map(c=>{ const s=r.cs[c.id]; return '<div class="hrow"><div class="lbl">'+c.name[LANG]+'</div><div class="track"><div class="fill" data-w="'+s+'" style="background:'+scoreColor(s)+'"></div></div><div class="val">'+s+'</div></div>'; }).join('');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll('#chart-cats .fill').forEach(f=>f.style.width=f.dataset.w+'%')));
+
+  // strengths / gaps
+  document.getElementById('r-strengths').innerHTML=r.strengths.map((s,i)=>'<li><span class="idx">0'+(i+1)+'</span><span>'+catName(s.id)+' · '+s.score+'/100</span></li>').join('');
+  document.getElementById('r-gaps').innerHTML=r.gaps.map((g,i)=>'<li><span class="idx">0'+(i+1)+'</span><span>'+catName(g.id)+' · '+g.score+'/100</span></li>').join('');
+
+  // obligations table
+  const statusOf=s=> s>=75?['strong','st_strong','cmt_strong'] : s>=50?['partial','st_partial','cmt_partial'] : s>=25?['needs','st_needs','cmt_needs'] : ['missing','st_missing','cmt_missing'];
+  document.getElementById('r-obligations').innerHTML = OBLIGATIONS.map(id=>{ const s=r.cs[id]; const [ , cls, cmt]=statusOf(s); const lblKey='st_'+({strong:'strong',partial:'partial',needs:'needs',missing:'missing'})[statusOf(s)[0]];
+    return '<tr><td>'+catName(id)+'</td><td><span class="status-pill '+cls+'"><span class="d"></span>'+t(lblKey)+'</span></td><td>'+t(cmt)+'</td></tr>'; }).join('');
+
+  // roadmap
+  const gapIds=r.gaps.map(g=>g.id);
+  const c30=[], c60=[], c90=[];
+  gapIds.forEach(id=>{ c30.push(GAP_ACTIONS[id].d30[LANG]); c60.push(GAP_ACTIONS[id].d60[LANG]); c90.push(GAP_ACTIONS[id].d90[LANG]); });
+  const planCol=(title,items)=>'<div class="plan-col"><h4>'+title+'</h4><ul>'+items.map(i=>'<li>'+i+'</li>').join('')+'</ul></div>';
+  document.getElementById('r-plan').innerHTML=planCol(t('d30'),c30)+planCol(t('d60'),c60)+planCol(t('d90'),c90);
+
+  // industry recs
+  document.getElementById('r-ind-sub').textContent=t('ind_rec_sub');
+  document.getElementById('r-industry').innerHTML=INDUSTRY_RECS[state.industry.id].map(x=>'<li><span class="idx">→</span><span>'+x[LANG]+'</span></li>').join('');
+
+  document.getElementById('r-how').textContent=t('how');
+  document.getElementById('r-disclaimer').textContent=t('disclaimer');
+}
+
+/* ============================================================
+   LOADING then results
+   ============================================================ */
+function runLoading(){
+  showLoading();
+  const linesEl=document.getElementById('load-lines');
+  linesEl.innerHTML=LOADING_STEPS.map(s=>'<div class="ln">'+s[LANG]+'</div>').join('')+'<div class="ln"><span class="ok">✓</span> '+(LANG==='es'?'Listo':'Done')+'<span class="term-cursor"></span></div>';
+  const lns=linesEl.querySelectorAll('.ln');
+  LOADING_STEPS.forEach((s,i)=>setTimeout(()=>lns[i].classList.add('on'),s.at));
+  setTimeout(()=>lns[lns.length-1].classList.add('on'),LOADING_TOTAL-350);
+  const pctEl=document.getElementById('load-pct'), barEl=document.getElementById('load-bar-fill'), t0=performance.now();
+  (function tick(now){ const p=Math.min((now-t0)/LOADING_TOTAL,1); pctEl.textContent=Math.round(p*100)+'%'; barEl.style.width=(p*100)+'%'; if(p<1)requestAnimationFrame(tick); })(t0);
+  const r=calculate();
+  setTimeout(()=>{
+    renderResults(r);
+    showResults();
+    document.getElementById('ai-alert').hidden = true;
+    document.getElementById('ai-notes-status').textContent = LANG==='es' ? 'Analizando…' : 'Analyzing…';
+    document.getElementById('ai-notes-diagnosis').textContent = '';
+    document.getElementById('ai-notes-cols').innerHTML = '';
+    fetchAIACTAnalysis(r);
+  }, LOADING_TOTAL+250);
+}
+document.getElementById('pdf-btn').addEventListener('click',()=>window.print());
+document.getElementById('restart-btn').addEventListener('click',()=>showStep(0));
+
+/* ============================================================
+   AI ANALYSIS · optional enrichment layer (same pattern as /airoi)
+   ============================================================ */
+function buildAIACTPayload(r){
+  const sensitive = [...state.usecases].map(id=>USECASES.find(u=>u.id===id)).filter(u=>u&&(u.tier==='high'||u.tier==='prohibited'));
+  return {
+    lang: LANG,
+    industry: state.industry.name[LANG],
+    companySize: state.size.label[LANG],
+    country: state.country || '',
+    overall: r.overall,
+    euReadiness: r.scores.euReadiness,
+    tier: r.tier,
+    riskId: r.riskId,
+    levelLabel: r.level.name[LANG],
+    strengths: r.strengths.map(s=>catName(s.id)),
+    gaps: r.gaps.map(g=>catName(g.id)),
+    sensitiveUseCases: sensitive.map(u=>u.label[LANG]).join(', ')
+  };
+}
+
+function localAIACTFallback(r){
+  const critical = (r.tier==='prohibited' || r.tier==='high') && r.scores.euReadiness < 40;
+  return {
+    alert: critical ? {
+      severity:'critical',
+      text: LANG==='es'
+        ? 'Nivel de riesgo elevado combinado con baja preparación frente al EU AI Act. Prioriza una revisión antes de escalar el uso de estos sistemas.'
+        : 'High risk tier combined with low EU AI Act readiness. Prioritize a review before scaling these systems further.'
+    } : null,
+    diagnosis: LANG==='es'
+      ? 'Resumen calculado únicamente a partir de tus puntuaciones: el área ' + catName(r.gaps[0].id) + ' es la brecha prioritaria dado tu nivel de madurez actual.'
+      : 'Summary based purely on your scores: ' + catName(r.gaps[0].id) + ' is the priority gap given your current maturity level.',
+    pros: [ LANG==='es' ? (catName(r.strengths[0].id)+' es tu área más consolidada.') : (catName(r.strengths[0].id)+' is your most consolidated area.') ],
+    cons: [ LANG==='es' ? (catName(r.gaps[0].id)+' necesita atención antes de ampliar el uso de IA.') : (catName(r.gaps[0].id)+' needs attention before expanding AI use.') ],
+    isFallback: true
+  };
+}
+
+async function fetchAIACTAnalysis(r){
+  const controller = new AbortController();
+  const timeout = setTimeout(()=>controller.abort(), 12000);
+  try{
+    const res = await fetch('/api/aiact-analysis', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(buildAIACTPayload(r)), signal: controller.signal
+    });
+    clearTimeout(timeout);
+    if(!res.ok) throw new Error('bad status '+res.status);
+    const data = await res.json();
+    if(!data.ok || !data.analysis) throw new Error('no analysis');
+    renderAIACTAnalysis(data.analysis, false);
+  }catch(err){
+    clearTimeout(timeout);
+    renderAIACTAnalysis(localAIACTFallback(r), true);
+  }
+}
+
+function aiactEscape(s){
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderAIACTAnalysis(a, isFallback){
+  const alertEl = document.getElementById('ai-alert');
+  if(a.alert){
+    alertEl.hidden = false;
+    alertEl.className = 'ai-alert ' + a.alert.severity;
+    document.getElementById('ai-alert-text').innerHTML = '<b>'+(a.alert.severity==='critical' ? (LANG==='es'?'Aviso: ':'Notice: ') : (LANG==='es'?'Punto fuerte: ':'Strong result: '))+'</b>'+aiactEscape(a.alert.text);
+  } else {
+    alertEl.hidden = true;
+  }
+
+  document.getElementById('ai-notes-label').textContent = LANG==='es' ? 'Notas de IA' : 'AI notes';
+  document.getElementById('ai-notes-status').textContent = isFallback ? (LANG==='es'?'resumen local':'local summary') : (LANG==='es'?'con IA':'AI-enriched');
+  document.getElementById('ai-notes-diagnosis').textContent = a.diagnosis;
+
+  const prosLabel = LANG==='es' ? 'A favor' : 'Pros';
+  const consLabel = LANG==='es' ? 'En contra' : 'Cons';
+  document.getElementById('ai-notes-cols').innerHTML =
+    '<div class="col"><span>'+prosLabel+'</span><ul class="pros">'+(a.pros||[]).map(x=>'<li>'+aiactEscape(x)+'</li>').join('')+'</ul></div>' +
+    '<div class="col"><span>'+consLabel+'</span><ul class="cons">'+(a.cons||[]).map(x=>'<li>'+aiactEscape(x)+'</li>').join('')+'</ul></div>';
+}
+
+/* Systems dropdown (same behaviour as root page) */
+const sysItem = document.getElementById('systems-item');
+const sysBtn = document.getElementById('systems-btn');
+sysBtn.addEventListener('click', e=>{
+  e.stopPropagation();
+  sysItem.classList.toggle('open');
+  sysBtn.setAttribute('aria-expanded', sysItem.classList.contains('open'));
+});
+document.addEventListener('click', ()=> sysItem.classList.remove('open'));
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') sysItem.classList.remove('open'); });
+
+/* mobile hamburger menu */
+const menuToggle = document.getElementById('menu-toggle');
+const mobilePanel = document.getElementById('mobile-panel');
+menuToggle.addEventListener('click', e=>{
+  e.stopPropagation();
+  const open = mobilePanel.classList.toggle('open');
+  menuToggle.setAttribute('aria-expanded', open);
+});
+mobilePanel.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=>{
+  mobilePanel.classList.remove('open');
+  menuToggle.setAttribute('aria-expanded', 'false');
+}));
+document.addEventListener('click', e=>{
+  if(mobilePanel.classList.contains('open') && !mobilePanel.contains(e.target) && e.target!==menuToggle){
+    mobilePanel.classList.remove('open');
+    menuToggle.setAttribute('aria-expanded', 'false');
+  }
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ mobilePanel.classList.remove('open'); menuToggle.setAttribute('aria-expanded','false'); } });
+
+/* Topbar blur on scroll (same behaviour as root page) */
+const topbar = document.getElementById('topbar');
+function onTopbarScroll(){ topbar.classList.toggle('scrolled', window.scrollY > 40); }
+window.addEventListener('scroll', onTopbarScroll, {passive:true});
+onTopbarScroll();
+
+applyLang();
+</script>
+</body>
+</html>

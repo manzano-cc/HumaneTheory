@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI ROI Calculator | Humane Theory</title>
+<link rel="icon" type="image/svg+xml" href="../favicons/favicon.svg">
+<link rel="icon" type="image/png" href="../favicons/favicon.png">
+<link rel="shortcut icon" href="../favicons/favicon.ico">
+<style>
+/* ============================================================
+   AI ROI CALCULATOR  /airoi
+   Shares the visual language of the main Humane Theory page:
+   Geist fonts, dotted background, dark cards, glossy pills,
+   inner-shadow headline, Geist Pixel labels.
+   Flow: profile > questions > role mix > investment > results
+   ============================================================ */
+
+/* ---------- Fonts (shared with root page) ---------- */
+@font-face{font-family:"Geist";src:url("../fonts/Geist-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Geist";src:url("../fonts/Geist-Italic-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:italic;font-display:swap}
+@font-face{font-family:"Geist Mono";src:url("../fonts/GeistMono-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Geist Mono";src:url("../fonts/GeistMono-Italic-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:italic;font-display:swap}
+@font-face{font-family:"Geist Pixel";src:url("../fonts/GeistPixel-Square.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+
+/* ---------- Tokens (same as root) ---------- */
+:root{
+  --black:#0a0a0a;
+  --white:#ffffff;
+  --card:#161616;
+  --card-border:#262626;
+  --dark-card:#161616;
+  --dark-border:#262626;
+  --maxw:1180px;
+  --pad:40px;
+  --btn-radius:9px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;scroll-behavior:smooth}
+body{
+  font-family:"Geist",system-ui,sans-serif;color:#f2f2f2;
+  background:#000000;
+  min-height:100vh;
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+input{font:inherit;color:inherit}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad)}
+
+/* ---------- Topbar (identical to root) ---------- */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:50;background:transparent;transition:background .3s ease,border-color .3s ease}
+.topbar.scrolled{background:rgba(0,0,0,.7);-webkit-backdrop-filter:saturate(160%) blur(14px);backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid #1c1c1c}
+.header-row{display:flex;align-items:center;justify-content:space-between;padding-top:26px;padding-bottom:16px;gap:24px}
+.logo{display:flex;align-items:center;gap:9px;padding:6px 10px;border-radius:999px}
+.logo img{height:20px;width:auto;display:block;filter:brightness(0) invert(1)}
+
+.menu-toggle{
+  display:none;align-items:center;justify-content:center;width:34px;height:34px;
+  color:#e6e6e4;flex:0 0 auto;position:relative;z-index:46;
+}
+.menu-toggle svg{width:17px;height:17px}
+.menu-toggle .icon-close{display:none}
+.menu-toggle[aria-expanded="true"] .icon-menu{display:none}
+.menu-toggle[aria-expanded="true"] .icon-close{display:block}
+.mobile-panel{isolation:isolate;
+  position:fixed;inset:0;z-index:44;background:#0a0a0a;
+  padding:88px 24px 26px;height:100vh;height:100dvh;overflow-y:auto;
+  transform:translateY(-8px);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;
+}
+.mobile-panel.open{opacity:1;transform:none;pointer-events:auto}
+.mobile-panel .msec{font-family:"Geist Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#6d6d6d;margin:20px 0 8px}
+.mobile-panel .msec:first-child{margin-top:0}
+.mobile-panel .mlink{display:block;padding:12px 2px;font-size:15px;color:#e6e6e4;border-bottom:1px solid #1c1c1c}
+.mobile-panel .mcontact{display:flex;width:100%;height:44px;margin-top:22px}
+
+.main-nav{display:flex;align-items:center;gap:6px;position:relative}
+.nav-item{position:relative}
+.nav-link{
+  display:flex;align-items:center;gap:5px;padding:9px 14px;border-radius:var(--btn-radius);
+  font-size:13.5px;color:#c7c7c7;transition:color .18s ease,background .18s ease;
+}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,.06)}
+.nav-link svg{width:10px;height:10px;opacity:.7;transition:transform .2s ease}
+.nav-item.open .nav-link svg{transform:rotate(180deg)}
+
+.dropdown{
+  position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(-6px);
+  min-width:190px;background:#0d0d0d;border:1px solid #232323;border-radius:12px;
+  padding:6px;box-shadow:0 20px 50px rgba(0,0,0,.5);
+  opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease;
+}
+.nav-item.open .dropdown{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.dropdown a{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:8px;font-size:13px;color:#d4d4d4}
+.dropdown a:hover{background:rgba(255,255,255,.06);color:#fff}
+.dropdown a .dot{width:4px;height:4px;border-radius:1px;background:#5a5a5a;flex:0 0 auto}
+.dropdown a{position:relative}
+.dropdown a.disabled,.mlink.disabled{opacity:.5;cursor:default}
+.dropdown a.disabled:hover,.mlink.disabled:hover{background:transparent;color:#d4d4d4}
+
+.mtag{
+  margin-left:3px;font-weight:600;letter-spacing:.02em;line-height:1;
+  background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+}
+.mtag-new{font-size:10px;position:relative;top:-.5em;background-image:linear-gradient(180deg,#836464 0%,#B58A8A 100%)}
+.mtag-soon{font-size:8px;vertical-align:middle;background-image:linear-gradient(180deg,#525252 0%,#727272 100%)}
+
+.header-right{display:flex;align-items:center;gap:18px}
+.header-right .btn{height:30px;padding:0 16px;font-size:13.5px}
+.text-link{font-size:13.5px;color:#c7c7c7;transition:color .15s ease}
+.text-link:hover{color:#fff}
+
+/* ---------- Page head ---------- */
+.page-head{padding-top:150px;padding-bottom:8px}
+.section-label{font-family:"Geist Mono",monospace;font-size:14px;color:#f2f2f2;font-weight:500;margin-bottom:20px}
+.page-title{
+  font-family:"Geist",sans-serif;font-weight:500;
+  font-size:clamp(30px,4.6vw,52px);line-height:1.05;letter-spacing:-.01em;
+  color:#b8b8b8;filter:url(#innerText);
+}
+.page-sub{
+  margin-top:14px;max-width:560px;
+  font-weight:300;font-size:clamp(14px,1.6vw,17px);line-height:1.5;color:#a8a8a8;
+}
+.privacy-note{
+  margin-top:18px;max-width:620px;
+  display:flex;gap:11px;align-items:flex-start;
+  background:var(--card);border:1px solid var(--card-border);border-radius:8px;
+  padding:14px 16px;font-size:12.5px;line-height:1.55;color:#8f8f8f;
+}
+.privacy-note svg{width:16px;height:16px;flex:0 0 auto;color:#8f8f8f;margin-top:1px}
+.privacy-note strong{color:#dcdcdc;font-weight:600}
+
+/* ---------- Progress ---------- */
+.progress{margin:36px 0 22px;display:flex;align-items:center;gap:16px}
+.progress .step-label{font-family:"Geist Pixel","Geist Mono",monospace;font-size:11px;color:#a8a8a8;white-space:nowrap}
+.progress .bar{flex:1;height:3px;background:#262626;border-radius:99px;overflow:hidden}
+.progress .bar i{display:block;height:100%;width:0;background:#f2f2f2;border-radius:99px;transition:width .45s cubic-bezier(.4,0,.2,1)}
+
+/* ---------- Steps ---------- */
+.step{display:none;padding-bottom:90px}
+.step.active{display:block;animation:stepIn .35s ease both}
+@keyframes stepIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.step h2{font-size:clamp(18px,2.2vw,24px);font-weight:600;letter-spacing:-.01em;margin-bottom:6px}
+.step .hint{font-size:13.5px;color:#8f8f8f;margin-bottom:26px;max-width:620px;line-height:1.55}
+
+/* ---------- Custom dropdowns (step 1) ---------- */
+.sel-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:760px}
+.sel{position:relative}
+.sel-label{font-family:"Geist Pixel","Geist Mono",monospace;font-size:10.5px;color:#a8a8a8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px;display:block}
+.sel-btn{
+  width:100%;display:flex;align-items:center;gap:11px;text-align:left;
+  background:var(--card);border:1px solid var(--card-border);border-radius:8px;
+  padding:15px 16px;font-size:14.5px;font-weight:500;color:#8f8f8f;
+  transition:border-color .18s ease, background .18s ease;
+}
+.sel-btn:hover{background:#1e1e1e}
+.sel-btn.filled{color:#f2f2f2}
+.sel-btn .ic{width:19px;height:19px;flex:0 0 auto;color:#8f8f8f;display:none}
+.sel-btn.filled .ic{display:block}
+.sel-btn .txt{flex:1}
+.sel-btn .chev{width:14px;height:14px;color:#9a9a96;transition:transform .2s ease;flex:0 0 auto}
+.sel.open .sel-btn{border-color:#9a9a96}
+.sel.open .sel-btn .chev{transform:rotate(180deg)}
+.sel-panel{
+  position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:40;
+  background:#141414;border:1px solid var(--card-border);border-radius:10px;
+  box-shadow:0 18px 46px rgba(0,0,0,.5);
+  max-height:320px;overflow:auto;display:none;padding:6px;
+}
+.sel.open .sel-panel{display:block;animation:stepIn .18s ease both}
+.sel-opt{
+  width:100%;display:flex;align-items:center;gap:11px;text-align:left;
+  padding:11px 12px;border-radius:7px;font-size:14px;color:#ececec;
+  transition:background .12s ease;
+}
+.sel-opt:hover{background:#1f1f1f}
+.sel-opt.selected{background:#232323;font-weight:500}
+.sel-opt .ic{width:18px;height:18px;flex:0 0 auto;color:#8f8f8f}
+.ic svg{width:100%;height:100%;display:block}
+
+/* ---------- Questions ---------- */
+.q-list{display:flex;flex-direction:column;gap:12px}
+.q-card{
+  background:var(--card);border:1px solid var(--card-border);border-radius:8px;
+  padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
+  opacity:0;transform:translateY(8px);animation:qIn .4s ease forwards;
+}
+@keyframes qIn{to{opacity:1;transform:none}}
+.q-card .q-num{font-family:"Geist Pixel","Geist Mono",monospace;font-size:10px;color:#9a9a96;margin-bottom:4px;display:block}
+.q-card .q-text{font-size:14.5px;font-weight:500;color:#f2f2f2;flex:1;min-width:230px}
+.q-answers{display:flex;gap:8px}
+.q-answers button{
+  font-size:12.5px;font-weight:500;color:#8f8f8f;
+  border:1px solid var(--card-border);border-radius:999px;padding:7px 16px;background:#1f1f1f;
+  transition:all .15s ease;
+}
+.q-answers button:hover{border-color:#9a9a96;color:#f2f2f2}
+.q-answers button.on{background:#f2f2f2;border-color:#f2f2f2;color:#0a0a0a}
+
+/* ---------- Role distribution (step 3) ---------- */
+.role-list{display:flex;flex-direction:column;gap:10px;max-width:760px}
+.role-row{
+  background:var(--card);border:1px solid var(--card-border);border-radius:8px;
+  padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  opacity:0;transform:translateY(8px);animation:qIn .4s ease forwards;
+}
+.role-row .rl{font-size:14px;font-weight:500;color:#f2f2f2}
+.role-input{display:flex;align-items:center;gap:8px}
+.role-input input{
+  width:66px;text-align:right;
+  font-family:"Geist Mono",monospace;font-size:13.5px;
+  background:#1f1f1f;border:1px solid var(--card-border);border-radius:7px;
+  padding:8px 10px;outline:none;color:#f2f2f2;
+  transition:border-color .15s ease;
+  -moz-appearance:textfield;appearance:textfield;
+}
+.role-input input::-webkit-outer-spin-button,.role-input input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.role-input input:focus{border-color:#9a9a96}
+.role-input .pct{font-family:"Geist Mono",monospace;font-size:12.5px;color:#8f8f8f}
+.role-total{
+  max-width:760px;margin-top:14px;
+  display:flex;justify-content:space-between;align-items:center;gap:14px;
+  border-radius:8px;padding:13px 18px;
+  font-family:"Geist Mono",monospace;font-size:13px;font-weight:500;
+  border:1px solid var(--card-border);
+}
+.role-total.ok{background:#0f1f15;border-color:#234a30;color:#39d27a}
+.role-total.bad{background:#241a15;border-color:#4a2e20;color:#b05c3f}
+.role-reset{font-size:12px;color:#8f8f8f;text-decoration:underline;text-underline-offset:3px}
+.role-reset:hover{color:#f2f2f2}
+
+/* ---------- Investment level (step 4) ---------- */
+.inv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.inv-card{
+  background:var(--card);border:1px solid var(--card-border);border-radius:8px;
+  padding:26px 22px;text-align:center;min-height:130px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  transition:background .18s ease, transform .18s ease, border-color .18s ease;
+}
+.inv-card:hover{background:#1e1e1e;transform:translateY(-2px)}
+.inv-card .in{font-size:17px;font-weight:600;letter-spacing:-.01em}
+.inv-card .it{font-size:12.5px;color:#8f8f8f;line-height:1.4}
+.inv-card.selected{background:#242424;border-color:#3a3a3a;color:#fff}
+.inv-card.selected .it{color:#b8b8b8}
+.inv-detail{
+  margin-top:14px;border-left:3px solid #dadada;border-radius:0 8px 8px 0;
+  background:var(--card);border-top:1px solid var(--card-border);border-right:1px solid var(--card-border);border-bottom:1px solid var(--card-border);
+  padding:20px 22px;max-width:100%;display:none;
+  animation:stepIn .25s ease both;
+}
+.inv-detail.show{display:block}
+.inv-detail h4{font-size:15px;font-weight:600;margin-bottom:4px}
+.inv-detail .tag{font-size:12.5px;color:#8f8f8f;margin-bottom:12px}
+.inv-detail p{font-size:13.5px;color:#a8a8a8;line-height:1.6;max-width:720px}
+.inv-detail .params{margin-top:12px;font-family:"Geist Mono",monospace;font-size:11.5px;color:#8f8f8f}
+
+/* nav buttons */
+.cur-field{margin-top:22px}
+.cur-field .sel-label{font-family:"Geist Pixel","Geist Mono",monospace;font-size:10.5px;color:#a8a8a8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px;display:block}
+.cur-toggle{display:inline-flex;background:var(--card);border:1px solid var(--card-border);border-radius:999px;padding:4px}
+.cur-toggle button{font-size:13px;font-weight:500;color:#8f8f8f;padding:8px 18px;border-radius:999px;transition:all .15s ease}
+.cur-toggle button.on{background:#f2f2f2;color:#0a0a0a}
+
+.step-nav{display:flex;justify-content:space-between;align-items:center;margin-top:30px;gap:14px}
+
+/* ---- unified glossy button system (same as root) ---- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;
+  border-radius:var(--btn-radius);padding:0 22px;font-size:14px;font-weight:500;white-space:nowrap;
+  transition:filter .15s ease,transform .1s ease;
+}
+.btn:active{transform:translateY(1px)}
+
+.btn-dark{
+  background:linear-gradient(180deg,#ffffff 0%,#d9d9d6 100%);
+  border:1px solid #c7c7c4;
+  box-shadow:inset 0 1px 1px #ffffff, inset 0 -1px 2px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.3);
+  color:#141414;text-shadow:0 1px 0 rgba(255,255,255,.75);
+}
+.btn-dark:hover{filter:brightness(1.05)}
+.btn-dark[disabled]{opacity:.35;cursor:not-allowed;filter:none}
+
+.btn-ghost{
+  background:linear-gradient(180deg,#2e2e2e 0%,#161616 100%);
+  border:1px solid #333;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.1), inset 0 -1px 2px rgba(0,0,0,.6), 0 1px 2px rgba(0,0,0,.35);
+  color:#e6e6e4;text-shadow:0 1px 1px rgba(0,0,0,.7);
+}
+.btn-ghost:hover{filter:brightness(1.18)}
+.validate-msg{font-size:12.5px;color:#b05c3f;margin-top:14px;display:none}
+.validate-msg.show{display:block}
+
+/* ---------- Loading (thinking) ---------- */
+.loading{display:none;padding-bottom:120px}
+.loading.active{display:block;animation:stepIn .3s ease both}
+.load-card{
+  background:var(--card);border:1px solid var(--card-border);border-radius:8px;
+  box-shadow:0 24px 70px rgba(0,0,0,.35);
+  padding:28px 30px;max-width:640px;
+}
+.load-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.load-title{font-family:"Geist Mono",monospace;font-size:12.5px;color:#9a9a9a}
+.load-pct{font-family:"Geist Pixel","Geist Mono",monospace;font-size:12px;color:#fff}
+.load-lines{font-family:"Geist Mono",monospace;font-size:12.5px;line-height:2;color:#dadada;min-height:160px}
+.load-lines .ln{opacity:0;transform:translateY(4px);transition:opacity .3s ease, transform .3s ease}
+.load-lines .ln.on{opacity:1;transform:none}
+.load-lines .ok{color:#39d27a}
+.load-bar{height:3px;background:#2e2e2e;border-radius:99px;overflow:hidden;margin-top:18px}
+.load-bar i{display:block;height:100%;width:0;background:#f5f5f2;border-radius:99px;transition:width .3s linear}
+.term-cursor{display:inline-block;width:7px;height:1.05em;background:#dadada;vertical-align:-.16em;margin-left:2px;animation:blink .8s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ---------- Results ---------- */
+.results{display:none;padding-bottom:40px}
+.results.active{display:block;animation:stepIn .4s ease both}
+.exec-summary{
+  background:var(--card);border:1px solid var(--card-border);border-radius:8px;
+  padding:24px 26px;margin-top:24px;
+  font-size:14.5px;line-height:1.65;color:#d6d6d6;
+  opacity:0;transform:translateY(10px);animation:qIn .45s ease forwards;
+}
+.exec-summary strong{font-weight:600;color:#f2f2f2}
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.res-card{
+  background:var(--card);border:1px solid var(--card-border);border-radius:8px;
+  padding:22px;min-height:130px;display:flex;flex-direction:column;justify-content:flex-end;
+  opacity:0;transform:translateY(10px);animation:qIn .45s ease forwards;
+}
+.res-card .k{font-family:"Geist Pixel","Geist Mono",monospace;font-size:10.5px;color:#a8a8a8;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px}
+.res-card .v{font-size:clamp(24px,3vw,34px);font-weight:600;letter-spacing:-.02em;color:#f2f2f2;line-height:1}
+.res-card .u{font-size:12.5px;color:#8f8f8f;margin-top:6px}
+.res-card.hero-card{grid-column:span 3;background:#f2f2f2;border-color:#f2f2f2;min-height:150px}
+.res-card.hero-card .k{color:#6b6b6b}
+.res-card.hero-card .v{color:#0a0a0a;font-size:clamp(38px,5vw,58px)}
+.res-card.hero-card .u{color:#6b6b6b}
+.level-badge{display:inline-flex;align-items:center;gap:7px;margin-top:10px;font-size:12.5px;font-weight:500}
+.level-badge .dot{width:7px;height:7px;border-radius:50%}
+.level-low .dot{background:#9a9a9a}.level-low{color:#7f7f7f}
+.level-medium .dot{background:#e0b34c}.level-medium{color:#c9a03e}
+.level-high .dot{background:#39d27a;animation:glow 1.7s ease-in-out infinite}.level-high{color:#39d27a}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(57,210,122,0)}50%{box-shadow:0 0 9px 2px rgba(57,210,122,.85)}}
+
+/* result panels + charts */
+.res-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.res-panel{
+  background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:24px;
+  opacity:0;transform:translateY(10px);animation:qIn .45s ease forwards;animation-delay:.2s;
+}
+.res-panel.full{grid-column:span 2}
+.res-panel h3{font-family:"Geist Mono",monospace;font-size:13px;font-weight:500;margin-bottom:4px}
+.res-panel .sub{font-size:12px;color:#9a9a9a;margin-bottom:18px}
+.res-panel ol,.res-panel ul{list-style:none;display:flex;flex-direction:column;gap:11px}
+.res-panel li{font-size:13.5px;color:#a8a8a8;display:flex;gap:10px;align-items:flex-start;line-height:1.45}
+.res-panel li .idx{font-family:"Geist Pixel","Geist Mono",monospace;font-size:10.5px;color:#9a9a96;padding-top:2px;white-space:nowrap}
+
+/* horizontal bar chart */
+.hchart{display:flex;flex-direction:column;gap:13px}
+.hrow{display:grid;grid-template-columns:minmax(150px,42%) 1fr auto;gap:12px;align-items:center}
+.hrow .lbl{font-size:13px;color:#a8a8a8;line-height:1.3}
+.hrow .track{height:10px;background:#262626;border-radius:99px;overflow:hidden}
+.hrow .fill{height:100%;width:0;background:#f2f2f2;border-radius:99px;transition:width .9s cubic-bezier(.4,0,.2,1)}
+.hrow .val{font-family:"Geist Mono",monospace;font-size:11.5px;color:#a8a8a8;white-space:nowrap;text-align:right;min-width:74px}
+
+/* vertical 12-month chart */
+.vchart-wrap{margin-top:6px}
+.vchart{position:relative;height:150px;display:flex;align-items:stretch;gap:6px}
+.vcol{position:relative;flex:1}
+.vbar{position:absolute;left:18%;right:18%;border-radius:3px;background:#f2f2f2;transform:scaleY(0);transform-origin:bottom;transition:transform .6s cubic-bezier(.4,0,.2,1)}
+.vbar.neg{background:#2c2c2c;transform-origin:top}
+.vzero{position:absolute;left:0;right:0;height:1px;background:#4a4a4a}
+.vmonths{display:flex;gap:6px;margin-top:8px}
+.vmonths span{flex:1;text-align:center;font-family:"Geist Pixel","Geist Mono",monospace;font-size:9px;color:#9a9a96}
+.vmonths span.be{color:#2f9e5f}
+.vlegend{display:flex;gap:18px;margin-top:12px;font-size:11.5px;color:#8f8f8f}
+.vlegend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.vlegend .d i{background:#f2f2f2}
+.vlegend .l i{background:#2c2c2c}
+
+/* financial table */
+.fin-table{display:flex;flex-direction:column}
+.fin-row{display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid #262626;font-size:13.5px;color:#a8a8a8}
+.fin-row:last-child{border-bottom:none}
+.fin-row .fv{font-family:"Geist Mono",monospace;font-size:12.5px;color:#f2f2f2;white-space:nowrap}
+.fin-row.total{font-weight:600;color:#f2f2f2}
+.fin-row.total .fv{font-weight:700}
+
+.assumptions{margin-top:14px;font-size:11.5px;color:#9a9a9a;line-height:1.7}
+.disclaimer{margin-top:26px;font-size:11.5px;color:#9a9a9a;line-height:1.6;max-width:640px}
+.res-actions{margin-top:26px;display:flex;gap:12px;flex-wrap:wrap}
+
+/* ---------- Scope panel: what this ROI assumes ---------- */
+.scope-panel{
+  margin-top:16px;background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:22px 24px;
+  opacity:0;transform:translateY(10px);animation:qIn .45s ease forwards;animation-delay:.04s;
+}
+.scope-panel h3{font-family:"Geist Mono",monospace;font-size:13px;font-weight:500;color:#f2f2f2;margin-bottom:4px}
+.scope-panel .sub{font-size:12px;color:#9a9a9a;margin-bottom:16px;max-width:640px;line-height:1.5}
+.scope-body{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.scope-desc h4{font-size:15px;font-weight:600;color:#f2f2f2;margin-bottom:3px}
+.scope-desc .tag{font-size:12px;color:#8f8f8f;margin-bottom:10px;display:block}
+.scope-desc p{font-size:13px;line-height:1.6;color:#b8b8b8}
+.scope-params{display:flex;flex-direction:column;gap:9px;justify-content:center}
+.scope-params .row{display:flex;justify-content:space-between;font-size:12.5px;padding:8px 0;border-bottom:1px solid #262626}
+.scope-params .row:last-child{border-bottom:none}
+.scope-params .row span:first-child{color:#9a9a9a}
+.scope-params .row span:last-child{font-family:"Geist Mono",monospace;color:#f2f2f2}
+@media(max-width:700px){.scope-body{grid-template-columns:1fr}}
+
+/* ---------- AI analysis panel ---------- */
+.ai-frame{padding:12px 16px;font-size:11.5px;line-height:1.55;color:#8f8f8f;background:#0f0f0f;border-bottom:1px solid #262626}
+.ai-panel{
+  margin-top:16px;background:var(--card);border:1px solid var(--card-border);border-radius:8px;overflow:hidden;
+  opacity:0;transform:translateY(10px);animation:qIn .45s ease forwards;animation-delay:.08s;
+}
+.ai-bar{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid #262626}
+.ai-path{font-family:"Geist Mono",monospace;font-size:11.5px;color:#8f8f8f;letter-spacing:.01em}
+.ai-path b{color:#c7c7c7;font-weight:500}
+.ai-status{display:flex;align-items:center;gap:7px;font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:.07em;color:#8f8f8f;text-transform:uppercase}
+.ai-status i{width:5px;height:5px;border-radius:50%;background:#6fae87;animation:dotPulse 1.4s ease-in-out infinite}
+.ai-status.done i{animation:none}
+.ai-status.error i{background:#c99a55;animation:none}
+@keyframes dotPulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.ai-body{padding:22px 24px}
+.ai-loading{display:flex;align-items:center;gap:10px;font-size:13px;color:#8f8f8f}
+.ai-dot{width:5px;height:5px;border-radius:50%;background:#6f6f6f;animation:aiBounce 1s ease-in-out infinite}
+.ai-dot:nth-child(2){animation-delay:.15s}
+.ai-dot:nth-child(3){animation-delay:.3s}
+@keyframes aiBounce{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-2px)}}
+
+.ai-diagnosis{font-size:14px;line-height:1.6;color:#d6d6d6}
+.ai-section{margin-top:22px}
+.ai-section h4{font-family:"Geist Mono",monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#8f8f8f;margin-bottom:12px;font-weight:500}
+.ai-priorities{list-style:none;display:flex;flex-direction:column;gap:12px}
+.ai-priorities li{display:flex;gap:11px;align-items:flex-start}
+.ai-priorities .n{font-family:"Geist Mono",monospace;font-size:11px;color:#6fae87;padding-top:2px;flex:0 0 auto}
+.ai-priorities .t{font-size:13.5px;color:#f2f2f2;font-weight:500;margin-bottom:3px}
+.ai-priorities .w{font-size:12.5px;color:#9a9a9a;line-height:1.5}
+.ai-risks{list-style:none;display:flex;flex-direction:column;gap:9px}
+.ai-risks li{font-size:12.5px;color:#a8a8a8;line-height:1.5;display:flex;gap:9px}
+.ai-risks li::before{content:"";width:4px;height:4px;border-radius:1px;background:#c99a55;flex:0 0 auto;margin-top:6px}
+.ai-confidence{margin-top:18px;padding-top:16px;border-top:1px solid #262626;font-size:12px;color:#8f8f8f;line-height:1.55;font-style:italic}
+
+.ai-verdict{margin-top:22px;padding-top:20px;border-top:1px solid #262626}
+.ai-verdict-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.ai-verdict-head h4{font-family:"Geist Mono",monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#f2f2f2;font-weight:500}
+.ai-rec{font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:99px;white-space:nowrap}
+.ai-rec-proceed{background:#182620;color:#6fae87;border:1px solid rgba(111,174,135,.3)}
+.ai-rec-pilot-first{background:#26210f;color:#c99a55;border:1px solid rgba(201,154,85,.3)}
+.ai-rec-hold-off{background:#241414;color:#c67a7a;border:1px solid rgba(198,122,122,.3)}
+.ai-proscons{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:14px}
+.pc-h{font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#8f8f8f;display:block;margin-bottom:9px}
+.pc ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.pc li{font-size:12.5px;line-height:1.5;color:#c7c7c5;padding-left:14px;position:relative}
+.pc-pro li::before{content:"+";position:absolute;left:0;color:#6fae87;font-weight:700}
+.pc-con li::before{content:"–";position:absolute;left:0;color:#c99a55;font-weight:700}
+.ai-verdict-sum{font-size:12.5px;color:#9a9a9a;line-height:1.55}
+@media(max-width:600px){.ai-proscons{grid-template-columns:1fr}}
+.ai-fallback{font-size:12.5px;color:#8f8f8f;line-height:1.6}
+.ai-badge{font-family:"Geist Mono",monospace;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:#6fae87;background:#182620;border:1px solid rgba(111,174,135,.3);padding:2px 7px;border-radius:99px;margin-left:8px}
+
+/* ---------- Footer strip ---------- */
+footer{background:#000000;padding:54px 0 0;position:relative;overflow:hidden;border-top:1px solid #1c1c1c}
+.foot-trust{padding-bottom:40px;border-bottom:1px solid #1c1c1c;margin-bottom:40px}
+.ft-pill{display:inline-flex;font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#8f8f8f;border:1px solid #262626;border-radius:999px;padding:4px 11px;margin-bottom:14px}
+.foot-trust h3{font-size:17px;font-weight:500;color:#e6e6e4;letter-spacing:-.01em;margin-bottom:10px}
+.foot-trust p{max-width:640px;font-size:13px;line-height:1.65;color:#8a8a8a;font-weight:300}
+.foot-top{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap}
+.foot-mark{display:inline-flex;align-items:center}
+.foot-mark img{height:24px;width:auto;filter:brightness(0) invert(1) url(#innerSm)}
+.foot-cols{display:flex;gap:70px}
+.foot-cols .col h4{font-size:10px;letter-spacing:.08em;color:#999999;text-transform:uppercase;margin-bottom:14px;font-weight:600}
+.foot-cols .col ul{list-style:none}
+.foot-cols .col li{font-size:13px;color:#4e4e4e;margin-bottom:8px}
+.foot-cols .col a:hover{color:#999999}
+.foot-legal{margin-top:44px;display:flex;flex-direction:column;gap:8px}
+.foot-legal .copy{font-size:10px;color:#4e4e4e;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
+.foot-legal .flink{display:block;font-size:12px;color:#999999}
+.foot-legal .flink:hover{color:#e6e6e4}
+.giant{margin-top:20px;text-align:center;font-weight:500;font-size:clamp(70px,20vw,260px);line-height:.82;letter-spacing:-.03em;color:#303030;white-space:nowrap;user-select:none;margin-bottom:-.16em;filter:url(#innerGiant);pointer-events:none}
+@media(max-width:560px){.foot-top{flex-direction:column;gap:24px}.foot-cols{gap:40px;flex-wrap:wrap}}
+
+.foot-strip{margin-top:70px;padding:26px 0 34px;font-family:"Geist Pixel","Geist Mono",monospace;font-size:10.5px;color:#8f8f8f;text-transform:uppercase;letter-spacing:.04em}
+
+/* ---------- Responsive ---------- */
+@media(max-width:820px){
+  :root{--pad:32px}
+  .res-grid{grid-template-columns:1fr 1fr}
+  .res-card.hero-card{grid-column:span 2}
+  .res-cols{grid-template-columns:1fr}
+  .res-panel.full{grid-column:span 1}
+  .sel-row{grid-template-columns:1fr}
+  .inv-grid{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+  :root{--pad:26px}
+  .page-head{padding-top:120px}
+  .res-grid{grid-template-columns:1fr}
+  .res-card.hero-card{grid-column:span 1}
+  .q-card{align-items:flex-start;flex-direction:column}
+  .hrow{grid-template-columns:1fr;gap:6px}
+  .hrow .val{text-align:left}
+}
+@media(max-width:640px){
+  .main-nav,.header-right{display:none}
+  .menu-toggle{display:flex}
+  .header-row{padding-left:24px;padding-right:24px}
+}
+
+/* ---------- Print (Download PDF) ---------- */
+@media print{
+  body{background:#fff !important;background-image:none !important;color:#222}
+  .topbar,.progress,.res-actions,.foot-strip,.step,.loading{display:none !important}
+  .page-head{padding-top:20px}
+  .page-title{filter:none;color:#333}
+  .section-label{color:#333 !important}
+  .page-sub{color:#444 !important}
+  .privacy-note{color:#444 !important;background:#f5f5f2 !important;border-color:#ddd !important}
+  .privacy-note strong{color:#111 !important}
+  .results{display:block !important;padding-bottom:0}
+  .res-card,.res-panel,.exec-summary,.ai-panel,.scope-panel{break-inside:avoid;opacity:1 !important;transform:none !important;animation:none !important}
+  .scope-panel{background:#f5f5f2 !important;border-color:#ddd !important}
+  .scope-panel h3,.scope-desc h4{color:#111 !important}
+  .scope-panel .sub,.scope-desc .tag,.scope-desc p,.scope-params .row span:first-child{color:#444 !important}
+  .scope-params .row span:last-child{color:#111 !important}
+  .scope-params .row{border-color:#ddd !important}
+  .ai-frame{background:#eee !important;color:#555 !important;border-color:#ddd !important}
+  .exec-summary{color:#222 !important;background:#f5f5f2 !important;border-color:#ddd !important}
+  .exec-summary strong{color:#000 !important}
+  .ai-panel{background:#f5f5f2 !important;border-color:#ddd !important}
+  .ai-bar{border-color:#ddd !important}
+  .ai-path,.ai-path b{color:#555 !important}
+  .ai-status,.ai-loading{display:none !important}
+  .ai-diagnosis{color:#222 !important}
+  .ai-section h4{color:#555 !important}
+  .ai-priorities .t{color:#111 !important}
+  .ai-priorities .w,.ai-risks li,.ai-confidence,.ai-fallback{color:#444 !important}
+  .res-card{background:#f5f5f2 !important;border-color:#ddd !important}
+  .res-card .k{color:#555 !important}
+  .res-card .v{color:#111 !important}
+  .res-card .u{color:#777 !important}
+  .res-card.hero-card{background:#161616 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .res-card.hero-card .k{color:#9a9a9a !important}
+  .res-card.hero-card .v{color:#fff !important}
+  .res-card.hero-card .u{color:#9a9a9a !important}
+  .res-panel{background:#f5f5f2 !important;border-color:#ddd !important}
+  .res-panel .sub{color:#777 !important}
+  .res-panel li{color:#444 !important}
+  .hrow .lbl{color:#444 !important}
+  .hrow .track{background:#e2e2e2 !important}
+  .hrow .val{color:#555 !important}
+  .fin-row{color:#444 !important;border-color:#ddd !important}
+  .fin-row .fv{color:#111 !important}
+  .fin-row.total{color:#000 !important}
+  .assumptions,.disclaimer{color:#777 !important}
+  .vzero{background:#999 !important}
+  .vbar.neg{background:#ccc !important}
+  .vmonths span{color:#777 !important}
+  .vlegend{color:#777 !important}
+  .vlegend .l i{background:#ccc !important}
+  .hrow .fill,.vbar,.vlegend .d i{background:#1b1b1b !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{margin:14mm}
+}
+</style>
+</head>
+<body>
+
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="innerGiant" x="-20%" y="-20%" width="140%" height="140%"><feOffset dx="0" dy="6"/><feGaussianBlur stdDeviation="7" result="off"/><feComposite operator="out" in="SourceGraphic" in2="off" result="inv"/><feFlood flood-color="#000000" flood-opacity="0.85"/><feComposite operator="in" in2="inv" result="shd"/><feComposite operator="over" in="shd" in2="SourceGraphic"/></filter>
+</defs></svg>
+<!-- inner-shadow filters (same technique as root page) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="innerText" x="-20%" y="-20%" width="140%" height="140%">
+      <feOffset dx="0" dy="2.5"/><feGaussianBlur stdDeviation="2.4" result="off"/>
+      <feComposite operator="out" in="SourceGraphic" in2="off" result="inv"/>
+      <feFlood flood-color="#000000" flood-opacity="0.9"/>
+      <feComposite operator="in" in2="inv" result="shd"/>
+      <feComposite operator="over" in="shd" in2="SourceGraphic"/>
+    </filter>
+    <filter id="innerSm" x="-30%" y="-30%" width="160%" height="160%">
+      <feOffset dx="0" dy="0.8"/><feGaussianBlur stdDeviation="0.7" result="off"/>
+      <feComposite operator="out" in="SourceGraphic" in2="off" result="inv"/>
+      <feFlood flood-color="#000000" flood-opacity="0.95"/>
+      <feComposite operator="in" in2="inv" result="shd"/>
+      <feComposite operator="over" in="shd" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+</svg>
+
+<!-- ===== Topbar ===== -->
+<div class="topbar" id="topbar">
+  <div class="wrap header-row">
+    <a class="logo" href="../" aria-label="Humane Theory">
+      <img src="../logo-humanetheory.svg" alt="Humane Theory">
+    </a>
+
+    <nav class="main-nav" id="main-nav">
+      <div class="nav-item" id="systems-item">
+        <button class="nav-link" id="systems-btn" aria-expanded="false">
+          Systems
+          <svg viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="dropdown">
+          <a href="./"><span class="dot"></span>AI ROI</a>
+          <a href="../aiges/"><span class="dot"></span>AI ACT</a>
+          <a href="../bdash/"><span class="dot"></span>BDash</a>
+          <a href="../coradar/"><span class="dot"></span>CoRadar</a>
+          <a class="disabled" href="#" onclick="return false" aria-disabled="true"><span class="dot"></span>ReputIA<span class="mtag mtag-soon">Coming Soon</span></a>
+        </div>
+      </div>
+      <a class="nav-link" href="../#about">About</a>
+      <a class="nav-link" href="../statement/">Statement</a>
+    </nav>
+
+    <div class="header-right">
+      <a class="btn btn-ghost" href="../?topic=airoi#contact">Contact</a>
+    </div>
+
+    <button class="menu-toggle" id="menu-toggle" aria-label="Menu" aria-expanded="false">
+      <svg class="icon-menu" viewBox="0 0 20 14" fill="none"><path d="M1 1h18M1 7h18M1 13h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <svg class="icon-close" viewBox="0 0 20 20" fill="none"><path d="M2 2l16 16M18 2L2 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <div class="mobile-panel" id="mobile-panel">
+    <div class="msec">Systems</div>
+    <a class="mlink" href="./">AI ROI</a>
+    <a class="mlink" href="../aiges/">AI ACT</a>
+    <a class="mlink" href="../bdash/">BDash</a>
+    <a class="mlink" href="../coradar/">CoRadar</a>
+    <a class="mlink disabled" href="#" onclick="return false" aria-disabled="true">ReputIA<span class="mtag mtag-soon">Coming Soon</span></a>
+    <div class="msec">More</div>
+    <a class="mlink" href="../#about">About</a>
+    <a class="mlink" href="../statement/">Statement</a>
+    <a class="btn btn-ghost mcontact" href="../?topic=airoi#contact">Contact</a>
+  </div>
+</div>
+
+<!-- ===== Page head ===== -->
+<header class="wrap page-head">
+  <div class="section-label">/airoi</div>
+  <h1 class="page-title">AI ROI CALCULATOR.</h1>
+  <p class="page-sub">Estimate the return of bringing AI into your operations. Takes under 2 minutes.</p>
+
+  <div class="privacy-note">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg>
+    <span><strong>Private by design.</strong> Your answers and the full calculation are processed locally in your browser, and nothing is stored server-side. To write the personalized analysis further down, only the calculated results, never your raw answers or any identifying detail, are processed once through Humane Theory's own analysis system. That data is never retained, resold, or shared afterward. AI tool prices also change often, so these figures are indicative estimates, not a quote. <a href="how-it-works/" style="color:#dcdcdc;text-decoration:underline;text-underline-offset:2px">How this is calculated →</a></span>
+  </div>
+
+  <div class="progress" id="progress">
+    <span class="step-label" id="step-label">STEP 01 / 04</span>
+    <div class="bar"><i id="bar-fill"></i></div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- STEP 1 · Company profile -->
+  <section class="step active" id="step-1">
+    <h2>Company profile</h2>
+    <p class="hint">Share a bit about your organization. Questions and assumptions adjust to your sector.</p>
+
+    <div class="sel-row">
+      <div class="sel" id="sel-industry">
+        <span class="sel-label">Industry</span>
+        <button class="sel-btn" type="button">
+          <span class="ic"></span>
+          <span class="txt">Select your industry</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="sel-panel"></div>
+      </div>
+      <div class="sel" id="sel-size">
+        <span class="sel-label">Company size</span>
+        <button class="sel-btn" type="button">
+          <span class="ic"></span>
+          <span class="txt">Select number of employees</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="sel-panel"></div>
+      </div>
+    </div>
+
+    <div class="cur-field">
+      <span class="sel-label">Currency</span>
+      <div class="cur-toggle" id="cur-toggle">
+        <button type="button" data-cur="€" class="on">€ EUR</button>
+        <button type="button" data-cur="$">$ USD</button>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <span></span>
+      <button class="btn btn-dark" id="continue-1" disabled>Continue →</button>
+    </div>
+  </section>
+
+  <!-- STEP 2 · Operations questions -->
+  <section class="step" id="step-2">
+    <h2 id="q-title">About your operations</h2>
+    <p class="hint">Answer honestly. This drives the estimate.</p>
+    <div class="q-list" id="q-list"></div>
+    <p class="validate-msg" id="q-validate">Please answer every question to continue.</p>
+    <div class="step-nav">
+      <button class="btn btn-ghost" data-back>← Back</button>
+      <button class="btn btn-dark" id="continue-2">Continue →</button>
+    </div>
+  </section>
+
+  <!-- STEP 3 · Role distribution -->
+  <section class="step" id="step-3">
+    <h2>Role distribution</h2>
+    <p class="hint">Adjust the percentages to match your workforce. Different roles benefit differently from AI, so the mix changes the estimate. The total must equal 100%.</p>
+    <div class="role-list" id="role-list"></div>
+    <div class="role-total" id="role-total">
+      <button class="role-reset" id="role-reset" type="button">Reset to industry defaults</button>
+      <span id="role-total-txt">Total: 100%</span>
+    </div>
+    <p class="validate-msg" id="role-validate">Percentages must add up to exactly 100%.</p>
+    <div class="step-nav">
+      <button class="btn btn-ghost" data-back>← Back</button>
+      <button class="btn btn-dark" id="continue-3">Continue →</button>
+    </div>
+  </section>
+
+  <!-- STEP 4 · Investment level -->
+  <section class="step" id="step-4">
+    <h2>Investment level</h2>
+    <p class="hint">How are you planning to approach AI adoption? The level changes the assumed budget, adoption rate and impact ceiling.</p>
+    <div class="inv-grid" id="inv-grid"></div>
+    <div class="inv-detail" id="inv-detail"></div>
+    <p class="validate-msg" id="inv-validate">Select an investment level to continue.</p>
+    <div class="step-nav">
+      <button class="btn btn-ghost" data-back>← Back</button>
+      <button class="btn btn-dark" id="calc-btn">Calculate ROI →</button>
+    </div>
+  </section>
+
+  <!-- LOADING -->
+  <section class="loading" id="loading">
+    <div class="load-card">
+      <div class="load-head">
+        <span class="load-title">_Bot ./roi_model.sh</span>
+        <span class="load-pct" id="load-pct">0%</span>
+      </div>
+      <div class="load-lines" id="load-lines"></div>
+      <div class="load-bar"><i id="load-bar-fill"></i></div>
+    </div>
+  </section>
+
+  <!-- RESULTS · Executive summary -->
+  <section class="results" id="results">
+    <h2>Executive summary</h2>
+    <p class="hint" id="res-context"></p>
+
+    <div class="exec-summary" id="exec-summary"></div>
+
+    <div class="scope-panel" id="scope-panel">
+      <h3>/what-this-roi-assumes</h3>
+      <p class="sub">This is not "buy everyone a Claude or ChatGPT seat." Each investment level implies a different depth of implementation. That's what actually drives the return below.</p>
+      <div class="scope-body" id="scope-body"></div>
+    </div>
+
+    <div class="ai-panel" id="ai-panel">
+      <div class="ai-bar">
+        <div class="ai-path"><b>humanetheory</b> / ai-analysis</div>
+        <div class="ai-status" id="ai-status"><i></i>Analyzing</div>
+      </div>
+      <p class="ai-frame">Everything above this line is calculated by a deterministic model from your own inputs, no AI involved. The section below adds judgment on top of those numbers: normally from an AI model reviewing them, or, if that's temporarily unavailable, from a local summary built only from your own figures. Either way, it cannot change or invent any figure.</p>
+      <div class="ai-body" id="ai-body">
+        <div class="ai-loading" id="ai-loading">
+          <span class="ai-dot"></span><span class="ai-dot"></span><span class="ai-dot"></span>
+          Reviewing your numbers against sector patterns…
+        </div>
+      </div>
+    </div>
+
+    <div class="res-grid">
+      <div class="res-card hero-card" style="animation-delay:.05s">
+        <div class="k">Estimated 12-month ROI</div>
+        <div class="v" id="r-roi">0%</div>
+        <div class="u"><span class="level-badge" id="r-level"><span class="dot"></span><span id="r-level-text"></span></span></div>
+      </div>
+      <div class="res-card" style="animation-delay:.10s">
+        <div class="k">Annual savings</div>
+        <div class="v" id="r-savings">€0</div>
+        <div class="u">estimated value per year</div>
+      </div>
+      <div class="res-card" style="animation-delay:.15s">
+        <div class="k">Hours saved</div>
+        <div class="v" id="r-hours">0</div>
+        <div class="u">hours per year</div>
+      </div>
+      <div class="res-card" style="animation-delay:.20s">
+        <div class="k">Payback period</div>
+        <div class="v" id="r-payback">0</div>
+        <div class="u" id="r-payback-u">months</div>
+      </div>
+      <div class="res-card" style="animation-delay:.25s">
+        <div class="k">Year-1 investment</div>
+        <div class="v" id="r-cost">€0</div>
+        <div class="u">services + tooling licenses</div>
+      </div>
+      <div class="res-card" style="animation-delay:.30s">
+        <div class="k">Team impact</div>
+        <div class="v" id="r-affected">0%</div>
+        <div class="u">of employees touched by repetitive work</div>
+      </div>
+      <div class="res-card" style="animation-delay:.35s">
+        <div class="k">FTE capacity unlocked</div>
+        <div class="v" id="r-fte">0</div>
+        <div class="u">full-time equivalents</div>
+      </div>
+    </div>
+
+    <div class="res-cols">
+      <!-- Top impact areas -->
+      <div class="res-panel full">
+        <h3>/top-impact-areas</h3>
+        <p class="sub">Ranked by your answers. Hours are the share of total automatable time.</p>
+        <div class="hchart" id="chart-areas"></div>
+      </div>
+
+      <!-- Savings by role -->
+      <div class="res-panel full">
+        <h3>/savings-by-role</h3>
+        <p class="sub">Your role mix weighted by how much each role benefits from AI.</p>
+        <div class="hchart" id="chart-roles"></div>
+      </div>
+
+      <!-- Value streams -->
+      <div class="res-panel">
+        <h3>/where-the-value-flows</h3>
+        <p class="sub">How saved time converts into business value.</p>
+        <div class="hchart" id="chart-streams"></div>
+      </div>
+
+      <!-- 12-month cumulative net position -->
+      <div class="res-panel">
+        <h3>/12-month-net-position</h3>
+        <p class="sub">Cumulative savings minus year-1 investment, per month.</p>
+        <div class="vchart-wrap">
+          <div class="vchart" id="vchart"></div>
+          <div class="vmonths" id="vmonths"></div>
+          <div class="vlegend">
+            <span class="d"><i></i>Net positive</span>
+            <span class="l"><i></i>Investment phase</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Financial breakdown -->
+      <div class="res-panel">
+        <h3>/financial-breakdown</h3>
+        <p class="sub">Year-1 view of the investment and return.</p>
+        <div class="fin-table" id="fin-table"></div>
+      </div>
+
+      <!-- Next steps -->
+      <div class="res-panel">
+        <h3>/next-steps</h3>
+        <p class="sub">Recommended path based on your opportunity level.</p>
+        <ol id="r-steps"></ol>
+      </div>
+    </div>
+
+    <p class="assumptions" id="assumptions"></p>
+    <p class="disclaimer">These results are indicative estimates and do not constitute financial, technical or legal advice.</p>
+
+    <div class="res-actions">
+      <button class="btn btn-dark" id="pdf-btn">↓ Download PDF</button>
+      <button class="btn btn-ghost" id="restart-btn">↺ Recalculate</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-trust">
+      <span class="ft-pill">AIGEA</span>
+      <h3>Part of AIGEA.</h3>
+      <p>Humane Theory is the applied-systems arm of AIGEA, the Artificial Intelligence Governance &amp; Ethics Agency. AIGEA researches how AI should be governed and used responsibly; Humane Theory builds the models, tools and systems that put those principles to work inside real companies, with a human always able to check what the AI did and why.</p>
+    </div>
+    <div class="foot-top">
+      <a class="foot-mark" href="../"><img src="../logo-humanetheory.svg" alt="Humane Theory"></a>
+      <div class="foot-cols">
+        <div class="col"><h4>Project</h4><ul>
+          <li><a href="../statement/">Statement</a></li>
+          <li><a href="../#systems">Systems</a></li>
+          <li><a href="https://aigea.org" target="_blank" rel="noopener">About AIGEA</a></li>
+        </ul></div>
+        <div class="col"><h4>Social</h4><ul>
+          <li><a href="#" onclick="return false">LinkedIn</a></li>
+          <li><a href="#" onclick="return false">X</a></li>
+        </ul></div>
+        <div class="col"><h4>Contact</h4><ul>
+          <li><a href="mailto:info@aigea.org">info@aigea.org</a></li>
+          <li><a href="https://aigea.org" target="_blank" rel="noopener">aigea.org</a></li>
+        </ul></div>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <span class="copy">COPYRIGHT ©2026 HUMANE THEORY</span>
+      <a class="flink" href="../privacy-policy/">Privacy Policy</a>
+      <a class="flink" href="../terms-of-use/">Terms of Use</a>
+      <a class="flink" href="../?topic=custom#contact">Custom Work</a>
+    </div>
+  </div>
+  <div class="giant">Humane Theory</div>
+</footer>
+
+<script>
+/* ============================================================
+   ICONS: minimal line icons, stroke = currentColor.
+   ============================================================ */
+const ICONS = {
+  manufacturing:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V10l5 3v-3l5 3v-3l4 2.5V21"/><path d="M16 10V5h3v6.5"/></svg>',
+  technology:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="10.5" rx="1.5"/><path d="M2 19h20"/></svg>',
+  services:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="8" width="17" height="11" rx="2"/><path d="M9 8V6.5A1.5 1.5 0 0 1 10.5 5h3A1.5 1.5 0 0 1 15 6.5V8"/><path d="M3.5 13h17"/></svg>',
+  healthcare:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M12 8.5v7M8.5 12h7"/></svg>',
+  financial:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"/><path d="M14.8 9.3a3.4 3.4 0 1 0 0 5.4"/><path d="M8.3 11h4M8.3 13h4"/></svg>',
+  retail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 8h13l-1.1 12h-10.8L5.5 8z"/><path d="M9 10.5V6a3 3 0 0 1 6 0v4.5"/></svg>',
+  logistics:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6.5" width="12" height="9" rx="1"/><path d="M14.5 9.5h3.8l3.2 3.5v2.5h-7"/><circle cx="7" cy="17.7" r="1.8"/><circle cx="17" cy="17.7" r="1.8"/></svg>',
+  aviation:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L3 10.5l6 2.5L12 21l3-6.5L21 3z"/><path d="M9 13L21 3"/></svg>',
+  hospitality:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v11"/><path d="M3 15h18v3"/><path d="M9.5 12H18a3 3 0 0 1 3 3"/><circle cx="6.2" cy="12" r="1.6"/></svg>',
+  education:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5l10 4.5-10 4.5L2 9l10-4.5z"/><path d="M6.5 11.3v4.2c0 1.3 2.5 2.6 5.5 2.6s5.5-1.3 5.5-2.6v-4.2"/></svg>',
+  government:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5.5H3L12 3z"/><path d="M5 8.5V18M9.7 8.5V18M14.3 8.5V18M19 8.5V18"/><path d="M3 21h18"/></svg>',
+  construction:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16.5a8 8 0 0 1 16 0"/><path d="M2.5 16.5h19"/><path d="M9.5 10V6h5v4"/></svg>',
+  other:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M4 7.5l8 4.5 8-4.5"/><path d="M12 12v9"/></svg>'
+};
+
+/* ============================================================
+   CONFIG: everything editable lives here.
+   ============================================================ */
+const CONFIG = {
+
+  /* Global model assumptions */
+  assumptions: {
+    weeksPerYear: 46,            // working weeks per year
+    hoursPerWeekAffected: 6,     // repetitive hours/week per affected employee
+    baseAffected: 0.15,          // minimum share of employees affected
+    affectedPerPoint: 0.045,     // extra share per question score point
+    maxAffected: 0.60,           // cap on affected share
+    costBase: 6000,              // implementation base cost (EUR)
+    costPerEmployee: 90,         // scaled per-employee services cost (EUR), sublinear
+    costExponent: 0.9,           // employees^exponent, economy of scale
+    fteHoursYear: 1720           // hours of one full-time equivalent
+  },
+
+  /* Investment levels: adoption, licensing and services scale with ambition.
+     Copy is our own; the three-tier pattern is a common industry framing. */
+  investmentLevels: [
+    {
+      id:"starter", name:"Starter", tagline:"Self-serve tools, minimal setup",
+      adoption:0.45, toolCostPerUserYear:300, servicesFactor:0.35, productivityConversion:0.70,
+      description:"Your team starts with off-the-shelf AI assistants and learns by doing. No consultants and no heavy integration work. This is the cheapest way to build AI habits and validate value before committing real budget. Expect quick wins on writing, research and support tasks."
+    },
+    {
+      id:"growth", name:"Growth", tagline:"Structured program, internal owner",
+      adoption:0.65, toolCostPerUserYear:480, servicesFactor:1.0, productivityConversion:0.75,
+      description:"A coordinated rollout led from inside: shared workflows, role-specific training and light integration with the systems you already use. Balanced cost and impact. This is the most common path for teams that have already validated the basics and want measurable results."
+    },
+    {
+      id:"transformation", name:"Transformation", tagline:"Deep redesign, external support",
+      adoption:0.80, toolCostPerUserYear:700, servicesFactor:1.9, productivityConversion:0.80,
+      description:"Process redesign with custom integrations, dedicated budget and external specialists. The highest investment and the highest ceiling: AI embedded into core workflows instead of assisting around them. Best suited to organizations with executive sponsorship and a clear roadmap."
+    }
+  ],
+
+  /* How saved value distributes across business value streams */
+  valueStreams: [
+    { label:"Direct productivity",              share:0.45 },
+    { label:"Quality and error reduction",      share:0.20 },
+    { label:"Reallocation to higher-value work",share:0.18 },
+    { label:"Faster learning and ramp-up",      share:0.10 },
+    { label:"Wellbeing and retention",          share:0.07 }
+  ],
+
+  /* Company sizes: representative headcount */
+  sizes: [
+    { label:"1-10 employees",        employees:6    },
+    { label:"11-50 employees",       employees:30   },
+    { label:"51-200 employees",      employees:120  },
+    { label:"201-500 employees",     employees:350  },
+    { label:"501-1,000 employees",   employees:750  },
+    { label:"1,001-5,000 employees", employees:3000 },
+    { label:"5,000+ employees",      employees:8000 }
+  ],
+
+  /* Opportunity level thresholds on 12-month ROI (%) */
+  levels: [
+    { max:60,       id:"low",    label:"Low opportunity"    },
+    { max:180,      id:"medium", label:"Medium opportunity" },
+    { max:Infinity, id:"high",   label:"High opportunity"   }
+  ],
+
+  /* Next steps per opportunity level */
+  nextSteps: {
+    low: [
+      "Map your most repetitive workflows before investing.",
+      "Run a small pilot on one process with clear metrics.",
+      "Revisit this estimate as your volume of repetitive work grows."
+    ],
+    medium: [
+      "Prioritize the top impact areas above. Start with one.",
+      "Run a 4-6 week pilot with a measurable baseline.",
+      "Define adoption KPIs: hours saved, error rate, response time.",
+      "Plan team enablement early. Adoption drives most of the ROI."
+    ],
+    high: [
+      "Start with the #1 impact area. It likely pays for the whole program.",
+      "Run a focused pilot now, then scale in waves per department.",
+      "Assign an internal owner for AI adoption and governance.",
+      "Measure weekly: hours saved, quality gains and payback progress."
+    ]
+  },
+
+  /* Industries: icon, hourly loaded cost (EUR), complexity multiplier,
+     7 concrete operational questions and a default role mix.
+     Question: text, impact area, weight. Role: label, default share %, AI gain (0-1). */
+  industries: [
+    {
+      id:"manufacturing", icon:"manufacturing", name:"Manufacturing",
+      hourly:32, complexity:1.25,
+      questions:[
+        { q:"Do operators log production data on paper or in spreadsheets?",              area:"Shop-floor data capture",      w:1.0 },
+        { q:"Is final quality inspection visual or based on manual sampling?",            area:"AI visual inspection",         w:1.2 },
+        { q:"Do unplanned machine breakdowns catch you by surprise every month?",         area:"Predictive maintenance",       w:1.1 },
+        { q:"Are supplier confirmations, delivery notes and invoices keyed in by hand?",  area:"Document automation",          w:1.1 },
+        { q:"Do planners rebuild the production schedule manually when orders change?",   area:"Production planning",          w:1.0 },
+        { q:"Do engineers dig through old drawings and specs without a proper search tool?", area:"Technical knowledge access", w:0.9 },
+        { q:"Are customer or compliance audit packs assembled manually?",                 area:"Compliance reporting",         w:0.8 }
+      ],
+      roles:[
+        { label:"Production and assembly",      share:45, gain:0.28 },
+        { label:"Quality",                      share:10, gain:0.50 },
+        { label:"Maintenance",                  share:10, gain:0.45 },
+        { label:"Supply chain and procurement", share:12, gain:0.55 },
+        { label:"Admin and finance",            share:13, gain:0.58 },
+        { label:"Sales and customer service",   share:10, gain:0.50 }
+      ]
+    },
+    {
+      id:"technology", icon:"technology", name:"Technology",
+      hourly:45, complexity:0.9,
+      questions:[
+        { q:"Do more than a quarter of support tickets repeat the same issues?",          area:"AI-assisted support",          w:1.2 },
+        { q:"Do engineers lose time searching docs, wikis or chat threads for answers?",  area:"Internal knowledge assistant", w:1.0 },
+        { q:"Is writing tests, changelogs or API docs a manual chore nobody wants?",      area:"Docs, QA and testing automation", w:1.1 },
+        { q:"Do SDRs or customer success write near-identical emails every day?",         area:"Sales and CS automation",      w:1.0 },
+        { q:"Are incidents triaged by reading logs and dashboards by hand?",              area:"Incident triage and ops",      w:0.9 },
+        { q:"Do PMs assemble status updates and release notes manually?",                 area:"Reporting automation",         w:0.8 },
+        { q:"Does a new engineer need more than a month to become productive?",           area:"Onboarding acceleration",      w:0.7 }
+      ],
+      roles:[
+        { label:"Engineering",          share:40, gain:0.48 },
+        { label:"Product and design",   share:10, gain:0.50 },
+        { label:"Support",              share:15, gain:0.62 },
+        { label:"Sales and CS",         share:15, gain:0.45 },
+        { label:"Marketing",            share:8,  gain:0.55 },
+        { label:"Admin and operations", share:12, gain:0.55 }
+      ]
+    },
+    {
+      id:"services", icon:"services", name:"Professional Services",
+      hourly:48, complexity:0.95,
+      questions:[
+        { q:"Do consultants spend evenings formatting decks and reports?",                area:"Deliverable production",       w:1.2 },
+        { q:"Is desk research and source-gathering done from scratch per engagement?",    area:"Research automation",          w:1.1 },
+        { q:"Do proposals reuse content that lives scattered across old files?",          area:"Proposal automation",          w:1.1 },
+        { q:"Are meeting notes, minutes and follow-ups typed up by hand?",                area:"Meeting intelligence",         w:0.9 },
+        { q:"Do you review contracts or large document sets page by page?",               area:"Document review",              w:1.0 },
+        { q:"Are timesheets, invoicing or WIP reports a month-end scramble?",             area:"Practice operations",          w:0.8 },
+        { q:"Do partners answer the same client questions again and again?",              area:"Client knowledge base",        w:0.7 }
+      ],
+      roles:[
+        { label:"Client delivery",       share:45, gain:0.50 },
+        { label:"Business development",  share:15, gain:0.45 },
+        { label:"Research and analysis", share:15, gain:0.58 },
+        { label:"Marketing",             share:5,  gain:0.55 },
+        { label:"Finance and admin",     share:12, gain:0.58 },
+        { label:"Operations",            share:8,  gain:0.40 }
+      ]
+    },
+    {
+      id:"healthcare", icon:"healthcare", name:"Healthcare",
+      hourly:38, complexity:1.35,
+      questions:[
+        { q:"Do clinicians type consultation notes after each visit?",                    area:"Ambient clinical documentation", w:1.2 },
+        { q:"Are referrals, discharge letters or reports written from scratch?",          area:"Clinical correspondence",      w:1.1 },
+        { q:"Do staff manage appointment changes by phone and spreadsheet?",              area:"Scheduling automation",        w:1.0 },
+        { q:"Are insurance claims coded and submitted manually?",                         area:"Coding and claims",            w:1.1 },
+        { q:"Do patients ask the same pre-visit and post-visit questions?",               area:"Patient communication",        w:0.9 },
+        { q:"Is compliance documentation assembled by hand before inspections?",          area:"Compliance automation",        w:0.8 },
+        { q:"Do admin teams re-enter data between clinical and billing systems?",         area:"Systems integration",          w:0.9 }
+      ],
+      roles:[
+        { label:"Clinical staff",                share:45, gain:0.25 },
+        { label:"Patient admin and scheduling",  share:15, gain:0.60 },
+        { label:"Billing and insurance",         share:12, gain:0.60 },
+        { label:"Compliance and quality",        share:8,  gain:0.50 },
+        { label:"IT and operations",             share:8,  gain:0.45 },
+        { label:"Management and admin",          share:12, gain:0.55 }
+      ]
+    },
+    {
+      id:"financial", icon:"financial", name:"Financial Services",
+      hourly:52, complexity:1.3,
+      questions:[
+        { q:"Do analysts extract figures from PDFs, filings or statements by hand?",      area:"Data extraction",              w:1.1 },
+        { q:"Is KYC and client onboarding a multi-day manual process?",                   area:"Onboarding and KYC",           w:1.1 },
+        { q:"Do compliance teams review communications or transactions manually?",        area:"Compliance review",            w:1.2 },
+        { q:"Are periodic client or regulatory reports assembled by hand?",               area:"Reporting automation",         w:1.0 },
+        { q:"Do relationship managers prepare meeting briefs from scratch?",              area:"Client intelligence",          w:0.9 },
+        { q:"Are credit or risk memos drafted manually every time?",                      area:"Risk analysis drafting",       w:1.0 },
+        { q:"Do ops teams reconcile data across systems in spreadsheets?",                area:"Reconciliation automation",    w:0.9 }
+      ],
+      roles:[
+        { label:"Client advisory",           share:25, gain:0.45 },
+        { label:"Operations and processing", share:25, gain:0.60 },
+        { label:"Compliance and risk",       share:15, gain:0.55 },
+        { label:"Analysis and reporting",    share:15, gain:0.60 },
+        { label:"Sales and relationships",   share:10, gain:0.40 },
+        { label:"Admin",                     share:10, gain:0.55 }
+      ]
+    },
+    {
+      id:"retail", icon:"retail", name:"Retail & Ecommerce",
+      hourly:28, complexity:0.9,
+      questions:[
+        { q:"Do agents spend the day answering order-status and returns tickets?",        area:"AI customer support",          w:1.2 },
+        { q:"Are product descriptions and translations written manually?",                area:"Product content generation",   w:1.0 },
+        { q:"Is your demand forecast built in spreadsheets and gut feel?",                area:"Demand forecasting",           w:1.1 },
+        { q:"Do you adjust prices and promotions without competitor data?",               area:"Pricing intelligence",         w:0.9 },
+        { q:"Are returns and refunds handled case by case?",                              area:"Returns automation",           w:0.9 },
+        { q:"Do marketing teams write campaign copy and build segments by hand?",         area:"Marketing automation",         w:0.9 },
+        { q:"Are supplier POs and invoices processed manually?",                          area:"Document automation",          w:0.8 }
+      ],
+      roles:[
+        { label:"Store and frontline",       share:40, gain:0.25 },
+        { label:"Customer support",          share:15, gain:0.62 },
+        { label:"Ecommerce and content",     share:12, gain:0.58 },
+        { label:"Marketing",                 share:10, gain:0.55 },
+        { label:"Supply and inventory",      share:13, gain:0.50 },
+        { label:"Admin and finance",         share:10, gain:0.55 }
+      ]
+    },
+    {
+      id:"logistics", icon:"logistics", name:"Transportation & Logistics",
+      hourly:30, complexity:1.15,
+      questions:[
+        { q:"Are daily routes planned by a person with a map and a spreadsheet?",         area:"Route optimization",           w:1.1 },
+        { q:"Do dispatchers reassign jobs by phone when plans change?",                   area:"Dynamic dispatching",          w:1.0 },
+        { q:"Are CMRs, PODs and freight documents typed into your TMS by hand?",          area:"Freight document automation",  w:1.2 },
+        { q:"Do customers call to ask where their shipment is?",                          area:"Proactive tracking updates",   w:1.0 },
+        { q:"Is invoice-to-POD reconciliation a manual month-end task?",                  area:"Billing reconciliation",       w:0.9 },
+        { q:"Are delay and damage claims handled over long email threads?",               area:"Exception and claims handling", w:0.9 },
+        { q:"Do you forecast capacity and demand manually?",                              area:"Capacity forecasting",         w:0.8 }
+      ],
+      roles:[
+        { label:"Drivers and field",              share:45, gain:0.20 },
+        { label:"Dispatch and planning",          share:15, gain:0.55 },
+        { label:"Back office and documentation",  share:15, gain:0.60 },
+        { label:"Customer service",               share:10, gain:0.58 },
+        { label:"Warehouse",                      share:8,  gain:0.30 },
+        { label:"Admin and finance",              share:7,  gain:0.55 }
+      ]
+    },
+    {
+      id:"aviation", icon:"aviation", name:"Aviation",
+      hourly:40, complexity:1.4,
+      questions:[
+        { q:"Do ops teams compile daily flight, delay or irregularity reports by hand?",  area:"Operations reporting",         w:1.0 },
+        { q:"Are turnaround delays investigated manually across emails and systems?",     area:"Turnaround analytics",         w:1.0 },
+        { q:"Do maintenance teams search PDF manuals and task cards to find procedures?", area:"Maintenance knowledge access", w:1.2 },
+        { q:"Is compliance evidence for EASA or FAA audits collected manually?",          area:"Audit and compliance automation", w:1.1 },
+        { q:"Do crew or roster changes trigger long manual re-planning cycles?",          area:"Crew and roster planning",     w:1.0 },
+        { q:"Are passenger claims like EU261 or baggage processed case by case?",         area:"Claims processing",            w:1.1 },
+        { q:"Are safety reports and occurrences transcribed and classified by hand?",     area:"Safety reporting",             w:0.9 }
+      ],
+      roles:[
+        { label:"Flight and ground operations",   share:40, gain:0.25 },
+        { label:"Maintenance and engineering",    share:15, gain:0.40 },
+        { label:"Ops control and planning",       share:12, gain:0.55 },
+        { label:"Passenger service",              share:13, gain:0.50 },
+        { label:"Compliance and safety",          share:8,  gain:0.50 },
+        { label:"Admin and finance",              share:12, gain:0.55 }
+      ]
+    },
+    {
+      id:"hospitality", icon:"hospitality", name:"Hospitality",
+      hourly:26, complexity:0.9,
+      questions:[
+        { q:"Do front-desk teams answer the same guest questions every day?",             area:"AI guest assistant",           w:1.2 },
+        { q:"Are group or special reservations handled by email back-and-forth?",         area:"Reservation automation",       w:1.0 },
+        { q:"Are staff rotas rebuilt manually every week?",                               area:"Staff scheduling",             w:0.9 },
+        { q:"Do online reviews get answered one by one, or not at all?",                  area:"Reputation management",        w:0.9 },
+        { q:"Are room rates adjusted manually against competitors?",                      area:"Dynamic pricing",              w:1.0 },
+        { q:"Do upsell offers depend on the receptionist remembering to ask?",            area:"Upsell automation",            w:0.8 },
+        { q:"Is housekeeping and maintenance coordinated by radio and paper?",            area:"Operations coordination",      w:0.8 }
+      ],
+      roles:[
+        { label:"Front office and guest service", share:30, gain:0.45 },
+        { label:"Housekeeping and F&B",           share:35, gain:0.15 },
+        { label:"Reservations and revenue",       share:10, gain:0.60 },
+        { label:"Marketing",                      share:8,  gain:0.55 },
+        { label:"Maintenance",                    share:7,  gain:0.30 },
+        { label:"Admin and finance",              share:10, gain:0.55 }
+      ]
+    },
+    {
+      id:"education", icon:"education", name:"Education",
+      hourly:30, complexity:1.05,
+      questions:[
+        { q:"Do teachers rebuild lesson materials and quizzes every term?",               area:"Content and assessment creation", w:1.1 },
+        { q:"Is grading and written feedback consuming staff evenings?",                  area:"Assisted grading and feedback", w:1.0 },
+        { q:"Do admissions teams process applications and documents by hand?",            area:"Admissions automation",        w:1.1 },
+        { q:"Do students wait days for answers to routine questions?",                    area:"Student services assistant",   w:1.0 },
+        { q:"Are attendance, records and certificates managed manually?",                 area:"Records automation",           w:0.9 },
+        { q:"Are accreditation or board reports assembled by hand?",                      area:"Institutional reporting",      w:0.8 },
+        { q:"Is staff onboarding and policy training repetitive to deliver?",             area:"Staff enablement",             w:0.7 }
+      ],
+      roles:[
+        { label:"Teaching staff",         share:50, gain:0.35 },
+        { label:"Student services",       share:12, gain:0.55 },
+        { label:"Admissions and records", share:10, gain:0.60 },
+        { label:"Administration",         share:15, gain:0.55 },
+        { label:"IT and facilities",      share:8,  gain:0.40 },
+        { label:"Marketing and comms",    share:5,  gain:0.55 }
+      ]
+    },
+    {
+      id:"government", icon:"government", name:"Government",
+      hourly:32, complexity:1.45,
+      questions:[
+        { q:"Are permits, licenses and applications reviewed page by page?",              area:"Case and permit processing",   w:1.2 },
+        { q:"Do citizens wait on hold for answers that repeat every day?",                area:"Citizen service assistant",    w:1.1 },
+        { q:"Are case files assembled from several disconnected systems?",                area:"Records intelligence",         w:1.0 },
+        { q:"Are minutes and resolutions produced manually after each session?",          area:"Documentation automation",     w:0.9 },
+        { q:"Do approvals still travel through email chains or internal mail?",           area:"Workflow digitization",        w:1.0 },
+        { q:"Are transparency or information requests handled manually?",                 area:"Information request handling", w:0.9 },
+        { q:"Do inspectors write their reports twice, on site and back at the office?",   area:"Field reporting",              w:0.8 }
+      ],
+      roles:[
+        { label:"Case workers",              share:35, gain:0.50 },
+        { label:"Citizen services",          share:15, gain:0.55 },
+        { label:"Records and documentation", share:15, gain:0.60 },
+        { label:"Policy and analysis",       share:10, gain:0.50 },
+        { label:"Inspection and field",      share:12, gain:0.30 },
+        { label:"Admin and finance",         share:13, gain:0.55 }
+      ]
+    },
+    {
+      id:"construction", icon:"construction", name:"Construction",
+      hourly:33, complexity:1.2,
+      questions:[
+        { q:"Are RFIs, submittals and change orders tracked in email and Excel?",         area:"RFI and change management",    w:1.1 },
+        { q:"Do site managers type up daily reports every evening?",                      area:"Field reporting automation",   w:1.0 },
+        { q:"Are subcontractor invoices matched to contracts by hand?",                   area:"Invoice and contract matching", w:1.1 },
+        { q:"Does bidding require re-reading hundreds of pages of tender documents?",     area:"Tender analysis",              w:1.1 },
+        { q:"Is safety documentation like permits and toolbox talks still on paper?",     area:"Safety compliance",            w:0.9 },
+        { q:"Do schedule clashes between trades surface too late?",                       area:"Schedule coordination",        w:1.0 },
+        { q:"Are as-built documents and O&M manuals compiled manually at handover?",      area:"Handover documentation",       w:0.8 }
+      ],
+      roles:[
+        { label:"Site and field crews",        share:50, gain:0.15 },
+        { label:"Project management",          share:15, gain:0.50 },
+        { label:"Engineering and design",      share:10, gain:0.45 },
+        { label:"Procurement and contracts",   share:10, gain:0.58 },
+        { label:"Safety and compliance",       share:5,  gain:0.50 },
+        { label:"Admin and finance",           share:10, gain:0.58 }
+      ]
+    },
+    {
+      id:"other", icon:"other", name:"Other",
+      hourly:34, complexity:1.0,
+      questions:[
+        { q:"Do teams spend hours each week on data entry, filing or scheduling?",        area:"Admin automation",             w:1.1 },
+        { q:"Do customers ask the same questions across email, phone and chat?",          area:"AI customer support",          w:1.0 },
+        { q:"Are invoices, contracts or forms processed by hand?",                        area:"Document processing",          w:1.1 },
+        { q:"Are recurring reports assembled manually from several sources?",             area:"Reporting automation",         w:0.9 },
+        { q:"Do sales teams write similar proposals and follow-ups repeatedly?",          area:"Sales automation",             w:1.0 },
+        { q:"Does key knowledge live in people's heads or scattered files?",              area:"Knowledge management",         w:0.9 },
+        { q:"Does audit or compliance preparation disrupt normal work?",                  area:"Compliance automation",        w:0.8 }
+      ],
+      roles:[
+        { label:"Operations",          share:30, gain:0.40 },
+        { label:"Customer service",    share:15, gain:0.58 },
+        { label:"Sales and marketing", share:15, gain:0.50 },
+        { label:"Admin and finance",   share:15, gain:0.58 },
+        { label:"Technical",           share:15, gain:0.45 },
+        { label:"Management",          share:10, gain:0.35 }
+      ]
+    }
+  ]
+};
+
+/* Answer options: value feeds the scoring model */
+const ANSWERS = [
+  { label:"No",        value:0   },
+  { label:"Partially", value:0.5 },
+  { label:"Yes",       value:1   }
+];
+
+/* Loading sequence: line text + when it turns on (ms) */
+const LOADING_STEPS = [
+  { t:"Loading industry benchmarks...",            at:200  },
+  { t:"Scoring repetitive-work exposure...",       at:850  },
+  { t:"Weighting role distribution...",            at:1500 },
+  { t:"Applying investment level assumptions...",  at:2150 },
+  { t:"Calculating investment and payback...",     at:2800 },
+  { t:"Compiling executive summary...",            at:3450 }
+];
+const LOADING_TOTAL = 4200; // ms before results reveal
+
+/* ============================================================
+   STATE + NAVIGATION
+   ============================================================ */
+const state = { industry:null, size:null, answers:[], roles:[], invLevel:null, currency:'€' };
+
+/* Currency toggle */
+document.querySelectorAll('#cur-toggle button').forEach(b=>b.addEventListener('click',()=>{
+  state.currency = b.dataset.cur;
+  document.querySelectorAll('#cur-toggle button').forEach(x=>x.classList.toggle('on', x===b));
+}));
+
+const steps = [1,2,3,4].map(n=>document.getElementById('step-'+n));
+const resultsEl  = document.getElementById('results');
+const loadingEl  = document.getElementById('loading');
+const barFill    = document.getElementById('bar-fill');
+const stepLabel  = document.getElementById('step-label');
+let current = 0;
+
+function showStep(i){
+  steps.forEach((s,idx)=>s.classList.toggle('active', idx===i));
+  resultsEl.classList.remove('active');
+  loadingEl.classList.remove('active');
+  current = i;
+  stepLabel.textContent = 'STEP 0' + (i+1) + ' / 04';
+  barFill.style.width = ((i+1)/4*90) + '%';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function showLoading(){
+  steps.forEach(s=>s.classList.remove('active'));
+  resultsEl.classList.remove('active');
+  loadingEl.classList.add('active');
+  stepLabel.textContent = 'CALCULATING';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function showResults(){
+  steps.forEach(s=>s.classList.remove('active'));
+  loadingEl.classList.remove('active');
+  resultsEl.classList.add('active');
+  stepLabel.textContent = 'RESULTS';
+  barFill.style.width = '100%';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+document.querySelectorAll('[data-back]').forEach(b=>b.addEventListener('click',()=>showStep(current-1)));
+
+/* ============================================================
+   CUSTOM DROPDOWN component (step 1)
+   ============================================================ */
+function createSelect(root, items, onPick){
+  const btn   = root.querySelector('.sel-btn');
+  const panel = root.querySelector('.sel-panel');
+  const icBox = btn.querySelector('.ic');
+  const txt   = btn.querySelector('.txt');
+
+  items.forEach((item,idx)=>{
+    const o = document.createElement('button');
+    o.type = 'button';
+    o.className = 'sel-opt';
+    o.innerHTML = (item.icon ? '<span class="ic">'+ICONS[item.icon]+'</span>' : '') +
+                  '<span>'+(item.name||item.label)+'</span>';
+    o.addEventListener('click',()=>{
+      panel.querySelectorAll('.sel-opt').forEach(x=>x.classList.remove('selected'));
+      o.classList.add('selected');
+      txt.textContent = item.name || item.label;
+      btn.classList.add('filled');
+      if(item.icon){ icBox.innerHTML = ICONS[item.icon]; }
+      root.classList.remove('open');
+      onPick(item, idx);
+    });
+    panel.appendChild(o);
+  });
+
+  btn.addEventListener('click', e=>{
+    e.stopPropagation();
+    document.querySelectorAll('.sel.open').forEach(s=>{ if(s!==root) s.classList.remove('open'); });
+    root.classList.toggle('open');
+  });
+}
+document.addEventListener('click',()=>document.querySelectorAll('.sel.open').forEach(s=>s.classList.remove('open')));
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.sel.open').forEach(s=>s.classList.remove('open')); });
+
+const continue1 = document.getElementById('continue-1');
+function checkProfile(){ continue1.disabled = !(state.industry && state.size); }
+
+createSelect(document.getElementById('sel-industry'), CONFIG.industries, item=>{ state.industry=item; checkProfile(); });
+createSelect(document.getElementById('sel-size'),     CONFIG.sizes,      item=>{ state.size=item;    checkProfile(); });
+
+continue1.addEventListener('click',()=>{
+  buildQuestions(state.industry);
+  buildRoles(state.industry);
+  showStep(1);
+});
+
+/* ============================================================
+   STEP 2 · operations questions
+   ============================================================ */
+function buildQuestions(ind){
+  const list = document.getElementById('q-list');
+  list.innerHTML = '';
+  state.answers = new Array(ind.questions.length).fill(null);
+  document.getElementById('q-title').textContent = ind.name + ': about your operations';
+
+  ind.questions.forEach((qu,qi)=>{
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.style.animationDelay = (qi*0.06)+'s';
+
+    const textWrap = document.createElement('div');
+    textWrap.className = 'q-text';
+    textWrap.innerHTML = '<span class="q-num">Q0'+(qi+1)+'</span>'+qu.q;
+
+    const answers = document.createElement('div');
+    answers.className = 'q-answers';
+    ANSWERS.forEach(a=>{
+      const ab = document.createElement('button');
+      ab.type='button';
+      ab.textContent = a.label;
+      ab.addEventListener('click',()=>{
+        state.answers[qi] = a.value;
+        answers.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+        ab.classList.add('on');
+        document.getElementById('q-validate').classList.remove('show');
+      });
+      answers.appendChild(ab);
+    });
+
+    card.appendChild(textWrap);
+    card.appendChild(answers);
+    list.appendChild(card);
+  });
+}
+document.getElementById('continue-2').addEventListener('click',()=>{
+  if(state.answers.some(a=>a===null)){
+    document.getElementById('q-validate').classList.add('show');
+    return;
+  }
+  showStep(2);
+});
+
+/* ============================================================
+   STEP 3 · role distribution (must total 100%)
+   ============================================================ */
+function buildRoles(ind){
+  const list = document.getElementById('role-list');
+  list.innerHTML = '';
+  state.roles = ind.roles.map(r=>r.share);
+
+  ind.roles.forEach((role,ri)=>{
+    const row = document.createElement('div');
+    row.className = 'role-row';
+    row.style.animationDelay = (ri*0.05)+'s';
+    row.innerHTML = '<span class="rl">'+role.label+'</span>';
+
+    const inputWrap = document.createElement('div');
+    inputWrap.className = 'role-input';
+    const inp = document.createElement('input');
+    inp.type = 'number'; inp.min = 0; inp.max = 100; inp.step = 1;
+    inp.value = role.share;
+    inp.addEventListener('input',()=>{
+      state.roles[ri] = Math.max(0, Math.min(100, Number(inp.value)||0));
+      updateRoleTotal();
+    });
+    inputWrap.appendChild(inp);
+    inputWrap.insertAdjacentHTML('beforeend','<span class="pct">%</span>');
+    row.appendChild(inputWrap);
+    list.appendChild(row);
+  });
+  updateRoleTotal();
+}
+function roleTotal(){ return state.roles.reduce((a,b)=>a+b,0); }
+function updateRoleTotal(){
+  const t = roleTotal();
+  const box = document.getElementById('role-total');
+  document.getElementById('role-total-txt').textContent = 'Total: ' + t + '%';
+  box.classList.toggle('ok', t===100);
+  box.classList.toggle('bad', t!==100);
+  if(t===100) document.getElementById('role-validate').classList.remove('show');
+}
+document.getElementById('role-reset').addEventListener('click',()=>{
+  buildRoles(state.industry);
+});
+document.getElementById('continue-3').addEventListener('click',()=>{
+  if(roleTotal()!==100){
+    document.getElementById('role-validate').classList.add('show');
+    return;
+  }
+  showStep(3);
+});
+
+/* ============================================================
+   STEP 4 · investment level
+   ============================================================ */
+const invGrid = document.getElementById('inv-grid');
+const invDetail = document.getElementById('inv-detail');
+CONFIG.investmentLevels.forEach(lvl=>{
+  const card = document.createElement('button');
+  card.type = 'button';
+  card.className = 'inv-card';
+  card.innerHTML = '<span class="in">'+lvl.name+'</span><span class="it">'+lvl.tagline+'</span>';
+  card.addEventListener('click',()=>{
+    state.invLevel = lvl;
+    invGrid.querySelectorAll('.inv-card').forEach(c=>c.classList.remove('selected'));
+    card.classList.add('selected');
+    invDetail.className = 'inv-detail show';
+    invDetail.innerHTML =
+      '<h4>'+lvl.name+'</h4><div class="tag">'+lvl.tagline+'</div>'+
+      '<p>'+lvl.description+'</p>'+
+      '<div class="params">Assumed adoption: '+Math.round(lvl.adoption*100)+'% · Licenses: '+state.currency+lvl.toolCostPerUserYear+'/user/year · Services scale: x'+lvl.servicesFactor+'</div>';
+    document.getElementById('inv-validate').classList.remove('show');
+  });
+  invGrid.appendChild(card);
+});
+
+/* ============================================================
+   CALCULATION MODEL
+   All formulas in one place. Easy to audit and tweak.
+   ============================================================ */
+function calculate(){
+  const A = CONFIG.assumptions;
+  const ind = state.industry, sz = state.size, lvl = state.invLevel;
+  const employees = sz.employees;
+
+  // 1) Question score drives how much of the workforce is affected
+  const score = ind.questions.reduce((acc,qu,i)=>acc + (state.answers[i]||0)*qu.w, 0);
+  const affected = Math.min(A.baseAffected + score*A.affectedPerPoint, A.maxAffected);
+
+  // 2) Role mix: effective automation potential = weighted average of role gains
+  const roleFactor = ind.roles.reduce((acc,r,i)=>acc + (state.roles[i]/100)*r.gain, 0);
+
+  // 3) Hours automatable per year across the affected workforce
+  const hoursYear = employees * affected * A.hoursPerWeekAffected * A.weeksPerYear
+                  * roleFactor * lvl.adoption;
+
+  // 4) Money saved: not every saved hour converts to value
+  const savings = hoursYear * ind.hourly * lvl.productivityConversion;
+
+  // 5) Year-1 investment: services scale with headcount, industry complexity
+  //    and the chosen investment level; licenses cover the affected workforce
+  const services = (A.costBase + A.costPerEmployee * Math.pow(employees, A.costExponent))
+                 * ind.complexity * lvl.servicesFactor;
+  const licenses = employees * affected * lvl.toolCostPerUserYear;
+  const cost = services + licenses;
+
+  const roi = (savings - cost) / cost * 100;
+  const paybackMonths = savings > 0 ? cost / (savings/12) : Infinity;
+  const fte = hoursYear / A.fteHoursYear;
+  const level = CONFIG.levels.find(l=>roi <= l.max);
+
+  // 6) Impact areas ranked by answer x weight, de-duplicated, up to 5
+  const ranked = ind.questions
+    .map((qu,i)=>({ area:qu.area, val:(state.answers[i]||0)*qu.w }))
+    .filter(x=>x.val>0)
+    .sort((a,b)=>b.val-a.val);
+  const seen = new Set(), areas = [];
+  for(const r of ranked){
+    if(!seen.has(r.area)){ seen.add(r.area); areas.push(r); }
+    if(areas.length===5) break;
+  }
+  if(areas.length===0) areas.push({area:"Administrative task automation", val:1});
+
+  // 7) Savings by role: share x gain, normalized over the role mix
+  const roleWeights = ind.roles.map((r,i)=>({ label:r.label, w:(state.roles[i]/100)*r.gain }))
+                               .filter(x=>x.w>0).sort((a,b)=>b.w-a.w);
+  const roleSum = roleWeights.reduce((a,x)=>a+x.w,0) || 1;
+
+  // 8) Monthly cumulative net position over 12 months
+  const monthly = savings/12;
+  const cumulative = Array.from({length:12},(_,m)=>monthly*(m+1) - cost);
+  const breakeven = cumulative.findIndex(v=>v>=0);
+
+  return { employees, affected, roleFactor, hoursYear, savings, services, licenses, cost,
+           roi, paybackMonths, fte, level, areas, roleWeights, roleSum, cumulative, breakeven };
+}
+
+/* ============================================================
+   RESULTS RENDERING
+   ============================================================ */
+const fmtEUR = n => state.currency + Math.round(n).toLocaleString('en-US');
+const fmtNum = n => Math.round(n).toLocaleString('en-US');
+
+function countUp(el, target, fmt, dur=900){
+  const t0 = performance.now();
+  (function tick(now){
+    const p = Math.min((now-t0)/dur, 1);
+    const eased = 1 - Math.pow(1-p, 3);
+    el.textContent = fmt(target*eased);
+    if(p<1) requestAnimationFrame(tick);
+  })(t0);
+  // Safety: rAF can be throttled in background tabs; guarantee the final value
+  setTimeout(()=>{ el.textContent = fmt(target); }, dur+150);
+}
+
+function renderResults(r){
+  const A = CONFIG.assumptions;
+  const lvl = state.invLevel;
+
+  document.getElementById('res-context').textContent =
+    state.industry.name + ' · ' + state.size.label + ' · ' + lvl.name + ' investment';
+
+  // Executive summary paragraph
+  document.getElementById('exec-summary').innerHTML =
+    'For a <strong>' + state.industry.name + '</strong> organization with <strong>' + state.size.label + '</strong> ' +
+    'following a <strong>' + lvl.name + '</strong> adoption path, our model estimates ' +
+    '<strong>' + fmtNum(r.hoursYear) + ' hours</strong> of automatable work per year, worth approximately ' +
+    '<strong>' + fmtEUR(r.savings) + '</strong> in annual value. Against a first-year investment of ' +
+    '<strong>' + fmtEUR(r.cost) + '</strong>, this yields an estimated 12-month ROI of ' +
+    '<strong>' + Math.round(r.roi) + '%</strong>' +
+    (isFinite(r.paybackMonths) ? ' with payback in <strong>' + (Math.round(r.paybackMonths*10)/10).toFixed(1) + ' months</strong>.' : '.') +
+    ' The biggest opportunity sits in <strong>' + r.areas[0].area.toLowerCase() + '</strong>.';
+
+  // What this ROI assumes: the investment level's real implementation scope
+  document.getElementById('scope-body').innerHTML =
+    '<div class="scope-desc"><h4>'+lvl.name+'</h4><span class="tag">'+lvl.tagline+'</span><p>'+lvl.description+'</p></div>' +
+    '<div class="scope-params">' +
+      '<div class="row"><span>Assumed adoption</span><span>'+Math.round(lvl.adoption*100)+'% of affected staff actually using it</span></div>' +
+      '<div class="row"><span>Tooling / licenses</span><span>'+state.currency+lvl.toolCostPerUserYear+' per user / year</span></div>' +
+      '<div class="row"><span>Implementation services</span><span>x'+lvl.servicesFactor+' of base services cost</span></div>' +
+      '<div class="row"><span>Saved hours that convert to €</span><span>'+Math.round(lvl.productivityConversion*100)+'%</span></div>' +
+    '</div>';
+
+  // Metric cards
+  countUp(document.getElementById('r-roi'),     r.roi,        v=>Math.round(v)+'%', 1100);
+  countUp(document.getElementById('r-savings'), r.savings,    fmtEUR);
+  countUp(document.getElementById('r-hours'),   r.hoursYear,  fmtNum);
+  countUp(document.getElementById('r-cost'),    r.cost,       fmtEUR);
+  countUp(document.getElementById('r-affected'),r.affected*100, v=>Math.round(v)+'%');
+  countUp(document.getElementById('r-fte'),     r.fte,        v=>(Math.round(v*10)/10).toFixed(1));
+
+  const pb = document.getElementById('r-payback');
+  if(isFinite(r.paybackMonths)){
+    countUp(pb, r.paybackMonths, v=>(Math.round(v*10)/10).toFixed(1));
+    document.getElementById('r-payback-u').textContent = 'months';
+  } else { pb.textContent='n/a'; document.getElementById('r-payback-u').textContent='not reached in year 1'; }
+
+  // Opportunity badge
+  const badge = document.getElementById('r-level');
+  badge.className = 'level-badge level-' + r.level.id;
+  document.getElementById('r-level-text').textContent = r.level.label;
+
+  // Chart 1: top impact areas (hours distributed by score share)
+  const sumVal = r.areas.reduce((a,x)=>a+x.val,0);
+  const maxVal = r.areas[0].val;
+  document.getElementById('chart-areas').innerHTML = r.areas.map(x=>{
+    const hrs = r.hoursYear * x.val/sumVal;
+    return '<div class="hrow"><div class="lbl">'+x.area+'</div>'+
+           '<div class="track"><div class="fill" data-w="'+(x.val/maxVal*100)+'"></div></div>'+
+           '<div class="val">~'+fmtNum(hrs)+' h/yr</div></div>';
+  }).join('');
+
+  // Chart 2: savings by role (top 6)
+  const topRoles = r.roleWeights.slice(0,6);
+  const maxRole = topRoles[0] ? topRoles[0].w : 1;
+  document.getElementById('chart-roles').innerHTML = topRoles.map(x=>{
+    return '<div class="hrow"><div class="lbl">'+x.label+'</div>'+
+           '<div class="track"><div class="fill" data-w="'+(x.w/maxRole*100)+'"></div></div>'+
+           '<div class="val">'+fmtEUR(r.savings*x.w/r.roleSum)+'</div></div>';
+  }).join('');
+
+  // Chart 3: value streams (share of savings)
+  const maxShare = CONFIG.valueStreams[0].share;
+  document.getElementById('chart-streams').innerHTML = CONFIG.valueStreams.map(s=>{
+    return '<div class="hrow"><div class="lbl">'+s.label+'</div>'+
+           '<div class="track"><div class="fill" data-w="'+(s.share/maxShare*100)+'"></div></div>'+
+           '<div class="val">'+fmtEUR(r.savings*s.share)+'</div></div>';
+  }).join('');
+
+  // Animate horizontal bars after paint
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    document.querySelectorAll('.hrow .fill').forEach(f=>{ f.style.width = f.dataset.w + '%'; });
+  }));
+
+  // Chart 4: 12-month cumulative net position
+  const H = 150;
+  const vals = r.cumulative;
+  const min = Math.min(0, ...vals), max = Math.max(0, ...vals);
+  const range = (max-min) || 1;
+  const zeroFromBottom = (0-min)/range * H;
+  const vchart = document.getElementById('vchart');
+  vchart.innerHTML = '<div class="vzero" style="bottom:'+zeroFromBottom+'px"></div>' +
+    vals.map(v=>{
+      const h = Math.max(2, Math.abs(v)/range * H);
+      if(v>=0) return '<div class="vcol"><div class="vbar" style="bottom:'+zeroFromBottom+'px;height:'+h+'px"></div></div>';
+      return '<div class="vcol"><div class="vbar neg" style="top:'+(H-zeroFromBottom)+'px;height:'+h+'px"></div></div>';
+    }).join('');
+  document.getElementById('vmonths').innerHTML =
+    vals.map((v,m)=>'<span class="'+(m===r.breakeven?'be':'')+'">M'+(m+1)+'</span>').join('');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    vchart.querySelectorAll('.vbar').forEach((b,i)=>{ setTimeout(()=>{ b.style.transform='scaleY(1)'; }, i*45); });
+  }));
+
+  // Financial breakdown table
+  const multiple = r.savings / r.cost;
+  document.getElementById('fin-table').innerHTML =
+    '<div class="fin-row"><span>Implementation services</span><span class="fv">'+fmtEUR(r.services)+'</span></div>'+
+    '<div class="fin-row"><span>AI tooling licenses (year 1)</span><span class="fv">'+fmtEUR(r.licenses)+'</span></div>'+
+    '<div class="fin-row total"><span>Total year-1 investment</span><span class="fv">'+fmtEUR(r.cost)+'</span></div>'+
+    '<div class="fin-row"><span>Gross annual savings</span><span class="fv">'+fmtEUR(r.savings)+'</span></div>'+
+    '<div class="fin-row total"><span>Net year-1 value</span><span class="fv">'+fmtEUR(r.savings-r.cost)+'</span></div>'+
+    '<div class="fin-row"><span>Return multiple</span><span class="fv">x'+(Math.round(multiple*10)/10).toFixed(1)+'</span></div>';
+
+  // Next steps
+  document.getElementById('r-steps').innerHTML =
+    CONFIG.nextSteps[r.level.id].map(s=>'<li><span class="idx">→</span><span>'+s+'</span></li>').join('');
+
+  // Assumptions footnote
+  document.getElementById('assumptions').textContent =
+    'Model assumptions: ' + lvl.name + ' investment level, ' + Math.round(lvl.adoption*100) + '% adoption, ' +
+    Math.round(lvl.productivityConversion*100) + '% of saved hours convert to value, ' +
+    A.hoursPerWeekAffected + ' repetitive hours/week per affected employee, ' +
+    A.weeksPerYear + ' working weeks/year, average loaded cost of ' + state.currency + state.industry.hourly + '/hour, ' +
+    'effective automation potential of ' + Math.round(r.roleFactor*100) + '% from your role mix, and industry complexity factor x' + state.industry.complexity + '.';
+}
+
+/* ============================================================
+   AI ANALYSIS · optional enrichment layer
+   Calls /api/roi-analysis (serverless function, key kept server-side).
+   Never blocks or breaks the page: any failure/timeout falls back
+   to a locally-generated summary built from the same numbers.
+   ============================================================ */
+function buildAIPayload(r){
+  const lvl = state.invLevel;
+  return {
+    industry: state.industry.name,
+    companySize: state.size.label,
+    investmentLevel: lvl.name,
+    investmentTagline: lvl.tagline,
+    investmentDescription: lvl.description,
+    adoptionPct: Math.round(lvl.adoption*100),
+    toolCostPerUserYear: lvl.toolCostPerUserYear,
+    servicesFactor: lvl.servicesFactor,
+    currency: state.currency === '€' ? 'EUR' : 'USD',
+    roiPct: Math.round(r.roi),
+    annualSavings: Math.round(r.savings),
+    year1Cost: Math.round(r.cost),
+    automatableHours: Math.round(r.hoursYear),
+    paybackMonths: isFinite(r.paybackMonths) ? Math.round(r.paybackMonths*10)/10 : null,
+    affectedPct: Math.round(r.affected*100),
+    fte: Math.round(r.fte*10)/10,
+    topImpactArea: r.areas[0].area,
+    opportunityLevel: r.level.label
+  };
+}
+
+function localFallbackSummary(r){
+  return {
+    diagnosis: 'Based purely on your inputs: a ' + (isFinite(r.paybackMonths) ? (Math.round(r.paybackMonths*10)/10)+'-month' : 'n/a') +
+      ' payback and ' + Math.round(r.roi) + '% year-1 ROI place this in the "' + r.level.label.toLowerCase() +
+      '" band. The single largest lever is ' + r.areas[0].area.toLowerCase() + ', which should anchor whatever you do first.',
+    priorities: [],
+    risks: [],
+    confidence_note: '',
+    verdict: {
+      recommendation: r.level.id==='high' ? 'Proceed' : (r.level.id==='medium' ? 'Pilot first' : 'Hold off'),
+      pros: [
+        (isFinite(r.paybackMonths) ? 'Payback in '+(Math.round(r.paybackMonths*10)/10)+' months' : 'Positive year-1 economics'),
+        Math.round(r.affected*100)+'% of staff touch repetitive work today, so the lever is real, not theoretical'
+      ],
+      cons: [
+        'These are model estimates, not a vendor quote. Real adoption often lands below the assumed rate',
+        'Numbers assume the investment level\'s scope is actually delivered, not just software purchased'
+      ],
+      summary: 'This is a local, numbers-only readout, not a recommendation informed by market comparisons.'
+    },
+    isFallback: true
+  };
+}
+
+async function fetchAIAnalysis(r){
+  const statusEl = document.getElementById('ai-status');
+  const bodyEl = document.getElementById('ai-body');
+
+  const controller = new AbortController();
+  const timeout = setTimeout(()=>controller.abort(), 12000);
+
+  try{
+    const res = await fetch('/api/roi-analysis', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(buildAIPayload(r)),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+
+    if(!res.ok) throw new Error('bad status '+res.status);
+    const data = await res.json();
+    if(!data.ok || !data.analysis) throw new Error('no analysis');
+
+    renderAIAnalysis(data.analysis, statusEl, bodyEl, false);
+  }catch(err){
+    clearTimeout(timeout);
+    renderAIAnalysis(localFallbackSummary(r), statusEl, bodyEl, true);
+  }
+}
+
+function renderAIAnalysis(a, statusEl, bodyEl, isFallback){
+  statusEl.className = 'ai-status done';
+  statusEl.innerHTML = '<i></i>' + (isFallback ? 'Local summary' : 'AI-enriched');
+
+  let html = '<div class="ai-diagnosis">' + escapeHTML(a.diagnosis) +
+    (isFallback ? '' : '<span class="ai-badge">AI</span>') + '</div>';
+
+  if(a.priorities && a.priorities.length){
+    html += '<div class="ai-section"><h4>Priorities</h4><ul class="ai-priorities">' +
+      a.priorities.slice(0,4).map((p,i)=>
+        '<li><span class="n">0'+(i+1)+'</span><div><div class="t">'+escapeHTML(p.title)+'</div><div class="w">'+escapeHTML(p.why)+'</div></div></li>'
+      ).join('') + '</ul></div>';
+  }
+  if(a.risks && a.risks.length){
+    html += '<div class="ai-section"><h4>Watch out for</h4><ul class="ai-risks">' +
+      a.risks.slice(0,5).map(x=>'<li>'+escapeHTML(x)+'</li>').join('') + '</ul></div>';
+  }
+  if(a.verdict){
+    const v = a.verdict;
+    html += '<div class="ai-verdict">' +
+      '<div class="ai-verdict-head"><h4>Should you do this?</h4><span class="ai-rec ai-rec-'+slug(v.recommendation)+'">'+escapeHTML(v.recommendation)+'</span></div>' +
+      (v.pros && v.pros.length ? '<div class="ai-proscons"><div class="pc pc-pro"><span class="pc-h">Advantages</span><ul>'+v.pros.map(x=>'<li>'+escapeHTML(x)+'</li>').join('')+'</ul></div>' +
+        (v.cons && v.cons.length ? '<div class="pc pc-con"><span class="pc-h">Disadvantages</span><ul>'+v.cons.map(x=>'<li>'+escapeHTML(x)+'</li>').join('')+'</ul></div>' : '') +
+      '</div>' : '') +
+      (v.summary ? '<p class="ai-verdict-sum">'+escapeHTML(v.summary)+'</p>' : '') +
+    '</div>';
+  }
+  if(a.confidence_note){
+    html += '<div class="ai-confidence">'+escapeHTML(a.confidence_note)+'</div>';
+  }
+  if(isFallback){
+    html += '<div class="ai-fallback" style="margin-top:14px">AI analysis is temporarily unavailable, so this summary was generated locally from your own numbers only.</div>';
+  }
+
+  bodyEl.innerHTML = html;
+}
+
+function slug(s){ return String(s).toLowerCase().replace(/[^a-z]+/g,'-'); }
+
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ============================================================
+   CALCULATE with loading sequence
+   ============================================================ */
+document.getElementById('calc-btn').addEventListener('click',()=>{
+  if(!state.invLevel){
+    document.getElementById('inv-validate').classList.add('show');
+    return;
+  }
+
+  showLoading();
+
+  const linesEl = document.getElementById('load-lines');
+  linesEl.innerHTML = LOADING_STEPS.map(s=>'<div class="ln">'+s.t+'</div>').join('') +
+                      '<div class="ln" id="load-done"><span class="ok">✓</span> Done<span class="term-cursor"></span></div>';
+  const lns = linesEl.querySelectorAll('.ln');
+
+  LOADING_STEPS.forEach((s,i)=>setTimeout(()=>lns[i].classList.add('on'), s.at));
+  setTimeout(()=>lns[lns.length-1].classList.add('on'), LOADING_TOTAL-350);
+
+  const pctEl = document.getElementById('load-pct');
+  const barEl = document.getElementById('load-bar-fill');
+  const t0 = performance.now();
+  (function tick(now){
+    const p = Math.min((now-t0)/LOADING_TOTAL, 1);
+    pctEl.textContent = Math.round(p*100)+'%';
+    barEl.style.width = (p*100)+'%';
+    if(p<1) requestAnimationFrame(tick);
+  })(t0);
+
+  const r = calculate();
+  setTimeout(()=>{
+    renderResults(r);
+    showResults();
+    document.getElementById('ai-status').className = 'ai-status';
+    document.getElementById('ai-status').innerHTML = '<i></i>Analyzing';
+    document.getElementById('ai-body').innerHTML =
+      '<div class="ai-loading" id="ai-loading"><span class="ai-dot"></span><span class="ai-dot"></span><span class="ai-dot"></span>Reviewing your numbers against sector patterns…</div>';
+    fetchAIAnalysis(r);
+  }, LOADING_TOTAL + 250);
+});
+
+/* PDF export: print stylesheet keeps only the report */
+document.getElementById('pdf-btn').addEventListener('click',()=>window.print());
+
+/* Restart the flow */
+document.getElementById('restart-btn').addEventListener('click',()=>{
+  state.answers=[]; state.invLevel=null;
+  document.querySelectorAll('.inv-card.selected').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('inv-detail').className='inv-detail';
+  showStep(0);
+});
+
+/* Systems dropdown (same behaviour as root page) */
+const sysItem = document.getElementById('systems-item');
+const sysBtn = document.getElementById('systems-btn');
+sysBtn.addEventListener('click', e=>{
+  e.stopPropagation();
+  sysItem.classList.toggle('open');
+  sysBtn.setAttribute('aria-expanded', sysItem.classList.contains('open'));
+});
+document.addEventListener('click', ()=> sysItem.classList.remove('open'));
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') sysItem.classList.remove('open'); });
+
+/* mobile hamburger menu */
+const menuToggle = document.getElementById('menu-toggle');
+const mobilePanel = document.getElementById('mobile-panel');
+menuToggle.addEventListener('click', e=>{
+  e.stopPropagation();
+  const open = mobilePanel.classList.toggle('open');
+  menuToggle.setAttribute('aria-expanded', open);
+});
+mobilePanel.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=>{
+  mobilePanel.classList.remove('open');
+  menuToggle.setAttribute('aria-expanded', 'false');
+}));
+document.addEventListener('click', e=>{
+  if(mobilePanel.classList.contains('open') && !mobilePanel.contains(e.target) && e.target!==menuToggle){
+    mobilePanel.classList.remove('open');
+    menuToggle.setAttribute('aria-expanded', 'false');
+  }
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ mobilePanel.classList.remove('open'); menuToggle.setAttribute('aria-expanded','false'); } });
+
+/* Topbar blur on scroll (same behaviour as root page) */
+const topbar = document.getElementById('topbar');
+function onTopbarScroll(){ topbar.classList.toggle('scrolled', window.scrollY > 40); }
+window.addEventListener('scroll', onTopbarScroll, {passive:true});
+onTopbarScroll();
+</script>
+</body>
+</html>

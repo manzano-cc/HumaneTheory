@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How the AI ROI Calculator Works | Humane Theory</title>
+<link rel="icon" type="image/svg+xml" href="../../favicons/favicon.svg">
+<link rel="icon" type="image/png" href="../../favicons/favicon.png">
+<link rel="shortcut icon" href="../../favicons/favicon.ico">
+<style>
+/* ============================================================
+   AI ROI · HOW IT WORKS  /airoi/how-it-works
+   Reference documentation for the ROI-estimation engine.
+   Shares the doc-layout system used by /aiges/how-it-works.
+   ============================================================ */
+
+/* ---------- Fonts (shared) ---------- */
+@font-face{font-family:"Geist";src:url("../../fonts/Geist-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Geist";src:url("../../fonts/Geist-Italic-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:italic;font-display:swap}
+@font-face{font-family:"Geist Mono";src:url("../../fonts/GeistMono-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Geist Pixel";src:url("../../fonts/GeistPixel-Square.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+
+:root{
+  --black:#0a0a0a;
+  --white:#ffffff;
+  --card:#161616;
+  --card-border:#262626;
+  --maxw:1180px;
+  --pad:40px;
+  --btn-radius:9px;
+  --accent:#6fae87;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;scroll-behavior:smooth}
+body{
+  font-family:"Geist",system-ui,sans-serif;color:#f2f2f2;
+  background:#000000;
+  min-height:100vh;
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad)}
+
+/* ---------- Topbar (identical to /airoi) ---------- */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:50;background:transparent;transition:background .3s ease,border-color .3s ease}
+.topbar.scrolled{background:rgba(0,0,0,.7);-webkit-backdrop-filter:saturate(160%) blur(14px);backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid #1c1c1c}
+.header-row{display:flex;align-items:center;justify-content:space-between;padding-top:26px;padding-bottom:16px;gap:24px}
+.logo{display:flex;align-items:center;gap:9px;padding:6px 10px;border-radius:999px}
+.logo img{height:20px;width:auto;display:block;filter:brightness(0) invert(1)}
+
+.menu-toggle{
+  display:none;align-items:center;justify-content:center;width:34px;height:34px;
+  color:#e6e6e4;flex:0 0 auto;position:relative;z-index:46;
+}
+.menu-toggle svg{width:17px;height:17px}
+.menu-toggle .icon-close{display:none}
+.menu-toggle[aria-expanded="true"] .icon-menu{display:none}
+.menu-toggle[aria-expanded="true"] .icon-close{display:block}
+.mobile-panel{isolation:isolate;
+  position:fixed;inset:0;z-index:44;background:#0a0a0a;
+  padding:88px 24px 26px;height:100vh;height:100dvh;overflow-y:auto;
+  transform:translateY(-8px);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;
+}
+.mobile-panel.open{opacity:1;transform:none;pointer-events:auto}
+.mobile-panel .msec{font-family:"Geist Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#6d6d6d;margin:20px 0 8px}
+.mobile-panel .msec:first-child{margin-top:0}
+.mobile-panel .mlink{display:block;padding:12px 2px;font-size:15px;color:#e6e6e4;border-bottom:1px solid #1c1c1c}
+.mobile-panel .mcontact{display:flex;width:100%;height:44px;margin-top:22px}
+
+.main-nav{display:flex;align-items:center;gap:6px;position:relative}
+.nav-item{position:relative}
+.nav-link{
+  display:flex;align-items:center;gap:5px;padding:9px 14px;border-radius:var(--btn-radius);
+  font-size:13.5px;color:#c7c7c7;transition:color .18s ease,background .18s ease;
+}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,.06)}
+.nav-link svg{width:10px;height:10px;opacity:.7;transition:transform .2s ease}
+.nav-item.open .nav-link svg{transform:rotate(180deg)}
+
+.dropdown{
+  position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(-6px);
+  min-width:190px;background:#0d0d0d;border:1px solid #232323;border-radius:12px;
+  padding:6px;box-shadow:0 20px 50px rgba(0,0,0,.5);
+  opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease;
+}
+.nav-item.open .dropdown{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.dropdown a{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:8px;font-size:13px;color:#d4d4d4}
+.dropdown a:hover{background:rgba(255,255,255,.06);color:#fff}
+.dropdown a .dot{width:4px;height:4px;border-radius:1px;background:#5a5a5a;flex:0 0 auto}
+.dropdown a{position:relative}
+.dropdown a.disabled,.mlink.disabled{opacity:.5;cursor:default}
+.dropdown a.disabled:hover,.mlink.disabled:hover{background:transparent;color:#d4d4d4}
+
+.mtag{
+  margin-left:3px;font-weight:600;letter-spacing:.02em;line-height:1;
+  background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+}
+.mtag-soon{font-size:8px;vertical-align:middle;background-image:linear-gradient(180deg,#525252 0%,#727272 100%)}
+
+.header-right{display:flex;align-items:center;gap:14px}
+.header-right .btn{height:30px;padding:0 16px;font-size:13.5px}
+.text-link{font-size:13.5px;color:#c7c7c7;transition:color .15s ease}
+.text-link:hover{color:#fff}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;
+  border-radius:var(--btn-radius);padding:0 22px;font-size:14px;font-weight:500;white-space:nowrap;
+  transition:filter .15s ease,transform .1s ease;
+}
+.btn:active{transform:translateY(1px)}
+.btn-ghost{
+  background:linear-gradient(180deg,#2e2e2e 0%,#161616 100%);
+  border:1px solid #333;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.1), inset 0 -1px 2px rgba(0,0,0,.6), 0 1px 2px rgba(0,0,0,.35);
+  color:#e6e6e4;text-shadow:0 1px 1px rgba(0,0,0,.7);
+}
+.btn-ghost:hover{filter:brightness(1.18)}
+.btn-dark{
+  background:linear-gradient(180deg,#ffffff 0%,#d9d9d6 100%);
+  border:1px solid #c7c7c4;
+  box-shadow:inset 0 1px 1px #ffffff, inset 0 -1px 2px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.3);
+  color:#141414;text-shadow:0 1px 0 rgba(255,255,255,.75);
+}
+.btn-dark:hover{filter:brightness(1.05)}
+
+@media(max-width:640px){
+  .main-nav,.header-right{display:none}
+  .menu-toggle{display:flex}
+  .header-row{padding-left:24px;padding-right:24px}
+}
+
+/* ---------- Page head ---------- */
+.page-head{padding-top:150px;padding-bottom:30px}
+.section-label{font-family:"Geist Mono",monospace;font-size:14px;color:#f2f2f2;font-weight:500;margin-bottom:20px}
+.page-title{font-family:"Geist",sans-serif;font-weight:500;font-size:clamp(26px,3.6vw,44px);line-height:1.12;letter-spacing:-.01em;color:#f2f2f2;max-width:840px}
+.page-sub{margin-top:16px;max-width:680px;font-weight:300;font-size:clamp(14px,1.6vw,16.5px);line-height:1.6;color:#a8a8a8}
+.page-sub strong{color:#dcdcdc;font-weight:600}
+.back-link{display:inline-flex;align-items:center;gap:7px;margin-top:22px;font-family:"Geist Mono",monospace;font-size:12px;color:#8f8f8f;border:1px solid var(--card-border);border-radius:999px;padding:8px 15px;transition:all .15s ease}
+.back-link:hover{color:#fff;border-color:#9a9a96}
+
+/* ---------- Layout: sticky TOC + content ---------- */
+.doc-layout{display:grid;grid-template-columns:230px 1fr;gap:52px;align-items:start;padding-top:10px;padding-bottom:90px}
+.toc{position:sticky;top:110px;align-self:start;max-height:calc(100vh - 140px);overflow-y:auto;padding-right:6px}
+.toc-label{font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#6d6d6d;margin-bottom:14px}
+.toc ol{list-style:none;display:flex;flex-direction:column;gap:2px;counter-reset:toc}
+.toc a{display:block;font-size:12.5px;line-height:1.4;color:#8f8f8f;padding:7px 10px;border-radius:7px;transition:all .15s ease}
+.toc a:hover{color:#f2f2f2;background:rgba(255,255,255,.04)}
+.toc a.active{color:var(--accent);font-weight:600}
+.toc a b{font-family:"Geist Mono",monospace;color:#6d6d6d;margin-right:7px;font-weight:400}
+.toc a.active b{color:var(--accent)}
+
+.content{min-width:0}
+.doc-sec{padding-top:14px;margin-top:14px;scroll-margin-top:100px}
+.doc-sec:first-child{margin-top:0}
+.doc-sec h2{display:flex;align-items:baseline;gap:12px;font-size:clamp(19px,2.2vw,24px);font-weight:600;letter-spacing:-.01em;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #1c1c1c}
+.doc-sec h2 .sn{font-family:"Geist Pixel","Geist Mono",monospace;font-size:13px;color:var(--accent);flex:0 0 auto}
+.doc-sec p{font-size:14px;line-height:1.7;color:#b8b8b8;margin-bottom:14px;max-width:760px}
+.doc-sec p strong{color:#e6e6e4;font-weight:600}
+.doc-sec ul,.doc-sec ol.plain{margin:0 0 16px 0;padding-left:20px;max-width:760px}
+.doc-sec li{font-size:13.5px;line-height:1.65;color:#b0b0b0;margin-bottom:7px}
+.doc-sec li strong{color:#e6e6e4;font-weight:600}
+.doc-sec a.inline{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+
+/* formula box */
+.formula{background:#121212;border:1px solid var(--card-border);border-radius:9px;padding:16px 18px;margin:16px 0;max-width:760px;overflow-x:auto}
+.formula .flabel{font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#6d6d6d;margin-bottom:9px}
+.formula code{display:block;font-family:"Geist Mono",monospace;font-size:12.5px;line-height:1.8;color:#d7ecdf;white-space:pre-wrap;word-break:break-word}
+.formula code .op{color:var(--accent)}
+.formula code .num{color:#e0b34c}
+
+/* worked example */
+.example{background:#101a15;border:1px solid #23352c;border-radius:9px;padding:16px 18px;margin:16px 0;max-width:760px;overflow-x:auto}
+.example .elabel{font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#6fa878;margin-bottom:9px}
+.example table{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:10px}
+.example th{text-align:left;color:#7fb397;font-weight:500;padding:4px 8px 6px;font-family:"Geist Mono",monospace;font-size:10.5px;border-bottom:1px solid #23352c}
+.example td{padding:5px 8px;color:#c2d8ca;border-bottom:1px solid #1c2b23}
+.example p{color:#b7cfc1;font-size:12.5px;margin:8px 0 0}
+.example p:first-child{margin-top:0}
+.example strong{color:var(--accent)}
+
+/* diagram card */
+.diagram{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:24px;margin:18px 0 22px;max-width:900px;overflow-x:auto}
+.flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+.fnode{background:#1c1c1c;border:1px solid #2c2c2c;border-radius:8px;padding:14px 16px;min-width:150px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.fnode.accent{border-color:#2e4a3a;background:#101a15}
+.fnode .ftag{font-family:"Geist Mono",monospace;font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--accent)}
+.fnode .ftitle{font-size:13px;font-weight:600;color:#f2f2f2}
+.fnode .fsub{font-size:11px;color:#9a9a9a;line-height:1.4}
+.farrow{display:flex;align-items:center;justify-content:center;min-width:40px;color:#5a5a5a;font-size:16px}
+.fcol{display:flex;flex-direction:column;gap:10px}
+.frow{display:flex;align-items:center;gap:0;flex-wrap:wrap;margin-bottom:10px}
+.frow:last-child{margin-bottom:0}
+@media(max-width:600px){.frow{flex-direction:column;align-items:stretch}.farrow{transform:rotate(90deg);min-height:26px}}
+
+/* investment levels table + cards */
+.lvl-table-wrap{overflow-x:auto;max-width:900px}
+.lvl-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:12.5px}
+.lvl-table th,.lvl-table td{text-align:left;padding:10px 12px;border-bottom:1px solid #262626}
+.lvl-table th{font-family:"Geist Mono",monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:#6d6d6d;font-weight:500}
+.lvl-table td{color:#c7c7c7;font-family:"Geist Mono",monospace;font-size:12px}
+.lvl-table td.lname{font-family:"Geist",sans-serif;font-size:13.5px;font-weight:600;color:#f2f2f2}
+.lvl-desc{display:flex;flex-direction:column;gap:10px;margin-top:14px;max-width:900px}
+.lvl-card{background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:14px 16px}
+.lvl-card h4{font-size:13.5px;font-weight:600;color:#f2f2f2;margin-bottom:3px}
+.lvl-card .tag{font-size:11.5px;color:#8f8f8f;display:block;margin-bottom:6px}
+.lvl-card p{font-size:12.5px;line-height:1.6;color:#a8a8a8;margin:0;max-width:none}
+
+/* note callout */
+.note{background:var(--card);border:1px solid var(--card-border);border-left:2px solid var(--accent);border-radius:0 8px 8px 0;padding:13px 16px;margin:16px 0;max-width:760px;font-size:12.5px;line-height:1.6;color:#a8a8a8}
+.note strong{color:#dcdcdc}
+
+.footnav{display:flex;justify-content:flex-end;align-items:center;margin-top:60px;padding-top:24px;border-top:1px solid #1c1c1c;flex-wrap:wrap;gap:14px}
+
+footer{background:#000000;padding:54px 0 0;position:relative;overflow:hidden;border-top:1px solid #1c1c1c}
+.foot-trust{padding-bottom:40px;border-bottom:1px solid #1c1c1c;margin-bottom:40px}
+.ft-pill{display:inline-flex;font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#8f8f8f;border:1px solid #262626;border-radius:999px;padding:4px 11px;margin-bottom:14px}
+.foot-trust h3{font-size:17px;font-weight:500;color:#e6e6e4;letter-spacing:-.01em;margin-bottom:10px}
+.foot-trust p{max-width:640px;font-size:13px;line-height:1.65;color:#8a8a8a;font-weight:300}
+.foot-top{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap}
+.foot-mark{display:inline-flex;align-items:center}
+.foot-mark img{height:24px;width:auto;filter:brightness(0) invert(1) url(#innerSm)}
+.foot-cols{display:flex;gap:70px}
+.foot-cols .col h4{font-size:10px;letter-spacing:.08em;color:#999999;text-transform:uppercase;margin-bottom:14px;font-weight:600}
+.foot-cols .col ul{list-style:none}
+.foot-cols .col li{font-size:13px;color:#4e4e4e;margin-bottom:8px}
+.foot-cols .col a:hover{color:#999999}
+.foot-legal{margin-top:44px;display:flex;flex-direction:column;gap:8px}
+.foot-legal .copy{font-size:10px;color:#4e4e4e;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
+.foot-legal .flink{display:block;font-size:12px;color:#999999}
+.foot-legal .flink:hover{color:#e6e6e4}
+.giant{margin-top:20px;text-align:center;font-weight:500;font-size:clamp(70px,20vw,260px);line-height:.82;letter-spacing:-.03em;color:#303030;white-space:nowrap;user-select:none;margin-bottom:-.16em;filter:url(#innerGiant);pointer-events:none}
+@media(max-width:560px){.foot-top{flex-direction:column;gap:24px}.foot-cols{gap:40px;flex-wrap:wrap}}
+
+.foot-strip{margin-top:20px;padding:26px 0 34px;font-family:"Geist Pixel","Geist Mono",monospace;font-size:10.5px;color:#8f8f8f;text-transform:uppercase;letter-spacing:.04em}
+
+/* responsive */
+@media(max-width:980px){
+  .doc-layout{grid-template-columns:1fr;gap:0}
+  .toc{position:static;max-height:none;margin-bottom:34px;padding:16px;background:var(--card);border:1px solid var(--card-border);border-radius:10px}
+  .toc ol{flex-direction:column}
+}
+@media(max-width:640px){
+  :root{--pad:22px}
+  .page-head{padding-top:120px}
+}
+</style>
+</head>
+<body>
+
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="innerSm" x="-30%" y="-30%" width="160%" height="160%"><feOffset dx="0" dy="0.8"/><feGaussianBlur stdDeviation="0.7" result="off"/><feComposite operator="out" in="SourceGraphic" in2="off" result="inv"/><feFlood flood-color="#000" flood-opacity="0.95"/><feComposite operator="in" in2="inv" result="shd"/><feComposite operator="over" in="shd" in2="SourceGraphic"/></filter>
+  <filter id="innerGiant" x="-20%" y="-20%" width="140%" height="140%"><feOffset dx="0" dy="6"/><feGaussianBlur stdDeviation="7" result="off"/><feComposite operator="out" in="SourceGraphic" in2="off" result="inv"/><feFlood flood-color="#000000" flood-opacity="0.85"/><feComposite operator="in" in2="inv" result="shd"/><feComposite operator="over" in="shd" in2="SourceGraphic"/></filter>
+</defs></svg>
+<!-- ===== Topbar ===== -->
+<div class="topbar" id="topbar">
+  <div class="wrap header-row">
+    <a class="logo" href="../../" aria-label="Humane Theory">
+      <img src="../../logo-humanetheory.svg" alt="Humane Theory">
+    </a>
+
+    <nav class="main-nav" id="main-nav">
+      <div class="nav-item" id="systems-item">
+        <button class="nav-link" id="systems-btn" aria-expanded="false">
+          Systems
+          <svg viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="dropdown">
+          <a href="../../airoi/"><span class="dot"></span>AI ROI</a>
+          <a href="../../aiges/"><span class="dot"></span>AI ACT</a>
+          <a href="../../bdash/"><span class="dot"></span>BDash</a>
+          <a href="../../coradar/"><span class="dot"></span>CoRadar</a>
+          <a class="disabled" href="#" onclick="return false" aria-disabled="true"><span class="dot"></span>ReputIA<span class="mtag mtag-soon">Coming Soon</span></a>
+        </div>
+      </div>
+      <a class="nav-link" href="../../#about">About</a>
+      <a class="nav-link" href="../../statement/">Statement</a>
+    </nav>
+
+    <div class="header-right">
+      <a class="btn btn-ghost" href="../../?topic=airoi#contact">Contact</a>
+    </div>
+
+    <button class="menu-toggle" id="menu-toggle" aria-label="Menu" aria-expanded="false">
+      <svg class="icon-menu" viewBox="0 0 20 14" fill="none"><path d="M1 1h18M1 7h18M1 13h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <svg class="icon-close" viewBox="0 0 20 20" fill="none"><path d="M2 2l16 16M18 2L2 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <div class="mobile-panel" id="mobile-panel">
+    <div class="msec">Systems</div>
+    <a class="mlink" href="../../airoi/">AI ROI</a>
+    <a class="mlink" href="../../aiges/">AI ACT</a>
+    <a class="mlink" href="../../bdash/">BDash</a>
+    <a class="mlink" href="../../coradar/">CoRadar</a>
+    <a class="mlink disabled" href="#" onclick="return false" aria-disabled="true">ReputIA<span class="mtag mtag-soon">Coming Soon</span></a>
+    <div class="msec">More</div>
+    <a class="mlink" href="../../#about">About</a>
+    <a class="mlink" href="../../statement/">Statement</a>
+    <a class="btn btn-ghost mcontact" href="../../?topic=airoi#contact">Contact</a>
+  </div>
+</div>
+
+<!-- ===== Page head ===== -->
+<header class="wrap page-head">
+  <div class="section-label">/how-it-works</div>
+  <h1 class="page-title">How the AI ROI Calculator actually works.</h1>
+  <p class="page-sub">Every number the calculator shows traces back to a formula documented below. There is no hidden model, no external benchmark database, and no step where a language model touches the math. <strong>Nothing here is a black box</strong>: read on, and any result can be reproduced by hand.</p>
+</header>
+
+<main class="wrap doc-layout">
+
+  <!-- ===== Sticky TOC ===== -->
+  <nav class="toc" id="toc" aria-label="Table of contents">
+    <div class="toc-label">Contents</div>
+    <ol>
+      <li><a href="#sec-1"><b>01</b>What this estimates</a></li>
+      <li><a href="#sec-2"><b>02</b>The inputs you provide</a></li>
+      <li><a href="#sec-3"><b>03</b>From answers to affected %</a></li>
+      <li><a href="#sec-4"><b>04</b>The role-mix factor</a></li>
+      <li><a href="#sec-5"><b>05</b>Automatable hours per year</a></li>
+      <li><a href="#sec-6"><b>06</b>Turning hours into money</a></li>
+      <li><a href="#sec-7"><b>07</b>The cost side</a></li>
+      <li><a href="#sec-8"><b>08</b>ROI and payback</a></li>
+      <li><a href="#sec-9"><b>09</b>The three investment levels</a></li>
+      <li><a href="#sec-10"><b>10</b>The optional AI narrative</a></li>
+      <li><a href="#sec-11"><b>11</b>Limitations and caveats</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===== Content ===== -->
+  <div class="content">
+
+    <section class="doc-sec" id="sec-1">
+      <h2><span class="sn">01</span>What this tool estimates</h2>
+      <p>The calculator produces a <strong>parametric estimate</strong> of the return from adopting AI, built from a fixed set of assumptions applied consistently to whatever gets entered: industry, company size, seven yes/partially/no answers about how operations run today, how the workforce is split by role, and how aggressively the investment is planned. Change any one of those, and every downstream number changes with it, deterministically, using the exact formulas below.</p>
+      <p>It explicitly does <strong>not</strong> estimate a few things people sometimes assume it does:</p>
+      <ul>
+        <li>It is <strong>not a quote</strong>. No vendor pricing, contract, or procurement data feeds into it.</li>
+        <li>It is <strong>not a certified assessment</strong>, audit, or compliance deliverable of any kind.</li>
+        <li>It is <strong>not financial, legal or tax advice</strong>. Decisions with real consequences should be checked with a qualified professional.</li>
+        <li>It does <strong>not</strong> account for specific vendors, contracts, existing tooling, or team capability, only industry-level averages and the inputs given to it.</li>
+      </ul>
+      <p>The full legal scope of these tools is covered in the <a class="inline" href="../../terms-of-use/">Terms of Use</a>.</p>
+    </section>
+
+    <section class="doc-sec" id="sec-2">
+      <h2><span class="sn">02</span>The inputs you provide</h2>
+      <p>Five inputs drive every calculation:</p>
+      <ul>
+        <li><strong>Industry</strong>: one of twelve sectors (Manufacturing, Technology, Professional Services, Healthcare, Financial Services, Retail &amp; Ecommerce, Transportation &amp; Logistics, Aviation, Hospitality, Education, Government, Construction, or Other). Each carries its own loaded hourly cost, a complexity multiplier, seven sector-specific diagnostic questions, and a default role mix.</li>
+        <li><strong>Company size</strong>: a headcount band (e.g. "51-200 employees"), mapped to a single representative employee count used in every formula (the 51-200 band uses <strong>120</strong> employees, for example).</li>
+        <li><strong>Seven diagnostic questions</strong>, specific to the chosen industry (e.g. for Technology: "Do more than a quarter of support tickets repeat the same issues?"). Each answer is <strong>No = 0</strong>, <strong>Partially = 0.5</strong>, or <strong>Yes = 1</strong>, and each question carries its own weight (roughly 0.7 to 1.2) reflecting how strongly it correlates with automatable work.</li>
+        <li><strong>Role mix</strong>: the percentage split of the workforce across the industry's roles (e.g. "Engineering 40%, Support 15%..."), pre-filled with sensible defaults that can be edited. Must total exactly 100%.</li>
+        <li><strong>Investment level</strong>: Starter, Growth, or Transformation, explained in full in <a class="inline" href="#sec-9">section 9</a>. This single choice changes the adoption rate, licensing cost, services scale, and the share of saved hours that convert to real value.</li>
+      </ul>
+      <p>Nothing else is asked. There is no login, no company name, no financial data.</p>
+    </section>
+
+    <section class="doc-sec" id="sec-3">
+      <h2><span class="sn">03</span>Step-by-step: from answers to "% of workforce affected"</h2>
+      <p>Each answer is multiplied by its question's weight, and the seven results are summed into a single <strong>score</strong>. That score is then converted into the share of the workforce whose work is considered "affected" by repetitive, automatable tasks, with a floor and a ceiling:</p>
+      <div class="formula">
+        <div class="flabel">score &middot; affected%</div>
+        <code>score      <span class="op">=</span> &Sigma; (answerValue <span class="op">&times;</span> questionWeight)   <span class="op">//</span> 7 questions, weights &asymp;0.7-1.2
+affected%  <span class="op">=</span> min( baseAffected <span class="op">+</span> score <span class="op">&times;</span> affectedPerPoint, maxAffected )
+           <span class="op">=</span> min( <span class="num">0.15</span> <span class="op">+</span> score <span class="op">&times;</span> <span class="num">0.045</span>, <span class="num">0.60</span> )</code>
+      </div>
+      <div class="diagram">
+        <div class="flow frow">
+          <div class="fnode"><span class="ftag">step 3</span><span class="ftitle">Your answers</span><span class="fsub">0 / 0.5 / 1 each</span></div>
+          <div class="farrow">&rarr;</div>
+          <div class="fnode"><span class="ftitle">&times; weight, summed</span><span class="fsub">score</span></div>
+          <div class="farrow">&rarr;</div>
+          <div class="fnode accent"><span class="ftag">result</span><span class="ftitle">affected %</span><span class="fsub">capped at 60%</span></div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="elabel">Worked example &middot; Technology</div>
+        <p>Answering Yes to the 4 highest-weighted questions (1.2 + 1.0 + 1.1 + 1.0) and No to the rest:</p>
+        <p>score = 1&times;1.2 + 1&times;1.0 + 1&times;1.1 + 1&times;1.0 + 0&times;0.9 + 0&times;0.8 + 0&times;0.7 = <strong>4.3</strong></p>
+        <p>affected% = min(0.15 + 4.3&times;0.045, 0.60) = min(0.15 + 0.1935, 0.60) = 0.3435 &rarr; <strong>34.35%</strong></p>
+      </div>
+      <p>The floor (<strong>15%</strong>) reflects that almost every organization has some baseline repetitive work, even if every answer is "No." The ceiling (<strong>60%</strong>) reflects that no realistic organization has more than about 60% of its workforce doing purely automatable work.</p>
+    </section>
+
+    <section class="doc-sec" id="sec-4">
+      <h2><span class="sn">04</span>Step-by-step: the role-mix factor</h2>
+      <p>Not every role benefits from AI equally. Each role in an industry's default mix carries a <strong>gain</strong> value (0 to 1) representing how much of that role's work AI can realistically take on today. The <strong>role factor</strong> is the weighted average of those gains, weighted by the percentage assigned to each role:</p>
+      <div class="formula">
+        <div class="flabel">roleFactor</div>
+        <code>roleFactor <span class="op">=</span> &Sigma; ( share% <span class="op">&times;</span> role.gain )   <span class="op">//</span> across all roles, shares sum to 100%</code>
+      </div>
+      <div class="example">
+        <div class="elabel">Worked example &middot; Technology's default mix</div>
+        <table>
+          <thead><tr><th>Role</th><th>Share</th><th>Gain</th><th>Contribution</th></tr></thead>
+          <tbody>
+            <tr><td>Engineering</td><td>40%</td><td>0.48</td><td>0.192</td></tr>
+            <tr><td>Product &amp; design</td><td>10%</td><td>0.50</td><td>0.050</td></tr>
+            <tr><td>Support</td><td>15%</td><td>0.62</td><td>0.093</td></tr>
+            <tr><td>Sales &amp; CS</td><td>15%</td><td>0.45</td><td>0.0675</td></tr>
+            <tr><td>Marketing</td><td>8%</td><td>0.55</td><td>0.044</td></tr>
+            <tr><td>Admin &amp; operations</td><td>12%</td><td>0.55</td><td>0.066</td></tr>
+          </tbody>
+        </table>
+        <p>roleFactor = 0.192 + 0.050 + 0.093 + 0.0675 + 0.044 + 0.066 = 0.5125 &rarr; <strong>51.25%</strong></p>
+      </div>
+      <p>This is why two companies with identical answers to the seven questions can get very different results: a workforce weighted toward high-gain roles (support, admin, analysis) shows a larger effective automation potential than one weighted toward low-gain, hands-on roles (frontline production, drivers, clinical staff).</p>
+    </section>
+
+    <section class="doc-sec" id="sec-5">
+      <h2><span class="sn">05</span>Step-by-step: automatable hours per year</h2>
+      <p>With the affected share and the role factor in hand, the model multiplies through headcount, a fixed weekly hours assumption, and the working year, then discounts by the investment level's adoption rate (the share of affected staff who actually use the tools day to day):</p>
+      <div class="formula">
+        <div class="flabel">hoursYear</div>
+        <code>hoursYear <span class="op">=</span> employees <span class="op">&times;</span> affected% <span class="op">&times;</span> hoursPerWeekAffected <span class="op">&times;</span> weeksPerYear
+          <span class="op">&times;</span> roleFactor <span class="op">&times;</span> adoption%
+          <span class="op">=</span> employees <span class="op">&times;</span> affected% <span class="op">&times;</span> <span class="num">6</span> <span class="op">&times;</span> <span class="num">46</span> <span class="op">&times;</span> roleFactor <span class="op">&times;</span> adoption%</code>
+      </div>
+      <div class="diagram">
+        <div class="flow frow">
+          <div class="fnode"><span class="ftag">input</span><span class="ftitle">Employees</span><span class="fsub">120</span></div>
+          <div class="farrow">&rarr;</div>
+          <div class="fnode"><span class="ftitle">&times; affected%</span><span class="fsub">34.35%</span></div>
+          <div class="farrow">&rarr;</div>
+          <div class="fnode"><span class="ftitle">&times; 6h/wk &times; 46wk</span><span class="fsub">276 h/yr base</span></div>
+          <div class="farrow">&rarr;</div>
+          <div class="fnode"><span class="ftitle">&times; roleFactor &times; adoption</span><span class="fsub">51.25% &times; 65%</span></div>
+          <div class="farrow">&rarr;</div>
+          <div class="fnode accent"><span class="ftag">result</span><span class="ftitle">hours / year</span><span class="fsub">&asymp;3,790</span></div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="elabel">Worked example &middot; 120 employees, Growth investment</div>
+        <p>120 employees (51-200 band), 34.35% affected, roleFactor 0.5125, adoption 65%:</p>
+        <p>hoursYear = 120 &times; 0.3435 &times; 6 &times; 46 &times; 0.5125 &times; 0.65 = 41.22 &times; 6 &times; 46 &times; 0.5125 &times; 0.65 = 11,376.72 &times; 0.5125 &times; 0.65 = <strong>&asymp;3,789.9 hours/year</strong></p>
+      </div>
+      <p>The <strong>6 hours/week</strong> and <strong>46 working weeks/year</strong> figures are fixed global assumptions (not editable per industry), representing a conservative slice of a working week spent on genuinely repetitive, automatable tasks for an "affected" employee.</p>
+    </section>
+
+    <section class="doc-sec" id="sec-6">
+      <h2><span class="sn">06</span>Step-by-step: turning hours into money</h2>
+      <p>Hours are converted to currency using the industry's average loaded hourly cost, discounted by the investment level's <strong>productivity conversion</strong> rate: the share of a saved hour that actually shows up as usable value rather than being reabsorbed, spent re-checking output, or lost to friction.</p>
+      <div class="formula">
+        <div class="flabel">savings</div>
+        <code>savings <span class="op">=</span> hoursYear <span class="op">&times;</span> industry.hourly <span class="op">&times;</span> productivityConversion</code>
+      </div>
+      <div class="diagram">
+        <div class="flow frow">
+          <div class="fnode"><span class="ftag">input</span><span class="ftitle">Hours / year</span><span class="fsub">&asymp;3,790</span></div>
+          <div class="farrow">&rarr;</div>
+          <div class="fnode"><span class="ftitle">&times; hourly cost</span><span class="fsub">&euro;45 (Technology)</span></div>
+          <div class="farrow">&rarr;</div>
+          <div class="fnode"><span class="ftitle">&times; conversion</span><span class="fsub">75% (Growth)</span></div>
+          <div class="farrow">&rarr;</div>
+          <div class="fnode accent"><span class="ftag">result</span><span class="ftitle">&euro; saved / year</span><span class="fsub">&asymp;&euro;127,900</span></div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="elabel">Worked example (continued)</div>
+        <p>savings = 3,789.9 &times; &euro;45 &times; 0.75 = 170,545.5 &times; 0.75 = <strong>&asymp;&euro;127,909 / year</strong></p>
+      </div>
+      <p>Industry hourly costs range from &euro;26/h (Hospitality) to &euro;52/h (Financial Services) in the model, reflecting typical loaded labor cost differences across sectors, not any specific salary data about a given company.</p>
+    </section>
+
+    <section class="doc-sec" id="sec-7">
+      <h2><span class="sn">07</span>Step-by-step: the cost side, services and licensing</h2>
+      <p>Year-1 investment has two components. <strong>Services</strong> (implementation, training, integration work) scale sub-linearly with headcount, i.e. bigger companies pay more in absolute terms but less per employee, an economy of scale captured by an exponent below 1, then get multiplied by the industry's complexity factor and the investment level's services scale.</p>
+      <div class="formula">
+        <div class="flabel">services &middot; licenses &middot; cost</div>
+        <code>services <span class="op">=</span> ( costBase <span class="op">+</span> costPerEmployee <span class="op">&times;</span> employees^costExponent )
+           <span class="op">&times;</span> industry.complexity <span class="op">&times;</span> level.servicesFactor
+         <span class="op">=</span> ( <span class="num">&euro;6,000</span> <span class="op">+</span> <span class="num">&euro;90</span> <span class="op">&times;</span> employees^<span class="num">0.9</span> ) <span class="op">&times;</span> complexity <span class="op">&times;</span> servicesFactor
+
+licenses <span class="op">=</span> employees <span class="op">&times;</span> affected% <span class="op">&times;</span> level.toolCostPerUserYear   <span class="op">//</span> per-seat, affected staff only
+
+cost     <span class="op">=</span> services <span class="op">+</span> licenses</code>
+      </div>
+      <div class="example">
+        <div class="elabel">Worked example &middot; 120 employees, Technology, Growth</div>
+        <p>complexity 0.9, servicesFactor 1.0, toolCostPerUserYear &euro;480:</p>
+        <p>services = (6,000 + 90 &times; 120^0.9) &times; 0.9 &times; 1.0 = (6,000 + 90 &times; 74.35) &times; 0.9 = (6,000 + 6,691) &times; 0.9 = <strong>&asymp;&euro;11,422</strong></p>
+        <p>licenses = 120 &times; 0.3435 &times; 480 = 41.22 &times; 480 = <strong>&asymp;&euro;19,786</strong></p>
+        <p>cost = 11,422 + 19,786 = <strong>&asymp;&euro;31,208</strong></p>
+      </div>
+      <p>Licensing only covers the <strong>affected</strong> share of employees, since those are the people the model assumes would actually be given AI tools, not the entire headcount.</p>
+    </section>
+
+    <section class="doc-sec" id="sec-8">
+      <h2><span class="sn">08</span>Step-by-step: ROI and payback</h2>
+      <p>With savings and cost both computed, ROI and payback are simple ratios. Nothing new gets introduced here, just division:</p>
+      <div class="formula">
+        <div class="flabel">roi &middot; paybackMonths &middot; fte</div>
+        <code>roi           <span class="op">=</span> (savings <span class="op">&minus;</span> cost) <span class="op">/</span> cost <span class="op">&times;</span> <span class="num">100</span>
+paybackMonths <span class="op">=</span> cost <span class="op">/</span> (savings <span class="op">/</span> <span class="num">12</span>)      <span class="op">//</span> months to recoup the year-1 investment
+fte           <span class="op">=</span> hoursYear <span class="op">/</span> <span class="num">1,720</span>          <span class="op">//</span> full-time-equivalent hours/year</code>
+      </div>
+      <div class="example">
+        <div class="elabel">Worked example (continued)</div>
+        <p>roi = (127,909 &minus; 31,208) / 31,208 &times; 100 = <strong>&asymp;310%</strong></p>
+        <p>paybackMonths = 31,208 / (127,909/12) = 31,208 / 10,659 = <strong>&asymp;2.9 months</strong></p>
+        <p>fte = 3,789.9 / 1,720 = <strong>&asymp;2.2 FTE</strong> capacity unlocked</p>
+      </div>
+      <p>The resulting ROI percentage is then bucketed into an <strong>opportunity level</strong> shown as a badge on the results: <strong>Low</strong> (ROI &le; 60%), <strong>Medium</strong> (60% &lt; ROI &le; 180%), or <strong>High</strong> (ROI &gt; 180%). These thresholds only change which of three pre-written "next steps" lists is shown; they never feed back into the numbers themselves.</p>
+    </section>
+
+    <section class="doc-sec" id="sec-9">
+      <h2><span class="sn">09</span>The three investment levels</h2>
+      <p>This is deliberately the single biggest lever in the whole model, and it exists to make one point explicit: <strong>this is not "buy everyone a Claude or ChatGPT seat."</strong> Each level implies a genuinely different depth of implementation work, and that depth, not just a subscription price, is what the numbers above assume actually gets delivered.</p>
+
+      <div class="lvl-table-wrap">
+        <table class="lvl-table">
+          <thead><tr><th>Level</th><th>Adoption</th><th>Tool cost / user / yr</th><th>Services scale</th><th>Productivity conversion</th></tr></thead>
+          <tbody>
+            <tr><td class="lname">Starter</td><td>45%</td><td>&euro;300</td><td>&times;0.35</td><td>70%</td></tr>
+            <tr><td class="lname">Growth</td><td>65%</td><td>&euro;480</td><td>&times;1.0</td><td>75%</td></tr>
+            <tr><td class="lname">Transformation</td><td>80%</td><td>&euro;700</td><td>&times;1.9</td><td>80%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lvl-desc">
+        <div class="lvl-card">
+          <h4>Starter</h4><span class="tag">Self-serve tools, minimal setup</span>
+          <p>A team starts with off-the-shelf AI assistants and learns by doing. No consultants, no heavy integration work. The cheapest way to build AI habits and validate value before committing real budget. Expect quick wins on writing, research and support tasks.</p>
+        </div>
+        <div class="lvl-card">
+          <h4>Growth</h4><span class="tag">Structured program, internal owner</span>
+          <p>A coordinated rollout led from inside: shared workflows, role-specific training and light integration with the systems already in use. Balanced cost and impact. The most common path for teams that have already validated the basics and want measurable results.</p>
+        </div>
+        <div class="lvl-card">
+          <h4>Transformation</h4><span class="tag">Deep redesign, external support</span>
+          <p>Process redesign with custom integrations, dedicated budget and external specialists. The highest investment and the highest ceiling: AI embedded into core workflows instead of assisting around them. Best suited to organizations with executive sponsorship and a clear roadmap.</p>
+        </div>
+      </div>
+
+      <p style="margin-top:14px">Notice what moves together: a higher tier assumes <em>more people actually adopting it</em> (adoption), <em>more of the saved hour landing as real value</em> (productivity conversion), <em>and</em> a proportionally bigger services bill. A Transformation-level ROI is not "the same plan, more expensive." It is a different, deeper plan, priced accordingly and credited accordingly.</p>
+    </section>
+
+    <section class="doc-sec" id="sec-10">
+      <h2><span class="sn">10</span>The optional AI-written narrative</h2>
+      <p>Everything above this line is 100% deterministic arithmetic that runs in the browser. Below the results, the calculator offers one additional, optional layer: a short narrative (a diagnosis, priorities, risks, and a "should you do this" verdict) written by a third-party AI language model reviewing the numbers that were <em>already computed</em> by the formulas on this page.</p>
+      <p>What actually leaves the browser for that step is a small payload of <strong>already-calculated results</strong>: industry name, company size band, chosen investment level and its parameters, and the final metrics (ROI%, savings, cost, hours, payback, affected%, FTE, top impact area). The seven raw answers, the exact role percentages, and any identifying detail are <strong>never sent</strong>, only the outputs.</p>
+      <p>That model is explicitly instructed to reason only over the figures it is given, never to invent statistics or restate numbers as if they were new findings, and it structurally <strong>cannot alter any figure</strong> shown above it on the page; it only adds commentary underneath. If that service is unavailable or times out, the page falls back to a short summary generated locally from the entered numbers, clearly labeled as such, so the page never blocks or breaks.</p>
+      <p>Full detail on what data is processed and how is in the <a class="inline" href="../../privacy-policy/">Privacy Policy</a>.</p>
+    </section>
+
+    <section class="doc-sec" id="sec-11">
+      <h2><span class="sn">11</span>Limitations and honest caveats</h2>
+      <ul>
+        <li>This is a <strong>parametric model built on reasonable, stated assumptions</strong>, not a model fitted to external market data, benchmarking studies, or a specific company's actual financials.</li>
+        <li>Every constant on this page (weights, factors, thresholds) is a deliberate, defensible estimate, not a number derived from a dataset. The exact figure is shown outright rather than hidden behind a vague "industry average."</li>
+        <li>Real results vary by execution quality, change management, existing tooling, and dozens of factors this model does not and cannot see.</li>
+        <li>AI tool pricing changes frequently; the licensing figures are indicative, not live vendor quotes.</li>
+        <li>None of this constitutes financial, legal or tax advice. See the <a class="inline" href="../../terms-of-use/">Terms of Use</a> for the full legal scope.</li>
+      </ul>
+      <div class="note"><strong>The point of this page.</strong> Disagreeing with an assumption means knowing exactly which constant to argue with, and exactly how it flows into the result. That is the whole idea of publishing the model instead of just the output.</div>
+    </section>
+
+    <div class="footnav">
+      <a class="btn btn-dark" href="../">Run the calculator &rarr;</a>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-trust">
+      <span class="ft-pill">AIGEA</span>
+      <h3>Part of AIGEA.</h3>
+      <p>Humane Theory is the applied-systems arm of AIGEA, the Artificial Intelligence Governance &amp; Ethics Agency. AIGEA researches how AI should be governed and used responsibly; Humane Theory builds the models, tools and systems that put those principles to work inside real companies, with a human always able to check what the AI did and why.</p>
+    </div>
+    <div class="foot-top">
+      <a class="foot-mark" href="../../"><img src="../../logo-humanetheory.svg" alt="Humane Theory"></a>
+      <div class="foot-cols">
+        <div class="col"><h4>Project</h4><ul>
+          <li><a href="../../statement/">Statement</a></li>
+          <li><a href="../../#systems">Systems</a></li>
+          <li><a href="https://aigea.org" target="_blank" rel="noopener">About AIGEA</a></li>
+        </ul></div>
+        <div class="col"><h4>Social</h4><ul>
+          <li><a href="#" onclick="return false">LinkedIn</a></li>
+          <li><a href="#" onclick="return false">X</a></li>
+        </ul></div>
+        <div class="col"><h4>Contact</h4><ul>
+          <li><a href="mailto:info@aigea.org">info@aigea.org</a></li>
+          <li><a href="https://aigea.org" target="_blank" rel="noopener">aigea.org</a></li>
+        </ul></div>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <span class="copy">COPYRIGHT ©2026 HUMANE THEORY</span>
+      <a class="flink" href="../../privacy-policy/">Privacy Policy</a>
+      <a class="flink" href="../../terms-of-use/">Terms of Use</a>
+      <a class="flink" href="../../?topic=custom#contact">Custom Work</a>
+    </div>
+  </div>
+  <div class="giant">Humane Theory</div>
+</footer>
+
+<script>
+/* Systems dropdown */
+const sysItem = document.getElementById('systems-item');
+const sysBtn = document.getElementById('systems-btn');
+sysBtn.addEventListener('click', e=>{
+  e.stopPropagation();
+  sysItem.classList.toggle('open');
+  sysBtn.setAttribute('aria-expanded', sysItem.classList.contains('open'));
+});
+document.addEventListener('click', ()=> sysItem.classList.remove('open'));
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') sysItem.classList.remove('open'); });
+
+/* mobile hamburger menu */
+const menuToggle = document.getElementById('menu-toggle');
+const mobilePanel = document.getElementById('mobile-panel');
+menuToggle.addEventListener('click', e=>{
+  e.stopPropagation();
+  const open = mobilePanel.classList.toggle('open');
+  menuToggle.setAttribute('aria-expanded', open);
+});
+mobilePanel.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=>{
+  mobilePanel.classList.remove('open');
+  menuToggle.setAttribute('aria-expanded', 'false');
+}));
+document.addEventListener('click', e=>{
+  if(mobilePanel.classList.contains('open') && !mobilePanel.contains(e.target) && e.target!==menuToggle){
+    mobilePanel.classList.remove('open');
+    menuToggle.setAttribute('aria-expanded', 'false');
+  }
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ mobilePanel.classList.remove('open'); menuToggle.setAttribute('aria-expanded','false'); } });
+
+/* Topbar blur on scroll */
+const topbar = document.getElementById('topbar');
+function onTopbarScroll(){ topbar.classList.toggle('scrolled', window.scrollY > 40); }
+window.addEventListener('scroll', onTopbarScroll, {passive:true});
+onTopbarScroll();
+
+/* TOC scrollspy */
+const tocLinks = Array.from(document.querySelectorAll('#toc a'));
+const secs = tocLinks.map(a=>document.querySelector(a.getAttribute('href')));
+function onSpy(){
+  let idx = 0;
+  const y = window.scrollY + 130;
+  secs.forEach((s,i)=>{ if(s && s.offsetTop <= y) idx = i; });
+  tocLinks.forEach((a,i)=>a.classList.toggle('active', i===idx));
+}
+window.addEventListener('scroll', onSpy, {passive:true});
+onSpy();
+</script>
+</body>
+</html>

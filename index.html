@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Humane Theory | Human Centered AI Solutions</title>
+<meta name="description" content="Practical work for organizations deciding how far to take it: tools, systems, and the thinking behind them.">
+<link rel="icon" type="image/svg+xml" href="favicons/favicon.svg">
+<link rel="icon" type="image/png" href="favicons/favicon.png">
+<link rel="shortcut icon" href="favicons/favicon.ico">
+<style>
+/* ---------- Fonts ---------- */
+@font-face{font-family:"Geist";src:url("fonts/Geist-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Geist";src:url("fonts/Geist-Italic-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:italic;font-display:swap}
+@font-face{font-family:"Geist Mono";src:url("fonts/GeistMono-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Geist Mono";src:url("fonts/GeistMono-Italic-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:italic;font-display:swap}
+@font-face{font-family:"Geist Pixel";src:url("fonts/GeistPixel-Square.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+
+/* ---------- Tokens ---------- */
+:root{
+  --black:#000000;
+  --ink:#0a0a0a;
+  --surface:#111111;
+  --surface-2:#161616;
+  --border:#232323;
+  --border-soft:#1c1c1c;
+  --white:#ffffff;
+  --text:#f2f2f0;
+  --text-dim:#9a9a9a;
+  --text-faint:#6d6d6d;
+  --accent:#6fae87;
+  --accent-dim:#182620;
+  --good:#6fae87;
+  --warn:#c99a55;
+  --maxw:1180px;
+  --pad:40px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;scroll-behavior:smooth}
+body{
+  font-family:"Geist",system-ui,sans-serif;color:var(--text);
+  background:var(--black);
+  background-image:radial-gradient(circle, rgba(255,255,255,.05) 1.1px, transparent 1.2px);
+  background-size:24px 24px;
+  overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+input,textarea{font:inherit;color:inherit}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad)}
+img{max-width:100%;display:block}
+
+/* ---------- Header ---------- */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:50;background:transparent;transition:background .3s ease,border-color .3s ease}
+.topbar.scrolled{background:rgba(0,0,0,.7);-webkit-backdrop-filter:saturate(160%) blur(14px);backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid var(--border-soft)}
+.header-row{display:flex;align-items:center;justify-content:space-between;padding-top:26px;padding-bottom:16px;gap:24px}
+.logo{display:flex;align-items:center;gap:9px;padding:6px 10px;border-radius:999px}
+.logo img{height:20px;width:auto;display:block;filter:brightness(0) invert(1)}
+.logo span{font-family:"Geist Mono",monospace;font-size:13.5px;color:#d6d6d6;letter-spacing:.01em}
+
+.main-nav{display:flex;align-items:center;gap:6px;position:relative}
+.nav-item{position:relative}
+.nav-link{
+  display:flex;align-items:center;gap:5px;padding:9px 14px;border-radius:var(--btn-radius);
+  font-size:13.5px;color:#c7c7c7;transition:color .18s ease,background .18s ease;
+}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,.06)}
+.nav-link svg{width:10px;height:10px;opacity:.7;transition:transform .2s ease}
+.nav-item.open .nav-link svg{transform:rotate(180deg)}
+
+.dropdown{
+  position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(-6px);
+  min-width:190px;background:#0d0d0d;border:1px solid var(--border);border-radius:12px;
+  padding:6px;box-shadow:0 20px 50px rgba(0,0,0,.5);
+  opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease;
+}
+.nav-item.open .dropdown{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.dropdown a{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:8px;font-size:13px;color:#d4d4d4}
+.dropdown a:hover{background:rgba(255,255,255,.06);color:#fff}
+.dropdown a .dot{width:4px;height:4px;border-radius:1px;background:#5a5a5a;flex:0 0 auto}
+.dropdown a{position:relative}
+.dropdown a.disabled,.mlink.disabled{opacity:.5;cursor:default}
+.dropdown a.disabled:hover,.mlink.disabled:hover{background:transparent;color:#d4d4d4}
+
+.mtag{
+  margin-left:3px;font-weight:600;letter-spacing:.02em;line-height:1;
+  background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+}
+.mtag-new{font-size:10px;position:relative;top:-.5em;background-image:linear-gradient(180deg,#836464 0%,#B58A8A 100%)}
+.mtag-soon{font-size:8px;vertical-align:middle;background-image:linear-gradient(180deg,#525252 0%,#727272 100%)}
+
+.header-right{display:flex;align-items:center;gap:18px}
+.text-link{font-size:13.5px;color:#c7c7c7;transition:color .15s ease}
+.text-link:hover{color:#fff}
+.text-link.on-dark{color:#fff;font-size:13.5px}
+.text-link.on-dark:hover{color:#d8d8d6}
+
+/* ---- unified glossy button system ---- */
+:root{--btn-radius:9px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;height:30px;padding:0 16px;
+  border-radius:var(--btn-radius);font-size:13.5px;font-weight:500;white-space:nowrap;
+  transition:filter .15s ease,transform .1s ease;
+}
+.btn:active{transform:translateY(1px)}
+
+.btn-ghost,.btn-line{
+  background:linear-gradient(180deg,#2e2e2e 0%,#161616 100%);
+  border:1px solid #333;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.1), inset 0 -1px 2px rgba(0,0,0,.6), 0 1px 2px rgba(0,0,0,.35);
+  color:#e6e6e4;
+  text-shadow:0 1px 1px rgba(0,0,0,.7);
+}
+.btn-ghost:hover,.btn-line:hover{filter:brightness(1.18)}
+
+.btn-solid{
+  background:linear-gradient(180deg,#ffffff 0%,#d9d9d6 100%);
+  border:1px solid #c7c7c4;
+  box-shadow:inset 0 1px 1px #ffffff, inset 0 -1px 2px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.3);
+  color:#141414;
+  text-shadow:0 1px 0 rgba(255,255,255,.75);
+}
+.btn-solid:hover{filter:brightness(1.05)}
+
+.menu-toggle{
+  display:none;align-items:center;justify-content:center;width:34px;height:34px;
+  color:#e6e6e4;flex:0 0 auto;position:relative;z-index:46;
+}
+.menu-toggle svg{width:17px;height:17px}
+.menu-toggle .icon-close{display:none}
+.menu-toggle[aria-expanded="true"] .icon-menu{display:none}
+.menu-toggle[aria-expanded="true"] .icon-close{display:block}
+
+.mobile-panel{isolation:isolate;
+  position:fixed;inset:0;z-index:44;background:#0a0a0a;
+  padding:88px 24px 26px;height:100vh;height:100dvh;overflow-y:auto;
+  transform:translateY(-8px);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;
+}
+.mobile-panel.open{opacity:1;transform:none;pointer-events:auto}
+.mobile-panel .msec{font-family:"Geist Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#6d6d6d;margin:20px 0 8px}
+.mobile-panel .msec:first-child{margin-top:0}
+.mobile-panel .mlink{display:block;padding:12px 2px;font-size:15px;color:#e6e6e4;border-bottom:1px solid #1c1c1c}
+.mobile-panel .mcontact{display:flex;width:100%;height:44px;margin-top:22px}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;padding:120px 0 70px;overflow:hidden}
+.hero-bg{position:absolute;inset:0;z-index:0}
+.hero-bg img{width:100%;height:100%;object-fit:cover;object-position:center 30%;filter:grayscale(1) brightness(.95)}
+.hero-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.08) 0%,rgba(0,0,0,.18) 45%,rgba(0,0,0,.85) 100%),radial-gradient(ellipse at 20% 30%,rgba(0,0,0,0),rgba(0,0,0,.3) 75%)}
+.hero-content{position:relative;z-index:1;width:100%}
+.hero h1{
+  font-family:"Geist",sans-serif;font-weight:500;
+  font-size:clamp(30px,5.4vw,58px);line-height:1.05;letter-spacing:-.015em;
+  max-width:780px;color:#fff;
+}
+.hero .sub{
+  margin-top:20px;max-width:520px;
+  font-family:"Geist",sans-serif;font-weight:300;
+  font-size:clamp(15px,1.7vw,18px);line-height:1.55;color:#c4c4c4;
+}
+.hero-cta{margin-top:34px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.hero-cta .btn{height:36px;padding:0 22px}
+
+.hero-anim{opacity:0;transform:translateY(16px);animation:heroIn .7s cubic-bezier(.16,.8,.3,1) forwards}
+@keyframes heroIn{to{opacity:1;transform:none}}
+
+/* ---------- Section label ---------- */
+.section-label{font-family:"Geist Mono",monospace;font-size:13px;color:#8f8f8f;margin-bottom:22px;font-weight:500;letter-spacing:.02em}
+
+/* ---------- About ---------- */
+.about{padding:110px 0 90px;scroll-margin-top:90px}
+.about-head h2{font-size:clamp(24px,3vw,36px);font-weight:500;letter-spacing:-.015em;line-height:1.25;color:#fff;max-width:640px}
+.about-head p{margin-top:18px;font-size:15px;line-height:1.7;color:var(--text-dim);font-weight:300;max-width:520px}
+
+/* ---- what we stand for: pillars ---- */
+.about-pillars{margin-top:80px;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border-soft);border:1px solid var(--border-soft);border-radius:10px;overflow:hidden}
+.pillar{background:#0c0c0c;padding:26px 24px}
+.pillar-no{font-family:"Geist Mono",monospace;font-size:11px;color:var(--text-faint);letter-spacing:.04em}
+.pillar h4{margin-top:14px;font-size:15px;font-weight:500;color:#fff;letter-spacing:-.005em}
+.pillar p{margin-top:9px;font-size:13px;line-height:1.65;color:var(--text-dim);font-weight:300}
+.about-pillars .pillar:nth-child(1){transition-delay:0s}
+.about-pillars .pillar:nth-child(2){transition-delay:.08s}
+.about-pillars .pillar:nth-child(3){transition-delay:.16s}
+
+/* ---- how a system gets built: timeline ---- */
+.about-steps{margin-top:56px}
+.about-steps h3{font-size:15px;font-weight:500;color:#fff;margin-bottom:30px}
+.steps-row{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;position:relative}
+.steps-row::before{content:"";position:absolute;top:5px;left:0;right:0;height:1px;background:var(--border-soft)}
+.step{position:relative;padding-top:26px}
+.step::before{content:"";position:absolute;top:0;left:0;width:9px;height:9px;border-radius:50%;background:var(--ink);border:1px solid #3a3a3a;transition:background .3s ease,border-color .3s ease}
+.step.on::before{background:var(--accent);border-color:var(--accent)}
+.step-no{font-size:11px;color:var(--text-faint);font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.step h5{margin-top:8px;font-size:13.5px;font-weight:500;color:#e6e6e4}
+.step p{margin-top:6px;font-size:12px;line-height:1.6;color:var(--text-dim);font-weight:300}
+.steps-row .step:nth-child(1){transition-delay:0s}
+.steps-row .step:nth-child(2){transition-delay:.08s}
+.steps-row .step:nth-child(3){transition-delay:.16s}
+.steps-row .step:nth-child(4){transition-delay:.24s}
+
+@media(max-width:900px){
+  :root{--pad:28px}
+  .about-pillars{grid-template-columns:1fr}
+  .steps-row{grid-template-columns:1fr 1fr;gap:28px 24px}
+}
+@media(max-width:560px){
+  :root{--pad:20px}
+  .about-pillars{grid-template-columns:1fr}
+  .steps-row{grid-template-columns:1fr;gap:22px}
+  .steps-row::before{display:none}
+  .step{padding-top:0;padding-left:22px;border-left:1px solid var(--border-soft);padding-bottom:2px}
+  .step::before{top:3px;left:-5px}
+}
+@media(max-width:640px){
+  .main-nav,.header-right{display:none}
+  .menu-toggle{display:flex}
+  .header-row{padding-left:24px;padding-right:24px}
+}
+
+/* subtle reveal-on-scroll (used site-wide) */
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- Systems grid ---------- */
+.systems{padding:60px 0 90px;scroll-margin-top:90px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  min-height:290px;padding:24px;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  transition:background .2s ease, transform .2s ease, border-color .2s ease;
+}
+.card:hover{border-color:#333}
+.card.disabled{opacity:.5;pointer-events:none}
+.card h3{display:flex;align-items:baseline;flex-wrap:wrap}
+.card .ic{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:auto;transition:border-color .2s ease}
+.card:hover .ic{border-color:#444}
+.card .ic svg{width:15px;height:15px;color:#b8b8b6}
+.card h3{font-size:17px;font-weight:600;letter-spacing:-.01em;margin-bottom:7px;margin-top:18px;color:#fff}
+.card p{font-size:12.5px;line-height:1.5;color:var(--text-dim);max-width:230px}
+.card.wide{grid-column:span 2}
+
+@media(max-width:820px){.grid{grid-template-columns:1fr 1fr}.card.wide{grid-column:span 2}}
+@media(max-width:560px){
+  .grid{grid-template-columns:1fr}
+  .card.wide{grid-column:span 1}
+  .card{min-height:170px}
+}
+
+/* ---------- Contact ---------- */
+.contact{padding:60px 0 100px;scroll-margin-top:90px}
+.contact-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:50px;align-items:start}
+.contact-info h2{font-size:clamp(22px,3vw,32px);font-weight:500;letter-spacing:-.01em;color:#fff;margin-bottom:16px}
+.contact-info p{font-size:14.5px;line-height:1.6;color:var(--text-dim);font-weight:300;max-width:380px}
+.contact-info .rows{margin-top:32px;display:flex;flex-direction:column;gap:16px}
+.contact-info .rows a{display:flex;align-items:center;gap:10px;font-size:13.5px;color:#d6d6d6}
+.contact-info .rows a svg{width:15px;height:15px;color:#8a8a88}
+.contact-info .rows a:hover{color:#fff}
+
+.form-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:32px}
+.field{margin-bottom:18px}
+.field label{display:block;font-family:"Geist Mono",monospace;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--text-faint);margin-bottom:8px}
+.field input,.field textarea,.field select{
+  width:100%;background:#0c0c0c;border:1px solid var(--border);border-radius:8px;
+  padding:12px 13px;font-size:14px;color:#fff;transition:border-color .18s ease;
+}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:#555}
+.field textarea{resize:vertical;min-height:110px}
+.field select{
+  appearance:none;-webkit-appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a8a8a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;background-size:11px 7px;padding-right:34px;
+}
+.field select option{background:#111;color:#fff}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-submit{
+  width:100%;height:38px;border-radius:var(--btn-radius);
+  background:linear-gradient(180deg,#ffffff 0%,#d9d9d6 100%);
+  border:1px solid #c7c7c4;
+  box-shadow:inset 0 1px 1px #ffffff, inset 0 -1px 2px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.3);
+  color:#141414;text-shadow:0 1px 0 rgba(255,255,255,.75);
+  font-weight:600;font-size:14px;margin-top:6px;transition:filter .15s ease,transform .1s ease;
+}
+.form-submit:hover{filter:brightness(1.05)}
+.form-submit:active{transform:translateY(1px)}
+.form-note{margin-top:12px;font-size:11.5px;color:var(--text-faint);text-align:center}
+.form-success{display:none;text-align:center;padding:30px 10px}
+.form-success.show{display:block}
+.form-success .ic{width:40px;height:40px;border-radius:50%;background:var(--accent-dim);border:1px solid rgba(61,220,132,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.form-success .ic svg{width:18px;height:18px;color:var(--accent)}
+.form-success h4{font-size:15px;color:#fff;margin-bottom:6px}
+.form-success p{font-size:13px;color:var(--text-dim)}
+
+@media(max-width:820px){.contact-grid{grid-template-columns:1fr;gap:36px}.form-row{grid-template-columns:1fr}}
+
+/* ---------- Footer ---------- */
+footer{background:var(--black);padding:54px 0 0;position:relative;overflow:hidden;border-top:1px solid var(--border-soft)}
+
+.foot-trust{padding-bottom:40px;border-bottom:1px solid var(--border-soft);margin-bottom:40px}
+.ft-pill{display:inline-flex;font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#8f8f8f;border:1px solid var(--border);border-radius:999px;padding:4px 11px;margin-bottom:14px}
+.foot-trust h3{font-size:17px;font-weight:500;color:#e6e6e4;letter-spacing:-.01em;margin-bottom:10px}
+.foot-trust p{max-width:640px;font-size:13px;line-height:1.65;color:#8a8a8a;font-weight:300}
+
+.foot-top{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap}
+.foot-mark{display:inline-flex;align-items:center}
+.foot-mark img{height:24px;width:auto;filter:brightness(0) invert(1) url(#innerSm)}
+.foot-cols{display:flex;gap:70px}
+.foot-cols .col h4{font-size:10px;letter-spacing:.08em;color:#999999;text-transform:uppercase;margin-bottom:14px;font-weight:600}
+.foot-cols .col ul{list-style:none}
+.foot-cols .col li{font-size:13px;color:#4e4e4e;margin-bottom:8px}
+.foot-cols .col a:hover{color:#999999}
+.foot-legal{margin-top:44px;display:flex;flex-direction:column;gap:8px}
+.foot-legal .copy{font-size:10px;color:#4e4e4e;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
+.foot-legal .flink{display:block;font-size:12px;color:#999999}
+.foot-legal .flink:hover{color:#e6e6e4}
+.giant{
+  margin-top:20px;text-align:center;font-weight:500;font-size:clamp(70px,20vw,260px);
+  line-height:.82;letter-spacing:-.03em;color:#303030;white-space:nowrap;user-select:none;
+  margin-bottom:-.16em;filter:url(#innerGiant);pointer-events:none;
+}
+
+@media(max-width:560px){
+  .foot-top{flex-direction:column;gap:24px}
+  .foot-cols{gap:40px;flex-wrap:wrap}
+  .hero{min-height:60vh;padding:120px 0 48px}
+  .hero h1{font-size:clamp(34px,9vw,44px)}
+  .hero .sub{font-size:clamp(16px,4vw,18px)}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="innerSm" x="-30%" y="-30%" width="160%" height="160%">
+    <feOffset dx="0" dy="0.8"/><feGaussianBlur stdDeviation="0.7" result="off"/>
+    <feComposite operator="out" in="SourceGraphic" in2="off" result="inv"/>
+    <feFlood flood-color="#000000" flood-opacity="0.9"/><feComposite operator="in" in2="inv" result="shd"/>
+    <feComposite operator="over" in="shd" in2="SourceGraphic"/>
+  </filter>
+  <filter id="innerGiant" x="-20%" y="-20%" width="140%" height="140%">
+    <feOffset dx="0" dy="6"/><feGaussianBlur stdDeviation="7" result="off"/>
+    <feComposite operator="out" in="SourceGraphic" in2="off" result="inv"/>
+    <feFlood flood-color="#000000" flood-opacity="0.85"/><feComposite operator="in" in2="inv" result="shd"/>
+    <feComposite operator="over" in="shd" in2="SourceGraphic"/>
+  </filter>
+</defs></svg>
+
+<!-- ===== Header ===== -->
+<header>
+  <div class="topbar" id="topbar">
+    <div class="wrap header-row">
+      <a class="logo" href="#" aria-label="Humane Theory">
+        <img src="logo-humanetheory.svg" alt="Humane Theory">
+      </a>
+
+      <nav class="main-nav" id="main-nav">
+        <div class="nav-item" id="systems-item">
+          <button class="nav-link" id="systems-btn" aria-expanded="false">
+            Systems
+            <svg viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="dropdown">
+            <a href="airoi/"><span class="dot"></span>AI ROI</a>
+            <a href="aiges/"><span class="dot"></span>AI ACT</a>
+            <a href="bdash/"><span class="dot"></span>BDash</a>
+            <a href="coradar/"><span class="dot"></span>CoRadar</a>
+            <a class="disabled" href="#" onclick="return false" aria-disabled="true"><span class="dot"></span>ReputIA<span class="mtag mtag-soon">Coming Soon</span></a>
+          </div>
+        </div>
+        <a class="nav-link" href="#about">About</a>
+        <a class="nav-link" href="statement/">Statement</a>
+      </nav>
+
+      <div class="header-right">
+        <a class="btn btn-ghost" href="?topic=general#contact">Contact</a>
+      </div>
+
+      <button class="menu-toggle" id="menu-toggle" aria-label="Menu" aria-expanded="false">
+        <svg class="icon-menu" viewBox="0 0 20 14" fill="none"><path d="M1 1h18M1 7h18M1 13h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <svg class="icon-close" viewBox="0 0 20 20" fill="none"><path d="M2 2l16 16M18 2L2 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <div class="mobile-panel" id="mobile-panel">
+      <div class="msec">Systems</div>
+      <a class="mlink" href="airoi/">AI ROI</a>
+      <a class="mlink" href="aiges/">AI ACT</a>
+      <a class="mlink" href="bdash/">BDash</a>
+      <a class="mlink" href="coradar/">CoRadar</a>
+      <a class="mlink disabled" href="#" onclick="return false" aria-disabled="true">ReputIA<span class="mtag mtag-soon">Coming Soon</span></a>
+      <div class="msec">More</div>
+      <a class="mlink" href="#about">About</a>
+      <a class="mlink" href="statement/">Statement</a>
+      <a class="btn btn-ghost mcontact" href="?topic=general#contact">Contact</a>
+    </div>
+  </div>
+
+  <!-- ===== Hero ===== -->
+  <div class="hero">
+    <div class="hero-bg"><picture><source srcset="heroimg.webp" type="image/webp"><img src="heroimg.jpg" alt="" width="1821" height="864"></picture></div>
+    <div class="wrap hero-content">
+      <h1 class="hero-anim" style="animation-delay:.05s">Human Centered AI Solutions</h1>
+      <p class="sub hero-anim" style="animation-delay:.18s">Practical work for organizations deciding how far to take it: tools, systems, and the thinking behind them.</p>
+      <div class="hero-cta hero-anim" style="animation-delay:.3s">
+        <a class="btn btn-ghost" href="?topic=custom#contact">Custom System</a>
+        <a class="btn btn-solid" href="#systems">See the systems</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== About ===== -->
+<section class="about" id="about">
+  <div class="wrap">
+    <div class="section-label">/About</div>
+
+    <div class="about-head reveal">
+      <h2>Building the systems.</h2>
+      <p>Designing and building practical AI systems: tools that check governance readiness, track real ROI, watch competitors, and run business-development workflows. Everything here is free to use while it's in early build.</p>
+    </div>
+
+    <div class="about-pillars">
+      <div class="pillar reveal">
+        <div class="pillar-no">01</div>
+        <h4>One job per system</h4>
+        <p>Each system solves one concrete problem instead of trying to be a general-purpose black box nobody can explain.</p>
+      </div>
+      <div class="pillar reveal">
+        <div class="pillar-no">02</div>
+        <h4>Governed by design</h4>
+        <p>Every system follows the same governance checks it's built to test for in others, not bolted on after the fact.</p>
+      </div>
+      <div class="pillar reveal">
+        <div class="pillar-no">03</div>
+        <h4>Your data stays yours</h4>
+        <p>Nothing you enter is sold, shared, or reused against you. Free to use while it's being built in the open.</p>
+      </div>
+    </div>
+
+    <div class="about-steps">
+      <h3>How a system gets built</h3>
+      <div class="steps-row">
+        <div class="step on reveal"><div class="step-no">01</div><h5>Spot the problem</h5><p>Starting from AI use seen happening badly, in the wild, never from a sales pitch.</p></div>
+        <div class="step reveal"><div class="step-no">02</div><h5>Build with checks in</h5><p>Logging, human checkpoints, and a governance pass before a system is ever used for real.</p></div>
+        <div class="step reveal"><div class="step-no">03</div><h5>Ship it as a lab</h5><p>Released free and clearly marked as in progress, stress-tested by real people, not a demo reel.</p></div>
+        <div class="step reveal"><div class="step-no">04</div><h5>Listen &amp; rebuild</h5><p>Fixing what breaks and retiring what doesn't earn its place. Nothing here is finished.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Systems ===== -->
+<section class="systems" id="systems">
+  <div class="wrap">
+    <div class="section-label">/Systems</div>
+    <div class="grid">
+      <a class="card" href="airoi/">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 19V9M11 19V5M18 19v-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <h3>AI ROI</h3>
+        <p>Measure the real business impact and ROI of AI in your company →</p>
+      </a>
+      <a class="card" href="aiges/">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4v5c0 5-3.4 8.4-8 9-4.6-.6-8-4-8-9V7z" stroke="currentColor" stroke-width="1.6"/></svg></div>
+        <h3>AI-ACT Comp</h3>
+        <p>Evaluate your organization's AI governance maturity and readiness for the EU AI Act. Identify risks, gaps, and practical next steps →</p>
+      </a>
+      <a class="card" href="bdash/">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 4h16v16H4z" stroke="currentColor" stroke-width="1.6"/><path d="M4 10h16M10 10v10" stroke="currentColor" stroke-width="1.6"/></svg></div>
+        <h3>BDash</h3>
+        <p>The open-source control center for AI business development agents. →</p>
+      </a>
+      <a class="card" href="coradar/">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 12l5-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <h3>CoRadar</h3>
+        <p>Prepare daily informs about what your competitors are doing →</p>
+      </a>
+      <a class="card disabled" href="#" onclick="return false" aria-disabled="true">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.4-9.3-9C1.2 8.6 3 5 6.6 5 9 5 10.8 6.6 12 8.3 13.2 6.6 15 5 17.4 5 21 5 22.8 8.6 21.3 12 19 16.6 12 21 12 21z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+        <h3>ReputIA<span class="mtag mtag-soon">Coming Soon</span></h3>
+        <p>Watch what is being said of your company in real time.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Contact ===== -->
+<section class="contact" id="contact">
+  <div class="wrap">
+    <div class="section-label">/Contact</div>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h2>Let's talk about your system.</h2>
+        <p>Share where AI is being talked about and where it's actually being used in your organization. Next steps follow shortly after.</p>
+      </div>
+
+      <div class="form-card">
+        <form id="contact-form">
+          <div class="form-row">
+            <div class="field"><label>Name</label><input type="text" required placeholder="Jane Doe"></div>
+            <div class="field"><label>Email</label><input type="email" required placeholder="jane@company.com"></div>
+          </div>
+          <div class="field"><label>Company</label><input type="text" placeholder="Company name"></div>
+          <div class="field">
+            <label>Reason for contact</label>
+            <select id="contact-topic">
+              <option value="general">General inquiry</option>
+              <option value="custom">Custom System</option>
+              <option value="airoi">AI ROI Calculator</option>
+              <option value="aiges">AI-ACT Comp</option>
+              <option value="coradar">Set up CoRadar</option>
+              <option value="bdash">Set up BDash</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="field"><label>Message</label><textarea required placeholder="What are you trying to solve?"></textarea></div>
+          <button class="form-submit" type="submit">Send message</button>
+          <div class="form-note">Replying within 5–8 business days.</div>
+        </form>
+        <div class="form-success" id="form-success">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h4>Message received</h4>
+          <p>Thanks for reaching out. Getting back to you shortly.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer>
+  <div class="wrap">
+    <div class="foot-trust">
+      <span class="ft-pill">AIGEA</span>
+      <h3>Part of AIGEA.</h3>
+      <p>Humane Theory is the applied-systems arm of AIGEA, the Artificial Intelligence Governance &amp; Ethics Agency. AIGEA researches how AI should be governed and used responsibly; Humane Theory builds the models, tools and systems that put those principles to work inside real companies, with a human always able to check what the AI did and why.</p>
+    </div>
+    <div class="foot-top">
+      <a class="foot-mark" href="#"><img src="logo-humanetheory.svg" alt="Humane Theory"></a>
+      <div class="foot-cols">
+        <div class="col"><h4>Project</h4><ul>
+          <li><a href="statement/">Statement</a></li>
+          <li><a href="#systems">Systems</a></li>
+          <li><a href="https://aigea.org" target="_blank" rel="noopener">About AIGEA</a></li>
+        </ul></div>
+        <div class="col"><h4>Social</h4><ul>
+          <li><a href="#" onclick="return false">LinkedIn</a></li>
+          <li><a href="#" onclick="return false">X</a></li>
+        </ul></div>
+        <div class="col"><h4>Contact</h4><ul>
+          <li><a href="mailto:info@aigea.org">info@aigea.org</a></li>
+          <li><a href="https://aigea.org" target="_blank" rel="noopener">aigea.org</a></li>
+        </ul></div>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <span class="copy">COPYRIGHT ©2026 HUMANE THEORY</span>
+      <a class="flink" href="privacy-policy/">Privacy Policy</a>
+      <a class="flink" href="terms-of-use/">Terms of Use</a>
+      <a class="flink" href="?topic=custom#contact">Custom Work</a>
+    </div>
+  </div>
+  <div class="giant">Humane Theory</div>
+</footer>
+
+<script>
+/* dropdown */
+const sysItem = document.getElementById('systems-item');
+const sysBtn = document.getElementById('systems-btn');
+sysBtn.addEventListener('click', e=>{
+  e.stopPropagation();
+  sysItem.classList.toggle('open');
+  sysBtn.setAttribute('aria-expanded', sysItem.classList.contains('open'));
+});
+document.addEventListener('click', ()=> sysItem.classList.remove('open'));
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') sysItem.classList.remove('open'); });
+
+/* mobile hamburger menu */
+const menuToggle = document.getElementById('menu-toggle');
+const mobilePanel = document.getElementById('mobile-panel');
+menuToggle.addEventListener('click', e=>{
+  e.stopPropagation();
+  const open = mobilePanel.classList.toggle('open');
+  menuToggle.setAttribute('aria-expanded', open);
+});
+mobilePanel.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=>{
+  mobilePanel.classList.remove('open');
+  menuToggle.setAttribute('aria-expanded', 'false');
+}));
+document.addEventListener('click', e=>{
+  if(mobilePanel.classList.contains('open') && !mobilePanel.contains(e.target) && e.target!==menuToggle){
+    mobilePanel.classList.remove('open');
+    menuToggle.setAttribute('aria-expanded', 'false');
+  }
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ mobilePanel.classList.remove('open'); menuToggle.setAttribute('aria-expanded','false'); } });
+
+/* topbar bg on scroll */
+const topbar = document.getElementById('topbar');
+function onScroll(){ topbar.classList.toggle('scrolled', window.scrollY > 40); }
+window.addEventListener('scroll', onScroll, {passive:true});
+onScroll();
+
+/* subtle reveal-on-scroll */
+const revealEls = document.querySelectorAll('.reveal, .card, .panel');
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('in');
+      io.unobserve(e.target);
+    }
+  });
+}, {threshold:.15, rootMargin:'0px 0px -40px 0px'});
+revealEls.forEach(el=>{ el.classList.add('reveal'); io.observe(el); });
+
+/* preselect the contact reason from ?topic=... in the URL */
+const topicSelect = document.getElementById('contact-topic');
+const topicParam = new URLSearchParams(location.search).get('topic');
+if(topicParam && topicSelect.querySelector('option[value="'+topicParam+'"]')){
+  topicSelect.value = topicParam;
+}
+if(location.hash === '#contact'){
+  document.getElementById('contact').scrollIntoView();
+}
+
+/* contact form: local-only, no network request */
+const form = document.getElementById('contact-form');
+const success = document.getElementById('form-success');
+form.addEventListener('submit', e=>{
+  e.preventDefault();
+  form.style.display = 'none';
+  success.classList.add('show');
+});
+</script>
+</body>
+</html>

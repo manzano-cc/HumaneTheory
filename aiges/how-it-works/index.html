@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How It Works | AI-ACT Comp | Humane Theory</title>
+<link rel="icon" type="image/svg+xml" href="../../favicons/favicon.svg">
+<link rel="icon" type="image/png" href="../../favicons/favicon.png">
+<link rel="shortcut icon" href="../../favicons/favicon.ico">
+<style>
+/* ============================================================
+   AI-ACT COMP · HOW IT WORKS  /aiges/how-it-works
+   Reference documentation for the readiness-scoring engine.
+   English only. Shares the Humane Theory visual language.
+   ============================================================ */
+
+/* ---------- Fonts (shared) ---------- */
+@font-face{font-family:"Geist";src:url("../../fonts/Geist-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Geist";src:url("../../fonts/Geist-Italic-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:italic;font-display:swap}
+@font-face{font-family:"Geist Mono";src:url("../../fonts/GeistMono-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Geist Pixel";src:url("../../fonts/GeistPixel-Square.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+
+:root{
+  --black:#0a0a0a;
+  --white:#ffffff;
+  --card:#161616;
+  --card-border:#262626;
+  --maxw:1180px;
+  --pad:40px;
+  --btn-radius:9px;
+  --accent:#7b93c9;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;scroll-behavior:smooth}
+body{
+  font-family:"Geist",system-ui,sans-serif;color:#f2f2f2;
+  background:#000000;
+  min-height:100vh;
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad)}
+
+/* ---------- Topbar (identical to /aiges) ---------- */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:50;background:transparent;transition:background .3s ease,border-color .3s ease}
+.topbar.scrolled{background:rgba(0,0,0,.7);-webkit-backdrop-filter:saturate(160%) blur(14px);backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid #1c1c1c}
+.header-row{display:flex;align-items:center;justify-content:space-between;padding-top:26px;padding-bottom:16px;gap:24px}
+.logo{display:flex;align-items:center;gap:9px;padding:6px 10px;border-radius:999px}
+.logo img{height:20px;width:auto;display:block;filter:brightness(0) invert(1)}
+
+.menu-toggle{
+  display:none;align-items:center;justify-content:center;width:34px;height:34px;
+  color:#e6e6e4;flex:0 0 auto;position:relative;z-index:46;
+}
+.menu-toggle svg{width:17px;height:17px}
+.menu-toggle .icon-close{display:none}
+.menu-toggle[aria-expanded="true"] .icon-menu{display:none}
+.menu-toggle[aria-expanded="true"] .icon-close{display:block}
+.mobile-panel{isolation:isolate;
+  position:fixed;inset:0;z-index:44;background:#0a0a0a;
+  padding:88px 24px 26px;height:100vh;height:100dvh;overflow-y:auto;
+  transform:translateY(-8px);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;
+}
+.mobile-panel.open{opacity:1;transform:none;pointer-events:auto}
+.mobile-panel .msec{font-family:"Geist Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#6d6d6d;margin:20px 0 8px}
+.mobile-panel .msec:first-child{margin-top:0}
+.mobile-panel .mlink{display:block;padding:12px 2px;font-size:15px;color:#e6e6e4;border-bottom:1px solid #1c1c1c}
+.mobile-panel .mcontact{display:flex;width:100%;height:44px;margin-top:22px}
+
+.main-nav{display:flex;align-items:center;gap:6px;position:relative}
+.nav-item{position:relative}
+.nav-link{
+  display:flex;align-items:center;gap:5px;padding:9px 14px;border-radius:var(--btn-radius);
+  font-size:13.5px;color:#c7c7c7;transition:color .18s ease,background .18s ease;
+}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,.06)}
+.nav-link svg{width:10px;height:10px;opacity:.7;transition:transform .2s ease}
+.nav-item.open .nav-link svg{transform:rotate(180deg)}
+
+.dropdown{
+  position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(-6px);
+  min-width:190px;background:#0d0d0d;border:1px solid #232323;border-radius:12px;
+  padding:6px;box-shadow:0 20px 50px rgba(0,0,0,.5);
+  opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease;
+}
+.nav-item.open .dropdown{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.dropdown a{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:8px;font-size:13px;color:#d4d4d4}
+.dropdown a:hover{background:rgba(255,255,255,.06);color:#fff}
+.dropdown a .dot{width:4px;height:4px;border-radius:1px;background:#5a5a5a;flex:0 0 auto}
+.dropdown a{position:relative}
+.dropdown a.disabled,.mlink.disabled{opacity:.5;cursor:default}
+.dropdown a.disabled:hover,.mlink.disabled:hover{background:transparent;color:#d4d4d4}
+
+.mtag{
+  margin-left:3px;font-weight:600;letter-spacing:.02em;line-height:1;
+  background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+}
+.mtag-new{font-size:10px;position:relative;top:-.5em;background-image:linear-gradient(180deg,#836464 0%,#B58A8A 100%)}
+.mtag-soon{font-size:8px;vertical-align:middle;background-image:linear-gradient(180deg,#525252 0%,#727272 100%)}
+
+.header-right{display:flex;align-items:center;gap:14px}
+.header-right .btn{height:30px;padding:0 16px;font-size:13.5px}
+.text-link{font-size:13.5px;color:#c7c7c7;transition:color .15s ease}
+.text-link:hover{color:#fff}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;
+  border-radius:var(--btn-radius);padding:0 22px;font-size:14px;font-weight:500;white-space:nowrap;
+  transition:filter .15s ease,transform .1s ease;
+}
+.btn:active{transform:translateY(1px)}
+.btn-ghost{
+  background:linear-gradient(180deg,#2e2e2e 0%,#161616 100%);
+  border:1px solid #333;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.1), inset 0 -1px 2px rgba(0,0,0,.6), 0 1px 2px rgba(0,0,0,.35);
+  color:#e6e6e4;text-shadow:0 1px 1px rgba(0,0,0,.7);
+}
+.btn-ghost:hover{filter:brightness(1.18)}
+.btn-dark{
+  background:linear-gradient(180deg,#ffffff 0%,#d9d9d6 100%);
+  border:1px solid #c7c7c4;
+  box-shadow:inset 0 1px 1px #ffffff, inset 0 -1px 2px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.3);
+  color:#141414;text-shadow:0 1px 0 rgba(255,255,255,.75);
+}
+.btn-dark:hover{filter:brightness(1.05)}
+
+@media(max-width:640px){
+  .main-nav,.header-right{display:none}
+  .menu-toggle{display:flex}
+  .header-row{padding-left:24px;padding-right:24px}
+}
+
+/* ---------- Page head ---------- */
+.page-head{padding-top:150px;padding-bottom:30px}
+.section-label{font-family:"Geist Mono",monospace;font-size:14px;color:#f2f2f2;font-weight:500;margin-bottom:20px}
+.page-title{font-family:"Geist",sans-serif;font-weight:500;font-size:clamp(26px,3.6vw,44px);line-height:1.12;letter-spacing:-.01em;color:#f2f2f2;max-width:840px}
+.page-sub{margin-top:16px;max-width:680px;font-weight:300;font-size:clamp(14px,1.6vw,16.5px);line-height:1.6;color:#a8a8a8}
+.page-sub a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+.back-link{display:inline-flex;align-items:center;gap:7px;margin-top:22px;font-family:"Geist Mono",monospace;font-size:12px;color:#8f8f8f;border:1px solid var(--card-border);border-radius:999px;padding:8px 15px;transition:all .15s ease}
+.back-link:hover{color:#fff;border-color:#9a9a96}
+
+/* ---------- Layout: sticky TOC + content ---------- */
+.doc-layout{display:grid;grid-template-columns:230px 1fr;gap:52px;align-items:start;padding-top:10px;padding-bottom:90px}
+.toc{position:sticky;top:110px;align-self:start;max-height:calc(100vh - 140px);overflow-y:auto;padding-right:6px}
+.toc-label{font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#6d6d6d;margin-bottom:14px}
+.toc ol{list-style:none;display:flex;flex-direction:column;gap:2px;counter-reset:toc}
+.toc a{display:block;font-size:12.5px;line-height:1.4;color:#8f8f8f;padding:7px 10px;border-radius:7px;transition:all .15s ease}
+.toc a:hover{color:#f2f2f2;background:rgba(255,255,255,.04)}
+.toc a.active{color:var(--accent);font-weight:600}
+.toc a b{font-family:"Geist Mono",monospace;color:#6d6d6d;margin-right:7px;font-weight:400}
+.toc a.active b{color:var(--accent)}
+
+.content{min-width:0}
+.doc-sec{padding-top:14px;margin-top:14px;scroll-margin-top:100px}
+.doc-sec:first-child{margin-top:0}
+.doc-sec h2{display:flex;align-items:baseline;gap:12px;font-size:clamp(19px,2.2vw,24px);font-weight:600;letter-spacing:-.01em;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #1c1c1c}
+.doc-sec h2 .sn{font-family:"Geist Pixel","Geist Mono",monospace;font-size:13px;color:var(--accent);flex:0 0 auto}
+.doc-sec p{font-size:14px;line-height:1.7;color:#b8b8b8;margin-bottom:14px;max-width:760px}
+.doc-sec p strong{color:#e6e6e4;font-weight:600}
+.doc-sec ul,.doc-sec ol.plain{margin:0 0 16px 0;padding-left:20px;max-width:760px}
+.doc-sec li{font-size:13.5px;line-height:1.65;color:#b0b0b0;margin-bottom:7px}
+.doc-sec li strong{color:#e6e6e4;font-weight:600}
+
+/* category list */
+.cat-list{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:900px;margin-bottom:8px}
+.cat-item{background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:13px 15px;display:flex;gap:11px;align-items:flex-start}
+.cat-item .cn{font-family:"Geist Pixel","Geist Mono",monospace;font-size:10.5px;color:#9a9a96;padding-top:2px;flex:0 0 auto}
+.cat-item .ct b{display:block;font-size:13.5px;color:#f2f2f2;font-weight:600;margin-bottom:3px}
+.cat-item .ct span{font-size:12px;color:#9a9a9a;line-height:1.45}
+@media(max-width:700px){.cat-list{grid-template-columns:1fr}}
+
+/* formula box */
+.formula{background:#121212;border:1px solid var(--card-border);border-radius:9px;padding:16px 18px;margin:16px 0;max-width:760px}
+.formula .flabel{font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#6d6d6d;margin-bottom:9px}
+.formula code{display:block;font-family:"Geist Mono",monospace;font-size:12.5px;line-height:1.8;color:#d7dcec;white-space:pre-wrap;word-break:break-word}
+.formula code .op{color:#7b93c9}
+.formula code .num{color:#e0b34c}
+
+/* worked example */
+.example{background:#141a1e;border:1px solid #253038;border-radius:9px;padding:16px 18px;margin:16px 0;max-width:760px}
+.example .elabel{font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#6f8aa8;margin-bottom:9px}
+.example table{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:10px}
+.example th{text-align:left;color:#7f97b3;font-weight:500;padding:4px 8px 6px;font-family:"Geist Mono",monospace;font-size:10.5px;border-bottom:1px solid #253038}
+.example td{padding:5px 8px;color:#c2ccd8;border-bottom:1px solid #1c252b}
+.example p{color:#b7c3cf;font-size:12.5px;margin:8px 0 0}
+
+/* diagram card */
+.diagram{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:24px;margin:18px 0 22px;max-width:900px;overflow-x:auto}
+.flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+.fnode{background:#1c1c1c;border:1px solid #2c2c2c;border-radius:8px;padding:14px 16px;min-width:150px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.fnode.accent{border-color:#3a4a6a;background:#151a24}
+.fnode .ftag{font-family:"Geist Mono",monospace;font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:#7b93c9}
+.fnode .ftitle{font-size:13px;font-weight:600;color:#f2f2f2}
+.fnode .fsub{font-size:11px;color:#9a9a9a;line-height:1.4}
+.farrow{display:flex;align-items:center;justify-content:center;min-width:40px;color:#5a5a5a;font-size:16px}
+.fcol{display:flex;flex-direction:column;gap:10px}
+.frow{display:flex;align-items:center;gap:0;flex-wrap:wrap;margin-bottom:10px}
+.frow:last-child{margin-bottom:0}
+@media(max-width:600px){.frow{flex-direction:column;align-items:stretch}.farrow{transform:rotate(90deg);min-height:26px}}
+
+/* weight bars */
+.wbars{display:flex;flex-direction:column;gap:10px;max-width:760px;margin:16px 0}
+.wrow{display:grid;grid-template-columns:170px 1fr 46px;gap:12px;align-items:center}
+.wrow .wl{font-size:12.5px;color:#c2c2c2}
+.wrow .wt{height:9px;background:#232323;border-radius:99px;overflow:hidden}
+.wrow .wt i{display:block;height:100%;background:linear-gradient(90deg,#4b5c82,#7b93c9);border-radius:99px}
+.wrow .wv{font-family:"Geist Mono",monospace;font-size:11.5px;color:#9a9a9a;text-align:right}
+
+/* tier ladder */
+.tier-ladder{display:flex;flex-direction:column;gap:8px;max-width:640px;margin:16px 0}
+.tier-row{display:flex;align-items:center;gap:12px;background:#161616;border:1px solid var(--card-border);border-radius:8px;padding:11px 14px}
+.tier-row .tdot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+.tier-row .tname{font-size:13px;font-weight:600;color:#f2f2f2;min-width:96px}
+.tier-row .tex{font-size:12px;color:#9a9a9a}
+.tier-minimal .tdot{background:#39d27a}
+.tier-limited .tdot{background:#7b93c9}
+.tier-high .tdot{background:#e0985a}
+.tier-prohibited .tdot{background:#e0685a}
+
+/* status pill legend */
+.status-pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:500;padding:4px 11px;border-radius:999px;white-space:nowrap}
+.status-pill .d{width:6px;height:6px;border-radius:50%}
+.st-strong{background:#12201a;color:#4bc17e}.st-strong .d{background:#39b06a}
+.st-partial{background:#141a24;color:#8ba3d6}.st-partial .d{background:#5f7fc4}
+.st-needs{background:#241d12;color:#d9a44c}.st-needs .d{background:#d9a44c}
+.st-missing{background:#241414;color:#d9846f}.st-missing .d{background:#d06a5a}
+.status-legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin:8px 0 18px}
+.status-legend .row{display:flex;align-items:center;gap:9px;font-size:12px;color:#9a9a9a}
+
+/* note callout */
+.note{background:var(--card);border:1px solid var(--card-border);border-left:2px solid var(--accent);border-radius:0 8px 8px 0;padding:13px 16px;margin:16px 0;max-width:760px;font-size:12.5px;line-height:1.6;color:#a8a8a8}
+.note strong{color:#dcdcdc}
+
+.footnav{display:flex;justify-content:flex-end;align-items:center;margin-top:60px;padding-top:24px;border-top:1px solid #1c1c1c;flex-wrap:wrap;gap:14px}
+
+footer{background:#000000;padding:54px 0 0;position:relative;overflow:hidden;border-top:1px solid #1c1c1c}
+.foot-trust{padding-bottom:40px;border-bottom:1px solid #1c1c1c;margin-bottom:40px}
+.ft-pill{display:inline-flex;font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#8f8f8f;border:1px solid #262626;border-radius:999px;padding:4px 11px;margin-bottom:14px}
+.foot-trust h3{font-size:17px;font-weight:500;color:#e6e6e4;letter-spacing:-.01em;margin-bottom:10px}
+.foot-trust p{max-width:640px;font-size:13px;line-height:1.65;color:#8a8a8a;font-weight:300}
+.foot-top{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap}
+.foot-mark{display:inline-flex;align-items:center}
+.foot-mark img{height:24px;width:auto;filter:brightness(0) invert(1) url(#innerSm)}
+.foot-cols{display:flex;gap:70px}
+.foot-cols .col h4{font-size:10px;letter-spacing:.08em;color:#999999;text-transform:uppercase;margin-bottom:14px;font-weight:600}
+.foot-cols .col ul{list-style:none}
+.foot-cols .col li{font-size:13px;color:#4e4e4e;margin-bottom:8px}
+.foot-cols .col a:hover{color:#999999}
+.foot-legal{margin-top:44px;display:flex;flex-direction:column;gap:8px}
+.foot-legal .copy{font-size:10px;color:#4e4e4e;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
+.foot-legal .flink{display:block;font-size:12px;color:#999999}
+.foot-legal .flink:hover{color:#e6e6e4}
+.giant{margin-top:20px;text-align:center;font-weight:500;font-size:clamp(70px,20vw,260px);line-height:.82;letter-spacing:-.03em;color:#303030;white-space:nowrap;user-select:none;margin-bottom:-.16em;filter:url(#innerGiant);pointer-events:none}
+@media(max-width:560px){.foot-top{flex-direction:column;gap:24px}.foot-cols{gap:40px;flex-wrap:wrap}}
+
+.foot-strip{margin-top:20px;padding:26px 0 34px;font-family:"Geist Pixel","Geist Mono",monospace;font-size:10.5px;color:#8f8f8f;text-transform:uppercase;letter-spacing:.04em}
+
+/* responsive */
+@media(max-width:980px){
+  .doc-layout{grid-template-columns:1fr;gap:0}
+  .toc{position:static;max-height:none;margin-bottom:34px;padding:16px;background:var(--card);border:1px solid var(--card-border);border-radius:10px}
+  .toc ol{flex-direction:column}
+}
+@media(max-width:640px){
+  :root{--pad:22px}
+  .page-head{padding-top:120px}
+  .cat-list{grid-template-columns:1fr}
+  .wrow{grid-template-columns:1fr;gap:5px}
+  .wrow .wv{text-align:left}
+}
+</style>
+</head>
+<body>
+
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="innerSm" x="-30%" y="-30%" width="160%" height="160%"><feOffset dx="0" dy="0.8"/><feGaussianBlur stdDeviation="0.7" result="off"/><feComposite operator="out" in="SourceGraphic" in2="off" result="inv"/><feFlood flood-color="#000" flood-opacity="0.95"/><feComposite operator="in" in2="inv" result="shd"/><feComposite operator="over" in="shd" in2="SourceGraphic"/></filter>
+  <filter id="innerGiant" x="-20%" y="-20%" width="140%" height="140%"><feOffset dx="0" dy="6"/><feGaussianBlur stdDeviation="7" result="off"/><feComposite operator="out" in="SourceGraphic" in2="off" result="inv"/><feFlood flood-color="#000000" flood-opacity="0.85"/><feComposite operator="in" in2="inv" result="shd"/><feComposite operator="over" in="shd" in2="SourceGraphic"/></filter>
+</defs></svg>
+<!-- ===== Topbar ===== -->
+<div class="topbar" id="topbar">
+  <div class="wrap header-row">
+    <a class="logo" href="../../" aria-label="Humane Theory">
+      <img src="../../logo-humanetheory.svg" alt="Humane Theory">
+    </a>
+
+    <nav class="main-nav" id="main-nav">
+      <div class="nav-item" id="systems-item">
+        <button class="nav-link" id="systems-btn" aria-expanded="false">
+          Systems
+          <svg viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="dropdown">
+          <a href="../../airoi/"><span class="dot"></span>AI ROI</a>
+          <a href="../../aiges/"><span class="dot"></span>AI ACT</a>
+          <a href="../../bdash/"><span class="dot"></span>BDash</a>
+          <a href="../../coradar/"><span class="dot"></span>CoRadar</a>
+          <a class="disabled" href="#" onclick="return false" aria-disabled="true"><span class="dot"></span>ReputIA<span class="mtag mtag-soon">Coming Soon</span></a>
+        </div>
+      </div>
+      <a class="nav-link" href="../../#about">About</a>
+      <a class="nav-link" href="../../statement/">Statement</a>
+    </nav>
+
+    <div class="header-right">
+      <a class="btn btn-ghost" href="../../?topic=aiges#contact">Contact</a>
+    </div>
+
+    <button class="menu-toggle" id="menu-toggle" aria-label="Menu" aria-expanded="false">
+      <svg class="icon-menu" viewBox="0 0 20 14" fill="none"><path d="M1 1h18M1 7h18M1 13h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <svg class="icon-close" viewBox="0 0 20 20" fill="none"><path d="M2 2l16 16M18 2L2 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <div class="mobile-panel" id="mobile-panel">
+    <div class="msec">Systems</div>
+    <a class="mlink" href="../../airoi/">AI ROI</a>
+    <a class="mlink" href="../../aiges/">AI ACT</a>
+    <a class="mlink" href="../../bdash/">BDash</a>
+    <a class="mlink" href="../../coradar/">CoRadar</a>
+    <a class="mlink disabled" href="#" onclick="return false" aria-disabled="true">ReputIA<span class="mtag mtag-soon">Coming Soon</span></a>
+    <div class="msec">More</div>
+    <a class="mlink" href="../../#about">About</a>
+    <a class="mlink" href="../../statement/">Statement</a>
+    <a class="btn btn-ghost mcontact" href="../../?topic=aiges#contact">Contact</a>
+  </div>
+</div>
+
+<!-- ===== Page head ===== -->
+<header class="wrap page-head">
+  <div class="section-label">/how-it-works</div>
+  <h1 class="page-title">How the AI-ACT readiness score actually works.</h1>
+  <p class="page-sub">This page is the full arithmetic behind the AI-ACT Comp report: every score, weight, badge and roadmap item traces back to a formula documented below. It is a self-assessment aid built on general AI-governance practice and publicly available EU AI Act material, not a certified audit or legal opinion. See the <a href="../../terms-of-use/">Terms of Use</a> for that distinction.</p>
+</header>
+
+<main class="wrap doc-layout">
+
+  <!-- ===== Sticky TOC ===== -->
+  <nav class="toc" id="toc" aria-label="Table of contents">
+    <div class="toc-label">Contents</div>
+    <ol>
+      <li><a href="#sec-1"><b>01</b>What this estimates</a></li>
+      <li><a href="#sec-2"><b>02</b>The inputs you provide</a></li>
+      <li><a href="#sec-3"><b>03</b>The 12 governance categories</a></li>
+      <li><a href="#sec-4"><b>04</b>Scoring one category</a></li>
+      <li><a href="#sec-5"><b>05</b>Overall &amp; composite scores</a></li>
+      <li><a href="#sec-6"><b>06</b>The risk tier</a></li>
+      <li><a href="#sec-7"><b>07</b>The risk exposure band</a></li>
+      <li><a href="#sec-8"><b>08</b>Strengths, gaps &amp; obligations</a></li>
+      <li><a href="#sec-9"><b>09</b>The 30/60/90 roadmap</a></li>
+      <li><a href="#sec-10"><b>10</b>The optional AI notes layer</a></li>
+      <li><a href="#sec-11"><b>11</b>Limitations &amp; caveats</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===== Content ===== -->
+  <div class="content">
+
+    <section class="doc-sec" id="sec-1">
+      <h2><span class="sn">01</span>What this assessment estimates</h2>
+      <p>AI-ACT Comp turns your answers into two independent readings: an internal <strong>governance maturity score</strong> (how disciplined your organization's AI practices are, across 12 areas), and an indicative <strong>EU AI Act risk tier</strong> (driven purely by what you use AI for). Both are computed with plain arithmetic, entirely in your browser, from the answers you give in the three steps of the tool.</p>
+      <p>What it deliberately does <strong>not</strong> do:</p>
+      <ul>
+        <li>It is not a legal certification of EU AI Act compliance.</li>
+        <li>It is not an official regulatory audit, and no authority reviews or endorses the output.</li>
+        <li>It does not replace qualified legal review, particularly once a use case lands in the "high-risk" or "prohibited" tier below.</li>
+      </ul>
+      <p>The full legal framing of that distinction lives in the <a href="../../terms-of-use/">Terms of Use</a>. Everything on this page describes the arithmetic that produces the numbers you see, nothing more, nothing less.</p>
+    </section>
+
+    <section class="doc-sec" id="sec-2">
+      <h2><span class="sn">02</span>The inputs you provide</h2>
+      <p>Step 1 collects context that personalizes the report but does not itself get scored: <strong>industry</strong>, <strong>company size</strong>, <strong>country/region</strong>, whether the company currently uses AI, whether it develops its own models, which third-party AI vendors are in use, and roughly how many AI systems are in production. These drive the industry-specific recommendations and the report header. They carry no numeric weight in the score.</p>
+      <p>Step 2 asks you to select every applicable <strong>AI use case</strong> (chatbots, recruitment, credit scoring, facial recognition, and so on). This selection is what determines the risk tier (see section 06) and is kept completely separate from Step 3.</p>
+      <p>Step 3 is the actual governance assessment: 24 questions across the 12 categories in section 03, answered on a 0&ndash;4 maturity scale or, for two of them, a 0&ndash;100% slider. This is the only input that feeds the category scores in section 04.</p>
+      <div class="note"><strong>Why the separation matters:</strong> a company can run excellent internal AI governance and still land in the "high-risk" tier purely because of what its AI is used for (e.g. credit scoring), or vice-versa, run weak governance while only doing low-stakes marketing copy. The tool is built to surface that gap rather than blend it away.</div>
+    </section>
+
+    <section class="doc-sec" id="sec-3">
+      <h2><span class="sn">03</span>The 12 governance categories being scored</h2>
+      <p>Every one of the 24 questions in Step 3 is tagged to exactly one of these 12 categories, two questions per category. This is the real list, in the order it appears in the assessment:</p>
+      <div class="cat-list">
+        <div class="cat-item"><span class="cn">01</span><div class="ct"><b>AI Governance</b><span>Is there a documented policy, an accountable owner or committee, and periodic management review of AI use?</span></div></div>
+        <div class="cat-item"><span class="cn">02</span><div class="ct"><b>AI Inventory</b><span>Do you know every AI system in use, who owns it, and how much of that inventory is actually captured?</span></div></div>
+        <div class="cat-item"><span class="cn">03</span><div class="ct"><b>AI Risk Classification</b><span>Are systems classified by risk level, and is that classification revisited when systems or their use change?</span></div></div>
+        <div class="cat-item"><span class="cn">04</span><div class="ct"><b>Human Oversight</b><span>Is there a human in the loop for relevant AI-supported decisions, with the ability to review or override them?</span></div></div>
+        <div class="cat-item"><span class="cn">05</span><div class="ct"><b>Data Governance</b><span>Do you know your data's origin and quality, and do you run bias assessments on data and models?</span></div></div>
+        <div class="cat-item"><span class="cn">06</span><div class="ct"><b>Transparency</b><span>Are users told when they're interacting with AI, and is how each system works documented and explainable?</span></div></div>
+        <div class="cat-item"><span class="cn">07</span><div class="ct"><b>Security &amp; Robustness</b><span>Is there pre-deployment testing, and a defined procedure for handling AI failures or malfunctions?</span></div></div>
+        <div class="cat-item"><span class="cn">08</span><div class="ct"><b>Third-party AI Governance</b><span>Are AI vendors assessed before contracting, and are their contracts and terms reviewed periodically?</span></div></div>
+        <div class="cat-item"><span class="cn">09</span><div class="ct"><b>Documentation</b><span>Is there technical documentation for your AI systems, with changes tracked and version traceability?</span></div></div>
+        <div class="cat-item"><span class="cn">10</span><div class="ct"><b>Continuous Monitoring</b><span>Are models monitored after deployment, and are internal audits or periodic reviews actually carried out?</span></div></div>
+        <div class="cat-item"><span class="cn">11</span><div class="ct"><b>AI Literacy</b><span>What share of staff has received AI training, and is that training role-based with internal usage guidelines?</span></div></div>
+        <div class="cat-item"><span class="cn">12</span><div class="ct"><b>Incident Management</b><span>Is there a procedure to log AI-related incidents, and are they analyzed into corrective actions?</span></div></div>
+      </div>
+    </section>
+
+    <section class="doc-sec" id="sec-4">
+      <h2><span class="sn">04</span>Step-by-step: how one category's score is built</h2>
+      <p>Each answer is first normalized to a 0&ndash;1 scale, depending on the question's input type:</p>
+      <div class="formula">
+        <div class="flabel">Normalization &middot; qNorm(question)</div>
+        <code>scale question (0&ndash;4 buttons)  &rarr;  answer <span class="op">/</span> <span class="num">4</span>
+slider question (0&ndash;100%)      &rarr;  answer <span class="op">/</span> <span class="num">100</span>
+yes/no question               &rarr;  1 for yes, 0 for no</code>
+      </div>
+      <p>A category's score is simply the <strong>average of its two questions' normalized values, scaled back up to 0&ndash;100 and rounded</strong>:</p>
+      <div class="formula">
+        <div class="flabel">categoryScore(category)</div>
+        <code>categoryScore <span class="op">=</span> round( average(normalized answers in this category) <span class="op">&times;</span> <span class="num">100</span> )</code>
+      </div>
+      <div class="diagram">
+        <div class="flow frow">
+          <div class="fnode"><span class="ftag">Q1</span><span class="ftitle">Answer &rarr; 0&ndash;1</span><span class="fsub">e.g. scale button "3" &rarr; 3/4 = 0.75</span></div>
+          <div class="farrow">&rarr;</div>
+          <div class="fnode"><span class="ftag">Q2</span><span class="ftitle">Answer &rarr; 0&ndash;1</span><span class="fsub">e.g. scale button "2" &rarr; 2/4 = 0.50</span></div>
+          <div class="farrow">&rarr;</div>
+          <div class="fnode accent"><span class="ftag">category</span><span class="ftitle">Average &times; 100</span><span class="fsub">(0.75 + 0.50) / 2 &times; 100 = 63</span></div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="elabel">Worked example &middot; "Human Oversight"</div>
+        <table>
+          <thead><tr><th>Question</th><th>Raw answer</th><th>Normalized</th></tr></thead>
+          <tbody>
+            <tr><td>Is there human oversight over AI-supported decisions?</td><td>3 / 4</td><td>0.75</td></tr>
+            <tr><td>Can a human review or override an AI decision?</td><td>2 / 4</td><td>0.50</td></tr>
+          </tbody>
+        </table>
+        <p>categoryScore(oversight) = round( (0.75 + 0.50) / 2 &times; 100 ) = <strong>63</strong></p>
+      </div>
+      <p>This same formula runs independently for all 12 categories, producing the 12 numbers (<code style="font-family:'Geist Mono',monospace;color:#d7dcec">cs.governance</code>, <code style="font-family:'Geist Mono',monospace;color:#d7dcec">cs.inventory</code>, etc.) that everything downstream is built from.</p>
+    </section>
+
+    <section class="doc-sec" id="sec-5">
+      <h2><span class="sn">05</span>Step-by-step: overall &amp; composite scores</h2>
+      <p>The headline <strong>overall readiness score</strong> is the plainest possible average, with no weighting at all:</p>
+      <div class="formula">
+        <div class="flabel">overall</div>
+        <code>overall <span class="op">=</span> round( sum(all 12 category scores) <span class="op">/</span> <span class="num">12</span> )</code>
+      </div>
+      <p>Everything else on the results page is a <strong>composite</strong>: a different grouping or weighting of the same 12 category scores, built to answer a more specific question. Three composites are simple, unweighted averages of a handful of related categories:</p>
+      <div class="formula">
+        <div class="flabel">unweighted composites</div>
+        <code>aiGovernance <span class="op">=</span> round( (governance <span class="op">+</span> inventory <span class="op">+</span> riskclass) <span class="op">/</span> <span class="num">3</span> )
+operational  <span class="op">=</span> round( (monitoring <span class="op">+</span> security <span class="op">+</span> incident) <span class="op">/</span> <span class="num">3</span> )
+riskMgmt     <span class="op">=</span> round( (riskclass <span class="op">+</span> security <span class="op">+</span> incident) <span class="op">/</span> <span class="num">3</span> )
+documentation <span class="op">=</span> cs.documentation (shown as-is)
+literacy      <span class="op">=</span> cs.literacy (shown as-is)
+vendor        <span class="op">=</span> cs.thirdparty (shown as-is)
+responsibleAI <span class="op">=</span> overall (same number, different label)</code>
+      </div>
+      <p>The fourth composite, <strong>EU AI Act readiness</strong>, is the only one that uses an explicit weight table. It leans harder on the categories that matter most for regulatory exposure specifically (risk classification, human oversight, transparency, data governance, documentation), and less on the ones that matter for general operational hygiene:</p>
+      <div class="formula">
+        <div class="flabel">euReadiness &middot; weighted average</div>
+        <code>euReadiness <span class="op">=</span> round( sum(categoryScore &times; weight) <span class="op">/</span> sum(weights) )</code>
+      </div>
+      <div class="wbars">
+        <div class="wrow"><span class="wl">AI Risk Classification</span><div class="wt"><i style="width:100%"></i></div><span class="wv">1.2</span></div>
+        <div class="wrow"><span class="wl">Human Oversight</span><div class="wt"><i style="width:100%"></i></div><span class="wv">1.2</span></div>
+        <div class="wrow"><span class="wl">Transparency</span><div class="wt"><i style="width:91.7%"></i></div><span class="wv">1.1</span></div>
+        <div class="wrow"><span class="wl">Data Governance</span><div class="wt"><i style="width:91.7%"></i></div><span class="wv">1.1</span></div>
+        <div class="wrow"><span class="wl">Documentation</span><div class="wt"><i style="width:83.3%"></i></div><span class="wv">1.0</span></div>
+        <div class="wrow"><span class="wl">AI Governance</span><div class="wt"><i style="width:83.3%"></i></div><span class="wv">1.0</span></div>
+        <div class="wrow"><span class="wl">Security &amp; Robustness</span><div class="wt"><i style="width:75%"></i></div><span class="wv">0.9</span></div>
+        <div class="wrow"><span class="wl">Third-party AI Governance</span><div class="wt"><i style="width:75%"></i></div><span class="wv">0.9</span></div>
+      </div>
+      <p style="font-size:12px;color:#8a8a8a">Only these 8 of the 12 categories feed <code style="font-family:'Geist Mono',monospace">euReadiness</code>; Inventory, Security's siblings (Monitoring, Literacy, Incident) are covered by the other composites instead, not by this one.</p>
+      <div class="example">
+        <div class="elabel">Worked example &middot; euReadiness</div>
+        <table>
+          <thead><tr><th>Category</th><th>Score</th><th>Weight</th><th>Score &times; Weight</th></tr></thead>
+          <tbody>
+            <tr><td>AI Risk Classification</td><td>40</td><td>1.2</td><td>48.0</td></tr>
+            <tr><td>Human Oversight</td><td>63</td><td>1.2</td><td>75.6</td></tr>
+            <tr><td>Transparency</td><td>50</td><td>1.1</td><td>55.0</td></tr>
+            <tr><td>Data Governance</td><td>75</td><td>1.1</td><td>82.5</td></tr>
+            <tr><td>Documentation</td><td>25</td><td>1.0</td><td>25.0</td></tr>
+            <tr><td>AI Governance</td><td>63</td><td>1.0</td><td>63.0</td></tr>
+            <tr><td>Security &amp; Robustness</td><td>50</td><td>0.9</td><td>45.0</td></tr>
+            <tr><td>Third-party AI Governance</td><td>38</td><td>0.9</td><td>34.2</td></tr>
+          </tbody>
+        </table>
+        <p>Sum of weights = 8.4. Sum of (score &times; weight) = 428.3. euReadiness = round(428.3 / 8.4) = <strong>51</strong>.</p>
+      </div>
+      <div class="diagram">
+        <div class="flow frow">
+          <div class="fnode accent"><span class="ftag">input</span><span class="ftitle">12 category scores</span><span class="fsub">from section 04, one per governance area</span></div>
+          <div class="farrow">&rarr;</div>
+          <div class="fcol">
+            <div class="fnode"><span class="ftitle">overall</span><span class="fsub">plain average of all 12</span></div>
+            <div class="fnode"><span class="ftitle">5 composites</span><span class="fsub">unweighted groupings (section 05)</span></div>
+            <div class="fnode"><span class="ftitle">euReadiness</span><span class="fsub">weighted average of 8 categories</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-sec" id="sec-6">
+      <h2><span class="sn">06</span>Step-by-step: how the risk tier is derived</h2>
+      <p>The EU AI Act risk tier is computed <strong>entirely from the use cases you selected in Step 2</strong>. It never looks at any governance score. Each use case in the tool carries a fixed indicative tier:</p>
+      <div class="tier-ladder">
+        <div class="tier-row tier-minimal"><span class="tdot"></span><span class="tname">Minimal</span><span class="tex">Customer service, marketing, programming, logistics, document automation, other</span></div>
+        <div class="tier-row tier-limited"><span class="tdot"></span><span class="tname">Limited</span><span class="tex">Chatbots, content generation, recommendation systems</span></div>
+        <div class="tier-row tier-high"><span class="tdot"></span><span class="tname">High</span><span class="tex">HR, recruitment, candidate evaluation, credit/financial scoring, insurance, healthcare, education, critical infrastructure, transport, biometric recognition</span></div>
+        <div class="tier-row tier-prohibited"><span class="tdot"></span><span class="tname">Prohibited</span><span class="tex">Facial recognition, surveillance</span></div>
+      </div>
+      <p>The tier assigned to your company is the <strong>single highest tier among every use case you selected</strong>. One sensitive use case is enough to move the whole result, no matter how many low-risk use cases sit alongside it. Selecting nothing defaults to minimal.</p>
+      <div class="formula">
+        <div class="flabel">classifyRisk()</div>
+        <code>tierOrder <span class="op">=</span> [minimal, limited, high, prohibited]
+tier <span class="op">=</span> "minimal"
+for each selected use case:
+  if that use case's tier ranks higher than the current tier &rarr; tier <span class="op">=</span> that use case's tier
+return tier</code>
+      </div>
+      <div class="note"><strong>Why the separation matters:</strong> a company with a 90/100 governance score that also does facial recognition still lands in "Prohibited: needs legal review." Conversely, a company with weak governance but only marketing/customer-service AI stays "Minimal." The tier is a statement about <em>what your AI does</em>, not about <em>how well you run it</em>. The two are reported separately on purpose.</div>
+    </section>
+
+    <section class="doc-sec" id="sec-7">
+      <h2><span class="sn">07</span>Step-by-step: the risk exposure band</h2>
+      <p>The colored badge on the results page ("Low / Medium / High risk exposure") is a third, practical signal: it combines the risk tier from section 06 with the EU AI Act readiness score from section 05, so a single glance tells you both what's at stake and how prepared you are for it.</p>
+      <div class="formula">
+        <div class="flabel">riskId &middot; exposure band</div>
+        <code>tierWeight <span class="op">=</span> { minimal: <span class="num">0</span>, limited: <span class="num">1</span>, high: <span class="num">2</span>, prohibited: <span class="num">3</span> }[tier]
+exposureBasis <span class="op">=</span> tierWeight <span class="op">&times;</span> <span class="num">22</span>  <span class="op">+</span>  (<span class="num">100</span> <span class="op">-</span> euReadiness) <span class="op">&times;</span> <span class="num">0.5</span>
+
+riskId <span class="op">=</span> "high"    if exposureBasis <span class="op">&ge;</span> <span class="num">70</span>
+riskId <span class="op">=</span> "medium"  if exposureBasis <span class="op">&ge;</span> <span class="num">38</span>
+riskId <span class="op">=</span> "low"     otherwise</code>
+      </div>
+      <div class="diagram">
+        <div class="flow frow">
+          <div class="fnode"><span class="ftag">step 2</span><span class="ftitle">Selected use cases</span><span class="fsub">&rarr; risk tier (minimal/limited/high/prohibited)</span></div>
+          <div class="farrow">+</div>
+          <div class="fnode"><span class="ftag">step 3</span><span class="ftitle">euReadiness score</span><span class="fsub">from the weighted composite in section 05</span></div>
+        </div>
+        <div class="flow frow" style="margin-top:4px">
+          <div class="fnode accent" style="min-width:100%"><span class="ftag">combined</span><span class="ftitle">exposureBasis = tierWeight &times; 22 + (100 &minus; euReadiness) &times; 0.5</span><span class="fsub">&rarr; risk exposure band: low / medium / high</span></div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="elabel">Worked example</div>
+        <p>Continuing from section 05: tier = "high" (tierWeight = 2), euReadiness = 51.</p>
+        <p>exposureBasis = 2 &times; 22 + (100 &minus; 51) &times; 0.5 = 44 + 24.5 = <strong>68.5</strong> &rarr; below 70, at or above 38 &rarr; riskId = <strong>"medium"</strong>.</p>
+      </div>
+    </section>
+
+    <section class="doc-sec" id="sec-8">
+      <h2><span class="sn">08</span>Strengths, priority gaps &amp; the obligations checklist</h2>
+      <p>The 12 category scores from section 04 are sorted from highest to lowest. The <strong>top 3</strong> become your reported "strengths"; the <strong>bottom 3</strong> (reversed so the weakest appears first) become your "priority gaps." Both lists are recomputed every time. They are never templated.</p>
+      <p>The obligations checklist maps 11 of the 12 categories (every one except Security &amp; Robustness, which is folded into the operational composite instead) onto a plain-language status, purely from that category's score:</p>
+      <div class="status-legend">
+        <div class="row"><span class="status-pill st-strong"><span class="d"></span>Strong</span>score &ge; 75</div>
+        <div class="row"><span class="status-pill st-partial"><span class="d"></span>Partial</span>score &ge; 50</div>
+        <div class="row"><span class="status-pill st-needs"><span class="d"></span>Needs improvement</span>score &ge; 25</div>
+        <div class="row"><span class="status-pill st-missing"><span class="d"></span>Missing</span>score &lt; 25</div>
+      </div>
+      <div class="formula">
+        <div class="flabel">statusOf(score)</div>
+        <code>score <span class="op">&ge;</span> <span class="num">75</span> &rarr; Strong
+score <span class="op">&ge;</span> <span class="num">50</span> &rarr; Partial
+score <span class="op">&ge;</span> <span class="num">25</span> &rarr; Needs improvement
+otherwise    &rarr; Missing</code>
+      </div>
+    </section>
+
+    <section class="doc-sec" id="sec-9">
+      <h2><span class="sn">09</span>The 30/60/90-day roadmap</h2>
+      <p>The roadmap is not a generic template. It is assembled directly from your 3 priority gaps identified in section 08. Each of the 12 categories has a fixed set of three suggested actions (one for the first 30 days, one for days 30&ndash;60, one for days 60&ndash;90). The roadmap simply pulls those three actions for your 3 lowest-scoring categories and lays them out in three columns.</p>
+      <div class="diagram">
+        <div class="flow frow">
+          <div class="fnode accent"><span class="ftag">input</span><span class="ftitle">Your 3 priority gaps</span><span class="fsub">the 3 lowest-scoring categories, from section 08</span></div>
+          <div class="farrow">&rarr;</div>
+          <div class="fnode"><span class="ftitle">First 30 days</span><span class="fsub">3 actions, one per gap</span></div>
+          <div class="fnode"><span class="ftitle">Days 30&ndash;60</span><span class="fsub">3 actions, one per gap</span></div>
+          <div class="fnode"><span class="ftitle">Days 60&ndash;90</span><span class="fsub">3 actions, one per gap</span></div>
+        </div>
+      </div>
+      <p>Change your answers, and different categories will fall into the bottom 3. The roadmap changes with them.</p>
+    </section>
+
+    <section class="doc-sec" id="sec-10">
+      <h2><span class="sn">10</span>The optional AI-written notes layer</h2>
+      <p>Everything above runs with plain JavaScript, in your browser, before this step. Once the report is rendered, the page optionally sends a small, already-computed summary (your industry, company size, country, the overall and EU AI Act readiness scores, your risk tier and exposure band, your maturity level label, and the names, not the details, of your 3 strengths and 3 gaps) to a Humane Theory serverless endpoint, which forwards it to a free-tier third-party language model to write a short diagnosis and, occasionally, flag something genuinely notable at the top of the page.</p>
+      <p>Two things are true of this step by design: it only ever receives labels and numbers that were already computed above, <strong>never your raw answers</strong> to the 24 questions; and it can only add commentary text and, rarely, an alert banner. It has no path back into the scores, tier, exposure band, or roadmap you've already seen. A top-of-page alert is added only when the tier is "high" or "prohibited" combined with a weak result, or when a result is unusually strong and consistent across every category. Most reports get no alert at all. For the full data-handling explanation, see the <a href="../../privacy-policy/">Privacy Policy</a>.</p>
+    </section>
+
+    <section class="doc-sec" id="sec-11">
+      <h2><span class="sn">11</span>Limitations and honest caveats</h2>
+      <ul>
+        <li>This is a self-assessment aid built on general AI-governance best practice and publicly available EU AI Act material. It is not a certified audit and carries no legal weight.</li>
+        <li>The use-case &rarr; tier mapping in section 06 is indicative and simplified; the actual EU AI Act text applies more nuanced criteria that a specialist should evaluate for borderline cases.</li>
+        <li>Every number depends entirely on the honesty and accuracy of your own answers. There is no external verification of anything you enter.</li>
+        <li>The optional AI notes layer in section 10 can occasionally be wrong or generic, like any language model output; treat it as commentary, not as an authoritative finding.</li>
+      </ul>
+      <p>For the full legal terms governing use of this tool, see the <a href="../../terms-of-use/">Terms of Use</a>. For how your data is handled end to end, see the <a href="../../privacy-policy/">Privacy Policy</a>.</p>
+    </section>
+
+    <div class="footnav">
+      <a class="btn btn-dark" href="../">Run the assessment &rarr;</a>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-trust">
+      <span class="ft-pill">AIGEA</span>
+      <h3>Part of AIGEA.</h3>
+      <p>Humane Theory is the applied-systems arm of AIGEA, the Artificial Intelligence Governance &amp; Ethics Agency. AIGEA researches how AI should be governed and used responsibly; Humane Theory builds the models, tools and systems that put those principles to work inside real companies, with a human always able to check what the AI did and why.</p>
+    </div>
+    <div class="foot-top">
+      <a class="foot-mark" href="../../"><img src="../../logo-humanetheory.svg" alt="Humane Theory"></a>
+      <div class="foot-cols">
+        <div class="col"><h4>Project</h4><ul>
+          <li><a href="../../statement/">Statement</a></li>
+          <li><a href="../../#systems">Systems</a></li>
+          <li><a href="https://aigea.org" target="_blank" rel="noopener">About AIGEA</a></li>
+        </ul></div>
+        <div class="col"><h4>Social</h4><ul>
+          <li><a href="#" onclick="return false">LinkedIn</a></li>
+          <li><a href="#" onclick="return false">X</a></li>
+        </ul></div>
+        <div class="col"><h4>Contact</h4><ul>
+          <li><a href="mailto:info@aigea.org">info@aigea.org</a></li>
+          <li><a href="https://aigea.org" target="_blank" rel="noopener">aigea.org</a></li>
+        </ul></div>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <span class="copy">COPYRIGHT ©2026 HUMANE THEORY</span>
+      <a class="flink" href="../../privacy-policy/">Privacy Policy</a>
+      <a class="flink" href="../../terms-of-use/">Terms of Use</a>
+      <a class="flink" href="../../?topic=custom#contact">Custom Work</a>
+    </div>
+  </div>
+  <div class="giant">Humane Theory</div>
+</footer>
+
+<script>
+/* Systems dropdown */
+const sysItem = document.getElementById('systems-item');
+const sysBtn = document.getElementById('systems-btn');
+sysBtn.addEventListener('click', e=>{
+  e.stopPropagation();
+  sysItem.classList.toggle('open');
+  sysBtn.setAttribute('aria-expanded', sysItem.classList.contains('open'));
+});
+document.addEventListener('click', ()=> sysItem.classList.remove('open'));
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') sysItem.classList.remove('open'); });
+
+/* mobile hamburger menu */
+const menuToggle = document.getElementById('menu-toggle');
+const mobilePanel = document.getElementById('mobile-panel');
+menuToggle.addEventListener('click', e=>{
+  e.stopPropagation();
+  const open = mobilePanel.classList.toggle('open');
+  menuToggle.setAttribute('aria-expanded', open);
+});
+mobilePanel.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=>{
+  mobilePanel.classList.remove('open');
+  menuToggle.setAttribute('aria-expanded', 'false');
+}));
+document.addEventListener('click', e=>{
+  if(mobilePanel.classList.contains('open') && !mobilePanel.contains(e.target) && e.target!==menuToggle){
+    mobilePanel.classList.remove('open');
+    menuToggle.setAttribute('aria-expanded', 'false');
+  }
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ mobilePanel.classList.remove('open'); menuToggle.setAttribute('aria-expanded','false'); } });
+
+/* Topbar blur on scroll */
+const topbar = document.getElementById('topbar');
+function onTopbarScroll(){ topbar.classList.toggle('scrolled', window.scrollY > 40); }
+window.addEventListener('scroll', onTopbarScroll, {passive:true});
+onTopbarScroll();
+
+/* TOC scrollspy */
+const tocLinks = Array.from(document.querySelectorAll('#toc a'));
+const secs = tocLinks.map(a=>document.querySelector(a.getAttribute('href')));
+function onSpy(){
+  let idx = 0;
+  const y = window.scrollY + 130;
+  secs.forEach((s,i)=>{ if(s && s.offsetTop <= y) idx = i; });
+  tocLinks.forEach((a,i)=>a.classList.toggle('active', i===idx));
+}
+window.addEventListener('scroll', onSpy, {passive:true});
+onSpy();
+</script>
+</body>
+</html>

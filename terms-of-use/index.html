@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms of Use | Humane Theory</title>
+<link rel="icon" type="image/svg+xml" href="../favicons/favicon.svg">
+<link rel="icon" type="image/png" href="../favicons/favicon.png">
+<link rel="shortcut icon" href="../favicons/favicon.ico">
+<style>
+@font-face{font-family:"Geist";src:url("../fonts/Geist-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Geist";src:url("../fonts/Geist-Italic-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:italic;font-display:swap}
+@font-face{font-family:"Geist Mono";src:url("../fonts/GeistMono-VariableFont_wght.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Geist Pixel";src:url("../fonts/GeistPixel-Square.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+
+:root{--card:#161616;--card-border:#262626;--maxw:1180px;--pad:40px;--btn-radius:9px}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;scroll-behavior:smooth}
+body{font-family:"Geist",system-ui,sans-serif;color:#f2f2f2;background:#000000;min-height:100vh;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad)}
+
+.topbar{position:fixed;top:0;left:0;right:0;z-index:50;background:transparent;transition:background .3s ease,border-color .3s ease}
+.topbar.scrolled{background:rgba(0,0,0,.7);-webkit-backdrop-filter:saturate(160%) blur(14px);backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid #1c1c1c}
+.header-row{display:flex;align-items:center;justify-content:space-between;padding-top:26px;padding-bottom:16px;gap:24px}
+.logo{display:flex;align-items:center;gap:9px;padding:6px 10px;border-radius:999px}
+.logo img{height:20px;width:auto;display:block;filter:brightness(0) invert(1)}
+
+.menu-toggle{display:none;align-items:center;justify-content:center;width:34px;height:34px;color:#e6e6e4;flex:0 0 auto;position:relative;z-index:46}
+.menu-toggle svg{width:17px;height:17px}
+.menu-toggle .icon-close{display:none}
+.menu-toggle[aria-expanded="true"] .icon-menu{display:none}
+.menu-toggle[aria-expanded="true"] .icon-close{display:block}
+.mobile-panel{isolation:isolate;position:fixed;inset:0;z-index:44;background:#0a0a0a;padding:88px 24px 26px;height:100vh;height:100dvh;overflow-y:auto;transform:translateY(-8px);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
+.mobile-panel.open{opacity:1;transform:none;pointer-events:auto}
+.mobile-panel .msec{font-family:"Geist Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#6d6d6d;margin:20px 0 8px}
+.mobile-panel .msec:first-child{margin-top:0}
+.mobile-panel .mlink{display:block;padding:12px 2px;font-size:15px;color:#e6e6e4;border-bottom:1px solid #1c1c1c}
+.mobile-panel .mcontact{display:flex;width:100%;height:44px;margin-top:22px}
+
+.main-nav{display:flex;align-items:center;gap:6px;position:relative}
+.nav-item{position:relative}
+.nav-link{display:flex;align-items:center;gap:5px;padding:9px 14px;border-radius:var(--btn-radius);font-size:13.5px;color:#c7c7c7;transition:color .18s ease,background .18s ease}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,.06)}
+.nav-link svg{width:10px;height:10px;opacity:.7;transition:transform .2s ease}
+.nav-item.open .nav-link svg{transform:rotate(180deg)}
+
+.dropdown{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(-6px);min-width:190px;background:#0d0d0d;border:1px solid #232323;border-radius:12px;padding:6px;box-shadow:0 20px 50px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease}
+.nav-item.open .dropdown{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.dropdown a{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:8px;font-size:13px;color:#d4d4d4;position:relative}
+.dropdown a:hover{background:rgba(255,255,255,.06);color:#fff}
+.dropdown a .dot{width:4px;height:4px;border-radius:1px;background:#5a5a5a;flex:0 0 auto}
+.dropdown a.disabled,.mlink.disabled{opacity:.5;cursor:default}
+.dropdown a.disabled:hover,.mlink.disabled:hover{background:transparent;color:#d4d4d4}
+
+.mtag{margin-left:3px;font-weight:600;letter-spacing:.02em;line-height:1;background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.mtag-new{font-size:10px;position:relative;top:-.5em;background-image:linear-gradient(180deg,#836464 0%,#B58A8A 100%)}
+.mtag-soon{font-size:8px;vertical-align:middle;background-image:linear-gradient(180deg,#525252 0%,#727272 100%)}
+
+.header-right{display:flex;align-items:center;gap:18px}
+.header-right .btn{height:30px;padding:0 16px;font-size:13.5px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;border-radius:var(--btn-radius);padding:0 22px;font-size:14px;font-weight:500;white-space:nowrap;transition:filter .15s ease,transform .1s ease}
+.btn:active{transform:translateY(1px)}
+.btn-ghost{background:linear-gradient(180deg,#2e2e2e 0%,#161616 100%);border:1px solid #333;box-shadow:inset 0 1px 1px rgba(255,255,255,.1), inset 0 -1px 2px rgba(0,0,0,.6), 0 1px 2px rgba(0,0,0,.35);color:#e6e6e4;text-shadow:0 1px 1px rgba(0,0,0,.7)}
+.btn-ghost:hover{filter:brightness(1.18)}
+
+.legal{padding-top:150px;padding-bottom:110px;max-width:740px}
+.section-label{font-family:"Geist Mono",monospace;font-size:14px;color:#f2f2f2;font-weight:500;margin-bottom:20px}
+.legal h1{font-size:clamp(26px,3.6vw,38px);font-weight:500;letter-spacing:-.01em;color:#e6e6e4}
+.legal .updated{margin-top:12px;font-family:"Geist Mono",monospace;font-size:11.5px;color:#6d6d6d;text-transform:uppercase;letter-spacing:.04em}
+.legal .lede{margin-top:20px;font-size:14.5px;line-height:1.65;color:#9a9a9a;font-weight:300}
+.legal h2{margin-top:38px;margin-bottom:6px;font-size:17px;font-weight:600;color:#e6e6e4;letter-spacing:-.005em}
+.legal p{margin-top:12px;font-size:14px;line-height:1.7;color:#9a9a9a;font-weight:300}
+.legal ul,.legal ol{margin-top:12px;padding-left:20px;display:flex;flex-direction:column;gap:8px}
+.legal li{font-size:14px;line-height:1.6;color:#9a9a9a;font-weight:300}
+.legal strong{color:#d4d4d4;font-weight:600}
+.legal a.inline{color:#b8b8b6;text-decoration:underline;text-underline-offset:2px}
+
+footer{background:#000000;padding:54px 0 0;position:relative;overflow:hidden;border-top:1px solid #1c1c1c}
+.foot-trust{padding-bottom:40px;border-bottom:1px solid #1c1c1c;margin-bottom:40px}
+.ft-pill{display:inline-flex;font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#8f8f8f;border:1px solid #262626;border-radius:999px;padding:4px 11px;margin-bottom:14px}
+.foot-trust h3{font-size:17px;font-weight:500;color:#e6e6e4;letter-spacing:-.01em;margin-bottom:10px}
+.foot-trust p{max-width:640px;font-size:13px;line-height:1.65;color:#8a8a8a;font-weight:300}
+.foot-top{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap}
+.foot-mark{display:inline-flex;align-items:center}
+.foot-mark img{height:24px;width:auto;filter:brightness(0) invert(1) url(#innerSm)}
+.foot-cols{display:flex;gap:70px}
+.foot-cols .col h4{font-size:10px;letter-spacing:.08em;color:#999999;text-transform:uppercase;margin-bottom:14px;font-weight:600}
+.foot-cols .col ul{list-style:none}
+.foot-cols .col li{font-size:13px;color:#4e4e4e;margin-bottom:8px}
+.foot-cols .col a:hover{color:#999999}
+.foot-legal{margin-top:44px;display:flex;flex-direction:column;gap:8px}
+.foot-legal .copy{font-size:10px;color:#4e4e4e;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
+.foot-legal .flink{display:block;font-size:12px;color:#999999}
+.foot-legal .flink:hover{color:#e6e6e4}
+.giant{margin-top:20px;text-align:center;font-weight:500;font-size:clamp(70px,20vw,260px);line-height:.82;letter-spacing:-.03em;color:#303030;white-space:nowrap;user-select:none;margin-bottom:-.16em;filter:url(#innerGiant);pointer-events:none}
+@media(max-width:560px){.foot-top{flex-direction:column;gap:24px}.foot-cols{gap:40px;flex-wrap:wrap}}
+
+.foot-strip{margin-top:70px;padding:26px 0 34px;font-family:"Geist Pixel","Geist Mono",monospace;font-size:10.5px;color:#8f8f8f;text-transform:uppercase;letter-spacing:.04em}
+
+@media(max-width:640px){.main-nav,.header-right{display:none}.menu-toggle{display:flex}.header-row{padding-left:24px;padding-right:24px}}
+@media(max-width:560px){:root{--pad:22px}.legal{padding-top:120px}}
+</style>
+</head>
+<body>
+
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="innerSm" x="-30%" y="-30%" width="160%" height="160%"><feOffset dx="0" dy="0.8"/><feGaussianBlur stdDeviation="0.7" result="off"/><feComposite operator="out" in="SourceGraphic" in2="off" result="inv"/><feFlood flood-color="#000" flood-opacity="0.95"/><feComposite operator="in" in2="inv" result="shd"/><feComposite operator="over" in="shd" in2="SourceGraphic"/></filter>
+  <filter id="innerGiant" x="-20%" y="-20%" width="140%" height="140%"><feOffset dx="0" dy="6"/><feGaussianBlur stdDeviation="7" result="off"/><feComposite operator="out" in="SourceGraphic" in2="off" result="inv"/><feFlood flood-color="#000000" flood-opacity="0.85"/><feComposite operator="in" in2="inv" result="shd"/><feComposite operator="over" in="shd" in2="SourceGraphic"/></filter>
+</defs></svg>
+<div class="topbar" id="topbar">
+  <div class="wrap header-row">
+    <a class="logo" href="../" aria-label="Humane Theory">
+      <img src="../logo-humanetheory.svg" alt="Humane Theory">
+    </a>
+    <nav class="main-nav" id="main-nav">
+      <div class="nav-item" id="systems-item">
+        <button class="nav-link" id="systems-btn" aria-expanded="false">
+          Systems
+          <svg viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="dropdown">
+          <a href="../airoi/"><span class="dot"></span>AI ROI</a>
+          <a href="../aiges/"><span class="dot"></span>AI ACT</a>
+          <a href="../bdash/"><span class="dot"></span>BDash</a>
+          <a href="../coradar/"><span class="dot"></span>CoRadar</a>
+          <a class="disabled" href="#" onclick="return false" aria-disabled="true"><span class="dot"></span>ReputIA<span class="mtag mtag-soon">Coming Soon</span></a>
+        </div>
+      </div>
+      <a class="nav-link" href="../#about">About</a>
+      <a class="nav-link" href="../statement/">Statement</a>
+    </nav>
+    <div class="header-right">
+      <a class="btn btn-ghost" href="../?topic=general#contact">Contact</a>
+    </div>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Menu" aria-expanded="false">
+      <svg class="icon-menu" viewBox="0 0 20 14" fill="none"><path d="M1 1h18M1 7h18M1 13h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <svg class="icon-close" viewBox="0 0 20 20" fill="none"><path d="M2 2l16 16M18 2L2 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="mobile-panel" id="mobile-panel">
+    <div class="msec">Systems</div>
+    <a class="mlink" href="../airoi/">AI ROI</a>
+    <a class="mlink" href="../aiges/">AI ACT</a>
+    <a class="mlink" href="../bdash/">BDash</a>
+    <a class="mlink" href="../coradar/">CoRadar</a>
+    <a class="mlink disabled" href="#" onclick="return false" aria-disabled="true">ReputIA<span class="mtag mtag-soon">Coming Soon</span></a>
+    <div class="msec">More</div>
+    <a class="mlink" href="../#about">About</a>
+    <a class="mlink" href="../statement/">Statement</a>
+    <a class="btn btn-ghost mcontact" href="../?topic=general#contact">Contact</a>
+  </div>
+</div>
+
+<main class="wrap legal">
+  <div class="section-label">/terms-of-use</div>
+  <h1>Terms of Use</h1>
+  <div class="updated">Last updated: September 2026</div>
+  <p class="lede">These terms govern your use of the Humane Theory website and the systems published on it (AI ROI, AI-ACT Comp, CoRadar, BDash, and any others we add over time). Humane Theory is operated by AIGEA, the Artificial Intelligence Governance &amp; Ethics Agency. By using this site, you agree to these terms.</p>
+
+  <h2>1. What Humane Theory is</h2>
+  <p>Humane Theory builds practical tools and reference systems that help organizations think through where and how to use AI: estimating return on investment, assessing governance readiness, monitoring competitors, and coordinating AI-assisted workflows. These are <strong>planning and diagnostic tools</strong>, not certified assessments, audits, or professional deliverables.</p>
+
+  <h2>2. Not professional advice</h2>
+  <p>Nothing produced by this site, including the AI ROI calculator, the AI-ACT Comp readiness assessment, or any AI-generated commentary, constitutes financial, legal, tax, or regulatory advice. Figures are indicative estimates built on the assumptions you provide and general modeling logic; they are not a quote, a guarantee, or a substitute for qualified professional review. Decisions with real financial, legal or compliance consequences should be checked with a qualified professional before you act on them.</p>
+
+  <h2>3. AI-generated content</h2>
+  <p>Some parts of these tools (for example, the narrative analysis on the AI ROI calculator, or the notes on the AI-ACT assessment) are written by third-party AI language models reviewing figures that our own deterministic logic already computed. That content can be imprecise, incomplete, or occasionally wrong, in the way any AI-generated text can be. It is offered as a starting point for your own judgment, not as a verified conclusion. See our <a class="inline" href="../privacy-policy/">Privacy Policy</a> for how that process handles your data.</p>
+
+  <h2>4. Acceptable use</h2>
+  <p>You agree not to: (a) use this site to build or train a competing product without our permission; (b) attempt to disrupt, overload, or reverse-engineer the underlying systems; (c) submit unlawful, abusive, or knowingly false information through any form on this site; or (d) misrepresent outputs from these tools as official certifications, audits, or guarantees to a third party.</p>
+
+  <h2>5. Intellectual property</h2>
+  <p>The design, code, copy, and system logic on this site belong to AIGEA / Humane Theory unless otherwise noted. You may use the calculators and their outputs for your own internal evaluation. You may not copy, resell, or redistribute the underlying tools as your own product.</p>
+
+  <h2>6. No warranty</h2>
+  <p>This site and its tools are provided <strong>as is</strong>, without warranties of any kind, express or implied, including accuracy, fitness for a particular purpose, or uninterrupted availability. AI model prices, capabilities, and market conditions referenced in our estimates change often; figures are illustrative, not current market quotes.</p>
+
+  <h2>7. Limitation of liability</h2>
+  <p>To the fullest extent permitted by law, Humane Theory and AIGEA are not liable for any indirect, incidental, or consequential damages arising from your use of, or reliance on, this site or its outputs, including business decisions made using our estimates.</p>
+
+  <h2>8. Changes to these terms</h2>
+  <p>We may update these terms as the product evolves. Material changes will update the date at the top of this page. Continued use of the site after a change means you accept the updated terms.</p>
+
+  <h2>9. Governing law</h2>
+  <p>These terms are governed by the laws of Spain, without regard to conflict-of-law principles, without prejudice to any mandatory consumer-protection rights you may have under the law of your country of residence.</p>
+
+  <h2>10. Contact</h2>
+  <p>Questions about these terms can be sent to <a class="inline" href="mailto:info@aigea.org">info@aigea.org</a>.</p>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-trust">
+      <span class="ft-pill">AIGEA</span>
+      <h3>Part of AIGEA.</h3>
+      <p>Humane Theory is the applied-systems arm of AIGEA, the Artificial Intelligence Governance &amp; Ethics Agency. AIGEA researches how AI should be governed and used responsibly; Humane Theory builds the models, tools and systems that put those principles to work inside real companies, with a human always able to check what the AI did and why.</p>
+    </div>
+    <div class="foot-top">
+      <a class="foot-mark" href="../"><img src="../logo-humanetheory.svg" alt="Humane Theory"></a>
+      <div class="foot-cols">
+        <div class="col"><h4>Project</h4><ul>
+          <li><a href="../statement/">Statement</a></li>
+          <li><a href="../#systems">Systems</a></li>
+          <li><a href="https://aigea.org" target="_blank" rel="noopener">About AIGEA</a></li>
+        </ul></div>
+        <div class="col"><h4>Social</h4><ul>
+          <li><a href="#" onclick="return false">LinkedIn</a></li>
+          <li><a href="#" onclick="return false">X</a></li>
+        </ul></div>
+        <div class="col"><h4>Contact</h4><ul>
+          <li><a href="mailto:info@aigea.org">info@aigea.org</a></li>
+          <li><a href="https://aigea.org" target="_blank" rel="noopener">aigea.org</a></li>
+        </ul></div>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <span class="copy">COPYRIGHT ©2026 HUMANE THEORY</span>
+      <a class="flink" href="../privacy-policy/">Privacy Policy</a>
+      <a class="flink" href="../terms-of-use/">Terms of Use</a>
+      <a class="flink" href="../?topic=custom#contact">Custom Work</a>
+    </div>
+  </div>
+  <div class="giant">Humane Theory</div>
+</footer>
+
+<script>
+const sysItem = document.getElementById('systems-item');
+const sysBtn = document.getElementById('systems-btn');
+sysBtn.addEventListener('click', e=>{
+  e.stopPropagation();
+  sysItem.classList.toggle('open');
+  sysBtn.setAttribute('aria-expanded', sysItem.classList.contains('open'));
+});
+document.addEventListener('click', ()=> sysItem.classList.remove('open'));
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') sysItem.classList.remove('open'); });
+
+const menuToggle = document.getElementById('menu-toggle');
+const mobilePanel = document.getElementById('mobile-panel');
+menuToggle.addEventListener('click', e=>{
+  e.stopPropagation();
+  const open = mobilePanel.classList.toggle('open');
+  menuToggle.setAttribute('aria-expanded', open);
+});
+mobilePanel.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=>{
+  mobilePanel.classList.remove('open');
+  menuToggle.setAttribute('aria-expanded', 'false');
+}));
+document.addEventListener('click', e=>{
+  if(mobilePanel.classList.contains('open') && !mobilePanel.contains(e.target) && e.target!==menuToggle){
+    mobilePanel.classList.remove('open');
+    menuToggle.setAttribute('aria-expanded', 'false');
+  }
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ mobilePanel.classList.remove('open'); menuToggle.setAttribute('aria-expanded','false'); } });
+
+const topbar = document.getElementById('topbar');
+function onTopbarScroll(){ topbar.classList.toggle('scrolled', window.scrollY > 40); }
+window.addEventListener('scroll', onTopbarScroll, {passive:true});
+onTopbarScroll();
+</script>
+</body>
+</html>
